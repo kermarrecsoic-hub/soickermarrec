@@ -31,7 +31,7 @@ body { min-height: 100svh; }
 .navigation a:first-child { margin-bottom: 12px; }
 
 /* Jede Schrift ist 0,4 Sekunden sichtbar: 3 × 0,4 = 1,2 s. */
-.navigation a.is-active { animation: font-cycle 1.2s step-end infinite; }
+.navigation a.is-active { animation: font-cycle 1.5s step-end infinite; }
 @keyframes font-cycle {
   0%, 33.332% { font-family: Arial, Helvetica, sans-serif; }
   33.333%, 66.665% { font-family: Baskerville, "Baskerville Old Face", Georgia, serif; }
