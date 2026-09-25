@@ -18,9 +18,9 @@ body { min-height: 100svh; }
 }
 .navigation a {
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
-  letter-spacing: 0;
+  letter-spacing: 0.2;
   line-height: 1.1;
   color: inherit;
   text-decoration: none;
