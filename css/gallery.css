@@ -69,3 +69,17 @@ a { color:inherit; text-decoration:none; }
  #zoom-image { margin:12dvh auto; max-height:76dvh; max-width:94vw; }
 }
 @media(prefers-reduced-motion:reduce) { html{scroll-behavior:auto;} .detail{transition:none;} }
+
+.copyright {
+  position: fixed;
+  bottom: 14px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  color: #999;
+  z-index: 100;
+  pointer-events: none;
+}
