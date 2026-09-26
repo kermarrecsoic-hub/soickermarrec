@@ -80,25 +80,26 @@ body { min-height: 100svh; }
   z-index: 100;
   pointer-events: none;
 }
-/* Sanfter Auftritt der Landingpage-Links */
-.navigation a {
-animation: intro-appear 0.55s ease-out both;
+/* Startanimation: nur beim Laden der Landingpage */
+
+.navigation {
+  animation: page-intro 0.8s ease-out both;
 }
-.navigation a:nth-child(1) { animation-delay: 0.05s; }
-.navigation a:nth-child(2) { animation-delay: 0.11s; }
-.navigation a:nth-child(3) { animation-delay: 0.17s; }
-.navigation a:nth-child(4) { animation-delay: 0.23s; }
-.navigation a:nth-child(5) { animation-delay: 0.29s; }
-.navigation a:nth-child(6) { animation-delay: 0.35s; }
-.navigation a:nth-child(7) { animation-delay: 0.41s; }
-@keyframes intro-appear {
-from { opacity: 0; transform: translateY(7px); }
-to { opacity: 1; transform: translateY(0); }
+
+@keyframes page-intro {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
 @media (prefers-reduced-motion: reduce) {
-.navigation a {
-animation: none;
-opacity: 1;
-transform: none;
-}
+  .navigation {
+    animation: none;
+  }
 }
