@@ -10,6 +10,7 @@ a { color:inherit; text-decoration:none; }
 .back-link { left:9.2%; font-size:17px; line-height:1; pointer-events:auto; }
 .current-section { left:50%; transform:translateX(-50%); white-space:nowrap; }
 .site-nav { right:6.2%; display:flex; align-items:flex-end; flex-direction:column; gap:0; min-width:120px; text-align:right; line-height:16px; pointer-events:auto; }
+.site-nav a:first-child { margin-bottom:12px; }
 .site-nav a[aria-current="page"] { color:var(--muted); }
 .site-nav a:hover,.back-link:hover { color:#a0a0a0; }
 .artwork-list { padding:calc(var(--header-bottom) + 36px) 5% 10vh; display:flex; flex-direction:column; align-items:center; gap:clamp(130px,23vh,270px); }
@@ -46,3 +47,24 @@ a { color:inherit; text-decoration:none; }
 }
 @media(prefers-reduced-motion:reduce) { html{scroll-behavior:auto;} .detail{transition:none;} }
 .copyright { position:fixed; bottom:14px; left:0; width:100%; text-align:center; font-family:Arial,sans-serif; font-size:10px; font-weight:400; color:#999; z-index:100; pointer-events:none; }
+
+/* Beliebig viele gleichwertige Hauptbilder als ruhige Bildfolge vor dem Werktitel. */
+.artwork-images.is-series { display:flex; flex-direction:column; align-items:center; gap:clamp(28px,7vh,90px); }
+.artwork-images.is-series .hero-wrap { width:100%; }
+.artwork-images.is-series .artwork-main { margin:0 auto; }
+/* Eine Bilderfolge besitzt keine seitlich schwebenden Detailbilder; sie ist selbst die Serie. */
+.artwork-images.is-series .detail { display:none; }
+.artwork-images.is-series .hero-wrap { position:relative; }
+.artwork-images.is-series .hero-wrap .artwork-main { max-width:min(88vw,850px);max-height:80svh; }
+.editorial-page { padding:calc(var(--header-bottom) + 40px) max(7%,20px) 110px;max-width:850px;margin:0 auto; }
+.editorial-picture { display:block;max-width:100%;max-height:75svh;width:auto;height:auto;object-fit:contain;margin:0 auto 50px; }
+.editorial-text { font:inherit;line-height:1.45;white-space:pre-line; }
+.editorial-contact { margin-top:32px;display:flex;flex-direction:column;align-items:flex-start;gap:8px; }
+.editorial-contact a { text-decoration:none;overflow-wrap:anywhere; }
+.editorial-contact a:hover { color:#999; }
+@media(max-width:700px) {
+  .artwork-images.is-series { gap:36px; }
+  .artwork-images.is-series .hero-wrap .artwork-main { max-width:88vw;max-height:66svh; }
+  .editorial-page { padding-top:calc(var(--header-bottom) + 35px); }
+  .editorial-picture { margin-bottom:34px; }
+}
