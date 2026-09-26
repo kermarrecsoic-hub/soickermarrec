@@ -65,3 +65,14 @@
     zoomImage.removeAttribute('src'); zoomImage.classList.remove('zoomed');
   });
 })();
+document.addEventListener("contextmenu", (event) => {
+  if (event.target.closest("img")) {
+    event.preventDefault();
+  }
+});
+
+document.addEventListener("dragstart", (event) => {
+  if (event.target.closest("img")) {
+    event.preventDefault();
+  }
+});
