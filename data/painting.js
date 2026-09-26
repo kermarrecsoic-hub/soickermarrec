@@ -8,7 +8,7 @@ window.PAINTING_WORKS = [
   {
     title: "Dante",
     medium: "acrylic, ink, kyougi on canvas",
-    dimensions: "65 × 46 cm",
+    dimensions: "65 × 50 cm",
     availability: "unavailable",
     text: "", // Hier kannst du einen eigenen längeren Beschreibungstext eintragen.
     image: "../images/painting/dante/main.jpg",
@@ -18,16 +18,17 @@ window.PAINTING_WORKS = [
       right: "../images/painting/dante/detail-right.jpg"
     }
   },
-  {
-    // Demonstriert das Scrollen. Sobald du dein zweites Werk hast: ersetzen oder löschen.
-    demo: true,
-    title: "Zweites Werk – Platzhalter",
-    medium: "Hier Material und Technik eintragen",
-    dimensions: "Maße ergänzen",
+   {
+    title: "Köpfe",
+    medium: "acrylic, ink, paper fragments on canvas",
+    dimensions: "65 × 50 cm",
     availability: "",
-    text: "Dieser Eintrag zeigt, wie weitere Werke untereinander erscheinen.",
-    image: "../images/painting/zweites-werk/main.jpg",
-    zoom: "../images/painting/zweites-werk/main.jpg",
-    details: null
-  }
+    text: "", // Hier kannst du einen eigenen längeren Beschreibungstext eintragen.
+    image: "../images/painting/Köpfe/main.jpg",
+    zoom: "../images/painting/Köpfe/zoom.jpg",
+    details: {
+      left: "../images/painting/Köpfe/detail-left.jpg",
+      right: "../images/painting/Köpfe/detail-right.jpg"
+    }
+  },
 ];
