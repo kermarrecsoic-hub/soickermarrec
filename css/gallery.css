@@ -128,3 +128,68 @@ img {
     row-gap: 15px;
   }
 }
+
+
+/* ABOUT – Bild und Text gleich breit */
+
+body:has(.editorial-picture) .editorial-picture {
+  width: min(100%, 620px);
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto 40px;
+}
+
+body:has(.editorial-picture) .editorial-text {
+  width: min(100%, 620px);
+  margin: 0 auto;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: #414141;
+}
+
+body:has(.editorial-picture) .editorial-text p {
+  margin: 0 0 36px;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+/* Vita bleibt linksbündig */
+
+.vita-title {
+  margin: 60px 0 36px;
+  text-align: center;
+  font: inherit;
+}
+
+.vita {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  column-gap: 20px;
+  row-gap: 18px;
+  text-align: left;
+  font: inherit;
+}
+
+.vita-year {
+  white-space: nowrap;
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+  body:has(.editorial-picture) .editorial-text {
+    font-size: 11px;
+    line-height: 15px;
+  }
+
+  .vita {
+    grid-template-columns: 82px minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 15px;
+  }
+}
+
