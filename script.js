@@ -178,26 +178,18 @@ function hide() {
   active=null;
   currentSpawn=null;
 }
-function delayedHide() {
-  cancelHide();
-  hideTimer=setTimeout(()=>{
-    if(!previewLink.matches(':hover') && !links.some(a=>a.matches(':hover'))) hide();
-  },350);
-}
-links.forEach(link=>{
-  link.addEventListener('mouseenter',()=>{if(!mobileMode()) show(link);});
-  link.addEventListener('mouseleave',()=>{if(!mobileMode()) delayedHide();});
-  link.addEventListener('focus',()=>{if(!mobileMode()) show(link);});
-  link.addEventListener('blur',()=>{if(!mobileMode()) delayedHide();});
-  link.addEventListener('click',event=>{
-    if(!mobileMode()) return;
-    if(active!==link) {event.preventDefault();show(link);}
+// Desktop: Eine geöffnete Vorschau bleibt nach Verlassen des Links sichtbar.
+// Ein neuer Link ersetzt sie; Klick auf den Hintergrund oder Escape schließt sie.
+links.forEach(link => {
+  link.addEventListener('mouseenter', () => { if (!mobileMode()) show(link); });
+  link.addEventListener('focus', () => { if (!mobileMode()) show(link); });
+  link.addEventListener('click', event => {
+    if (!mobileMode()) return;
+    if (active !== link) { event.preventDefault(); show(link); }
   });
 });
-previewLink.addEventListener('mouseenter',cancelHide);
-previewLink.addEventListener('mouseleave',()=>{if(!mobileMode())delayedHide();});
-document.addEventListener('click',event=>{
-  if(mobileMode() && !event.target.closest('.navigation a') && !event.target.closest('#preview-link')) hide();
+document.addEventListener('click', event => {
+  if (!event.target.closest('.navigation a') && !event.target.closest('#preview-link')) hide();
 });
 window.addEventListener('resize',()=>positionImage({keepCurrent:true}));
 window.addEventListener('keydown',event=>{if(event.key==='Escape')hide();});
