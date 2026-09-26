@@ -78,46 +78,53 @@ img {
   user-drag: none;
 }
 
-/* ABOUT – Text */
+/* ABOUT – exakt wie Navigation */
+
+.editorial-text {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: #414141;
+}
 
 .editorial-text p {
   margin: 0 0 36px;
 }
 
-/* ABOUT – Vita */
-
 .vita-title {
   margin: 60px 0 36px;
-  text-align: center;
-  font-family: Baskerville, "Times New Roman", serif;
-  font-size: 24px;
-  font-weight: normal;
+  text-align: left;
+  font: inherit;
+  font-weight: 400;
 }
 
 .vita {
   display: grid;
-  grid-template-columns: 130px minmax(0, 1fr);
+  grid-template-columns: 110px minmax(0, 1fr);
   column-gap: 20px;
-  row-gap: 30px;
+  row-gap: 18px;
 
+  font: inherit;
+  color: inherit;
   text-align: left;
-  font-family: Baskerville, "Times New Roman", serif;
-  font-size: 20px;
-  line-height: 1.5;
 }
 
 .vita-year {
-  font-style: italic;
+  font: inherit;
   white-space: nowrap;
 }
 
-/* Mobile */
-
 @media (max-width: 700px) {
+
+  .editorial-text {
+    font-size: 11px;
+    line-height: 15px;
+  }
+
   .vita {
-    grid-template-columns: 100px minmax(0, 1fr);
+    grid-template-columns: 82px minmax(0, 1fr);
     column-gap: 12px;
-    row-gap: 22px;
-    font-size: 15px;
+    row-gap: 15px;
   }
 }
