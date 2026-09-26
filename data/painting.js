@@ -16,7 +16,7 @@ window.PAINTING_WORKS = [
     details: {
       left: "../images/painting/dante/detail-left.jpg",
       right: "../images/painting/dante/detail-right.jpg"
-    
+    }
   },
    {
     title: "Köpfe",
