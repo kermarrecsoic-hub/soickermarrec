@@ -5,7 +5,6 @@
   const zoomImage = document.getElementById('zoom-image');
   const zoomSurface = document.getElementById('zoom-surface');
   const closeButton = document.getElementById('zoom-close');
-  const touchMode = window.matchMedia('(hover: none), (pointer: coarse)');
   const artworks = window.PAINTING_WORKS || [];
 
   // No HTML from data: user-written text always inserted with textContent.
@@ -29,12 +28,10 @@
     main.src=work.image; main.alt=work.title;
     main.loading='lazy'; main.decoding='async'; main.tabIndex=0;
     main.setAttribute('role','button');
-    main.setAttribute('aria-label',work.details ? work.title + ': Details zeigen oder Großansicht öffnen' : work.title + ': Großansicht öffnen');
-    const activate = () => {
-      if (touchMode.matches && work.details && !section.classList.contains('details-visible')) {
-        section.classList.add('details-visible');
-      } else { openZoom(work); }
-    };
+    main.setAttribute('aria-label',work.title + ': Großansicht öffnen');
+    // Auf Mobilgeräten öffnet schon das erste Tippen die Großansicht.
+    // Desktop: Detailbilder erscheinen weiterhin beim Hover.
+    const activate = () => openZoom(work);
     main.addEventListener('click',activate);
     main.addEventListener('keydown', e=> { if(e.key==='Enter'||e.key===' '){e.preventDefault();activate();} });
     hero.appendChild(main);
