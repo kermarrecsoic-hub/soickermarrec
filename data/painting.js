@@ -23,5 +23,17 @@ window.PAINTING_WORKS = [
       left: "../images/painting/Koepfe/detail-left.jpg",
       right: "../images/painting/Koepfe/detail-right.jpg"
     }
-  }
+  },
+    {
+    title: "Rome, 2026",
+    medium: "acrylic, ink, paper fragments on canvas",
+    dimensions: "46 × 61 cm",
+    availability: "",
+    text: "",
+    image: "../images/painting/rome/main.jpg",
+    details: {
+      left: "../images/painting/rome/detail-left.jpg",
+      right: "../images/painting/rome/detail-right.jpg"
+    }
+  },
 ];
