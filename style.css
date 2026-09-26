@@ -103,3 +103,13 @@ body { min-height: 100svh; }
     animation: none;
   }
 }
+
+/* Bildschutz für Smartphone und Desktop */
+
+img {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
