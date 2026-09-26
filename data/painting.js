@@ -24,11 +24,11 @@ window.PAINTING_WORKS = [
     dimensions: "65 × 50 cm",
     availability: "",
     text: "", // Hier kannst du einen eigenen längeren Beschreibungstext eintragen.
-    image: "../images/painting/Köpfe/main.jpg",
-    zoom: "../images/painting/Köpfe/zoom.jpg",
+    image: "../images/painting/Koepfe/main.jpg",
+    zoom: "../images/painting/Koepfe/zoom.jpg",
     details: {
-      left: "../images/painting/Köpfe/detail-left.jpg",
-      right: "../images/painting/Köpfe/detail-right.jpg"
+      left: "../images/painting/Koepfe/detail-left.jpg",
+      right: "../images/painting/Koepfe/detail-right.jpg"
     }
   },
 ];
