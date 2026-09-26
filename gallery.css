@@ -1,0 +1,71 @@
+/* Ausschließlich für Unterseiten – Landingpage-CSS wird nicht verändert. */
+:root { --ink:#414141; --muted:#bdbdbd; --header-bottom:172px; --fade-depth:70px; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body.gallery-page { margin:0; color:var(--ink); background:#fff; font:400 14px/1.35 Arial,Helvetica,sans-serif; }
+a { color:inherit; text-decoration:none; }
+.site-header { position:fixed; z-index:100; top:0; left:0; right:0; height:var(--header-bottom); pointer-events:none; }
+/* Durchgehender Verlauf innerhalb der Navigationshoehe. */
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Der Verlauf liegt IM Navigationsbanner: oben weiss, nach unten transparent.
+     Das beim Scrollen aufsteigende Bild verschwindet dadurch weich nach oben. */
+  background: linear-gradient(to bottom,
+    #fff 0%,
+    rgba(255,255,255,.99) 28%,
+    rgba(255,255,255,.93) 54%,
+    rgba(255,255,255,.72) 75%,
+    rgba(255,255,255,0) 100%
+  );
+  pointer-events: none;
+}
+.back-link,.current-section,.site-nav { position:absolute; z-index:1; top:54px; }
+.back-link { left:9.2%; font-size:17px; line-height:1; pointer-events:auto; }
+.current-section { left:50%; transform:translateX(-50%); white-space:nowrap; }
+.site-nav { right:6.2%; display:flex; align-items:flex-end; flex-direction:column; gap:0; min-width:120px; text-align:right; line-height:16px; pointer-events:auto; }
+.site-nav a[aria-current="page"] { color:var(--muted); }
+.site-nav a:hover,.back-link:hover { color:#a0a0a0; }
+.artwork-list { padding:calc(var(--header-bottom) + 36px) 5% 10vh; display:flex; flex-direction:column; align-items:center; gap:clamp(130px,23vh,270px); }
+.artwork { width:min(100%,1240px); display:flex; align-items:center; flex-direction:column; }
+.artwork-images { width:100%; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,440px) minmax(0,1fr); align-items:center; gap:clamp(14px,4vw,78px); }
+.hero-wrap { grid-column:2; grid-row:1; display:flex; justify-content:center; align-items:center; min-width:0; }
+.artwork-main { display:block; width:auto; height:auto; max-width:100%; max-height:min(70svh,720px); object-fit:contain; cursor:zoom-in; }
+.artwork-main:focus-visible { outline:1px solid #888; outline-offset:5px; }
+.detail { display:block; width:100%; max-width:280px; max-height:min(53svh,530px); object-fit:contain; justify-self:center; opacity:0; visibility:hidden; transform:translateY(7px); transition:opacity .25s ease,transform .25s ease,visibility .25s ease; }
+.detail-left { grid-column:1; grid-row:1; }
+.detail-right { grid-column:3; grid-row:1; }
+.artwork.has-details:hover .detail,.artwork.has-details.details-visible .detail,.artwork.has-details:focus-within .detail { opacity:1; visibility:visible; transform:translateY(0); }
+.artwork-description { text-align:center; max-width:min(620px,90%); margin-top:17px; line-height:1.4; }
+.artwork-title { margin:0 0 14px; font:inherit; }
+.artwork-description p { margin:0; }
+.artwork-description .availability { margin-top:16px; color:#bdbdbd; font-style:italic; }
+.artwork-description .free-text { margin-top:18px; white-space:pre-line; }
+.artwork.is-demo .artwork-description { color:#898989; }
+/* Seamless zoom: Klick auf Werk öffnet groß, Klick auf großes Bild vergrößert weiter. */
+.zoom-dialog { padding:0; border:none; width:100vw; height:100dvh; max-width:100vw; max-height:100dvh; background:#fff; color:var(--ink); overflow:hidden; }
+.zoom-dialog::backdrop { background:rgba(255,255,255,.96); }
+.zoom-surface { width:100%; height:100%; overflow:auto; text-align:center; }
+.zoom-close { position:fixed; z-index:2; top:20px; right:24px; border:0; background:rgba(255,255,255,.88); color:#777; font:12px Arial,sans-serif; padding:9px; cursor:pointer; }
+#zoom-image { display:block; width:auto; height:auto; max-width:92vw; max-height:92dvh; object-fit:contain; margin:4dvh auto; cursor:zoom-in; }
+#zoom-image.zoomed { max-width:none; max-height:none; width:auto; height:auto; min-width:160vw; cursor:zoom-out; }
+@media(max-width:700px) {
+ :root { --header-bottom:150px; --fade-depth:56px; }
+ body.gallery-page { font-size:12px; }
+ .back-link,.current-section,.site-nav { top:27px; }
+ .back-link { left:20px; }
+ .site-nav { right:15px; min-width:auto; font-size:11px; line-height:15px; }
+ .current-section { top:31px; }
+ .artwork-list { padding:calc(var(--header-bottom) + 28px) 12px 90px; gap:140px; }
+ .artwork-images { display:flex; align-items:center; flex-direction:column; gap:14px; }
+ .hero-wrap { width:100%; }
+ .artwork-main { max-width:88vw; max-height:61svh; }
+ .detail { display:none; width:min(40vw,180px); max-height:32svh; }
+ /* Auf Smartphones bleiben Detailbilder immer unsichtbar. */
+ .artwork .detail, .artwork.has-details.details-visible .detail { display:none !important; }
+ .artwork-description { margin-top:13px; }
+ .zoom-close { top:10px; right:10px; }
+ #zoom-image { margin:12dvh auto; max-height:76dvh; max-width:94vw; }
+}
+@media(prefers-reduced-motion:reduce) { html{scroll-behavior:auto;} .detail{transition:none;} }
