@@ -201,3 +201,15 @@ document.addEventListener('click',event=>{
 });
 window.addEventListener('resize',()=>positionImage({keepCurrent:true}));
 window.addEventListener('keydown',event=>{if(event.key==='Escape')hide();});
+
+document.addEventListener("contextmenu", (event) => {
+  if (event.target.closest("img")) {
+    event.preventDefault();
+  }
+});
+
+document.addEventListener("dragstart", (event) => {
+  if (event.target.closest("img")) {
+    event.preventDefault();
+  }
+});
