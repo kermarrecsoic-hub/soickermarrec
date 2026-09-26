@@ -1,7 +1,7 @@
 /* Werke und Texte hier ändern. Pfade relativ zu pages/painting.html. */
 window.PAINTING_WORKS = [
   {
-    title: "Dante",
+    title: "Dante, 2026",
     medium: "acrylic, ink, kyougi on canvas",
     dimensions: "65 × 50 cm",
     availability: "unavailable",
@@ -13,7 +13,7 @@ window.PAINTING_WORKS = [
     }
   },
   {
-    title: "Köpfe",
+    title: "Köpfe, 2026",
     medium: "acrylic, ink, paper fragments on canvas",
     dimensions: "65 × 50 cm",
     availability: "",
