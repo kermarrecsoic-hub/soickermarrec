@@ -68,3 +68,12 @@ a { color:inherit; text-decoration:none; }
   .editorial-page { padding-top:calc(var(--header-bottom) + 35px); }
   .editorial-picture { margin-bottom:34px; }
 }
+/* Bildschutz auf allen Unterseiten */
+
+img {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
