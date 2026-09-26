@@ -1,31 +1,31 @@
-# Soïc Kermarrec — Portfolio
+# Pain_ing – Entwurf der gemeinsamen Galerievorlage
 
-## Inhalt
-- `index.html`: Startseite mit allen sieben Links. `data-spawn="1"` bis `"6"` wählt einen Rastermittelpunkt. `data-preview="images/painting.jpg"` wählt das zugehörige Bild.
-- `style.css`: Gestaltung und Schriftwechsel Baskerville → Arial → Michroma (jeweils eine Sekunde). Baskerville wird lokal verwendet; auf Geräten ohne Baskerville erscheint Georgia. Michroma wird über Google Fonts geladen.
-- `script.js`: 6 Spawn-Punkte (Desktop: 3 Spalten × 2 Zeilen; Mobil: 2 Spalten × 3 Zeilen), responsive Vorschauen und Mobile-Tap-Steuerung.
-- `images/`: 7 austauschbare JPG-Platzhalter. Gleicher Dateiname = kein Code-Update erforderlich. Für PNG musst du zusätzlich in `index.html` `.jpg` durch `.png` ersetzen.
-- `pages/`: 7 vorbereitete Unterseiten; ersetze dort später den Platzhaltertext.
+Dieser ZIP-Ordner ist **ein gezieltes Update deines bestehenden GitHub-Repositories**, keine neue Landingpage. Nur `pages/painting.html` ersetzt eine bestehende Datei; die übrigen Dateien/Ordner sind neu. `index.html`, `style.css`, `script.js` und die bestehenden `images/*.jpg` bleiben vollständig unangetastet.
 
-## Vorschau-Regeln
-- Kein Zuschneiden, keine Verzerrung, kein Hochskalieren. Bild wird in seinem nativen Pixelmaß gezeigt, solange es in den maximalen 1200 × 1200-px-Rahmen passt.
-- Größere Bilder werden proportional verkleinert. Auf kleinen Displays und randnahen Spawn-Punkten kann der Rahmen zum Schutz vor Überlauf nochmals verkleinert werden.
-- Bildmittelpunkt = Rasterzellenmittelpunkt. Die Rasterzellen selbst begrenzen das Bild nicht: Nachbarzellen dürfen überlappt werden.
-- Desktop: Hover = Vorschau + Schriftwechsel; Maus weg = schließen; Klick = Seite.
-- Mobil: 1. Tippen = Vorschau; 2. Tippen auf denselben Link = Seite. Tippen auf eine andere Zeile wechselt die Vorschau. Tippen auf freien Bereich schließt sie.
+## Wie du die Dateien hochlädst
 
-## Empfohlene Bilddateien
-- 800–1200 Pixel an der längsten Kante; größere Dateien sind nicht nötig, sofern keine hochauflösende Vorschau gewünscht wird.
-- JPEG vorzugsweise ca. 150–500 KB; PNG nur für Transparenzen oder scharfe Grafiken, vorzugsweise unter 800 KB.
-- Obergrenze je Preview: ungefähr 1 MB. Es gibt technisch keine Mindest-KB-Zahl.
-- Farben: sRGB.
+Öffne GitHub > dein Repository > **Add file > Upload files**. Ziehe **den Inhalt** dieses entpackten Ordners hinein (alle Ordner zusammen); GitHub übernimmt die Ordnerstruktur. Prüfe unbedingt, dass `pages/painting.html`, `css/gallery.css`, `js/gallery.js`, `data/painting.js` und `images/painting/dante/main.jpg` an genau diesen Stellen liegen. Dann Commit changes. Wenn GitHub das Ersetzen von `pages/painting.html` beim gemeinsamen Upload nicht erlaubt, lösche erst die alte `pages/painting.html`, committe und lade die neue hoch.
 
-## Frisches GitHub-Repository
-1. ZIP lokal entpacken.
-2. Repository bei GitHub öffnen → **Add file** → **Upload files**.
-3. Den *Inhalt* des entpackten Ordners inklusive `images/` und `pages/` hochladen; nicht die ZIP und nicht den äußeren Ordner. `index.html` muss direkt im Repository-Hauptverzeichnis liegen.
-4. **Commit changes** anklicken.
-5. **Settings** → **Pages** → **Build and deployment**: `Deploy from a branch`, `main`, `/(root)` → **Save**.
-6. GitHub zeigt danach die öffentliche Adresse (meist `https://BENUTZERNAME.github.io/REPOSITORY/`).
+## Die Gestaltung
 
-Bei späteren Änderungen eine Bilddatei mit genau gleichem Namen im `images/`-Ordner austauschen und committen.
+- Feststehender Header: Zurück-Pfeil links; Pain_ing mittig; rechts die Seitenliste, aktive Seite hellgrau.
+- Weißer Verlauf unter dem Header bis unter den letzten rechten Navigationslink.
+- Hauptwerk mittig, vollständig, korrektes Seitenverhältnis, Text darunter, weitere Werke beim Scrollen.
+- Detailbilder optional: Bei Desktop-Hover sichtbar. Auf dem Handy: erstes Tippen auf das Hauptwerk öffnet die Details, zweites Tippen die Großansicht.
+- **Kein Lupensymbol.** Ein einfacher Klick auf das Hauptwerk öffnet auf dem Desktop die hochauflösende Großansicht. Ein weiterer Klick auf das große Bild vergrößert es; durch Scrollen kannst du den Ausschnitt untersuchen. `Schließen` oder Esc schließt.
+
+## Eigene Bilder und Texte
+
+Ersetze `images/painting/dante/main.jpg` durch dein optimiertes Werk, `zoom.jpg` durch eine größere hochauflösende Version und die beiden `detail-*.jpg` durch vorbereitete Ausschnitte. Benutze dieselben Dateinamen, dann musst du keine Pfade verändern.
+
+Ändere Titel, Maße, Medium, Verfügbarkeit, Freitext und Bildpfade **nur in `data/painting.js`**. Jede Klammergruppe `{...}` entspricht einem Werk. `details: null` deaktiviert die beiden Zusatzbilder. Der zweite Eintrag ist deutlich als DEMO markiert; ersetze/lösche ihn, sobald du weitere Werke hast.
+
+**Wichtig zu den Beispielbildern:** Die Bilder in diesem Entwurf wurden aus deinem PDF entnommen und dienen nur der Demonstration. Die dort eingebettete Hauptdatei hat 929 × 1200 Pixel; die beigefügte `zoom.jpg` kann daher noch keine zusätzlichen Details zeigen. Ersetze sie unbedingt durch dein hochauflösendes Original (empfohlen: längste Kante ca. 3000–4500 Pixel, möglichst unter 8 MB).
+
+## Weitere Seiten
+
+Für Graph1c, Ex. 26, Arch_0 usw. folgt dasselbe Grundgerüst. Der rechte Navigator verlinkt bereits auf deine vorhandenen Unterseiten, aber das neue Design wird zunächst **nur auf Painting** angewendet; die übrigen Seiten bleiben unverändert.
+
+### Falls du lokal durch Doppelklick testest
+
+Da die Daten in einer normalen JS-Datei stehen, brauchst du keinen lokalen Entwicklungsserver. Doppelklick auf `pages/painting.html` im entpackten Ordner ist ausreichend. Veröffentlicht funktioniert es auf GitHub Pages direkt.
