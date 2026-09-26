@@ -205,3 +205,8 @@ document.addEventListener("dragstart", (event) => {
     event.preventDefault();
   }
 });
+document.addEventListener("contextmenu", function (event) {
+  if (event.target.closest("img")) {
+    event.preventDefault();
+  }
+});
