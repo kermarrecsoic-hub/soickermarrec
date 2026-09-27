@@ -1,4 +1,4 @@
-/* XXX: Neue Projekte als Objekte am Ende des Arrays ergänzen. */
+/* XXX: `images` erzeugt auf Desktop zwei Reihen und mobil eine Spalte. */
 window.XXX_WORKS = [
   {
     title: "", // Hier später den Projekttitel eingeben
@@ -10,6 +10,6 @@ window.XXX_WORKS = [
     images: ["../images/xxx.jpg"],
   // Für eine Fotoserie weitere Bildpfade in images ergänzen, z. B.:
   // images: ["../images/architecture/serie/01.jpg", "../images/architecture/serie/02.jpg"],
-  // Alle Bilder erscheinen gleichwertig VOR dem Titel und dem Beschreibungstext.
+  // Alle Bilder stehen gleichwertig vor dem Titel und der vollbreiten Beschreibung.
   }
 ];
