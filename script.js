@@ -1,5 +1,5 @@
-// V8.1: Vorschauen proportional, oberhalb des Copyright-Banners,
-// mit kompakter Hitbox rund um die tatsächlichen Navigationslinks.
+// V8.4: Desktop-Vorschauen mit begrenzter Bildfläche und flexiblen Spawn-Bereichen.
+// Mobile-Positionierung wie bisher, alle Bilder bleiben proportional.
 const links = [...document.querySelectorAll('.navigation a[data-preview]')];
 const navigation = document.querySelector('.navigation');
 const previewLink = document.getElementById('preview-link');
@@ -95,42 +95,91 @@ function maxScale(p, natW, natH, zone) {
   }
   return lo;
 }
+// Desktop: Der Spawnpunkt definiert eine bevorzugte Gegend, NICHT einen
+// unverrückbaren Bildmittelpunkt. Vier maximal nutzbare Bereiche umgehen die
+// zentrale Navigation. Erst positionieren, nur wenn nötig proportional verkleinern.
+function desktopPlacement(spawn, naturalWidth, naturalHeight, zone) {
+  const { bottom } = previewLimits();
+  const margin = 24;
+  const navGap = 20;
+  const bounds = { left: margin, right: innerWidth-margin, top: margin, bottom: bottom-16 };
+  const regions = [
+    { name: 'left', left: bounds.left, right: zone.left-navGap, top: bounds.top, bottom: bounds.bottom },
+    { name: 'right', left: zone.right+navGap, right: bounds.right, top: bounds.top, bottom: bounds.bottom },
+    { name: 'top', left: bounds.left, right: bounds.right, top: bounds.top, bottom: zone.top-navGap },
+    { name: 'bottom', left: bounds.left, right: bounds.right, top: zone.bottom+navGap, bottom: bounds.bottom }
+  ];
+  // Ca. 11 % der sichtbaren Bildschirmfläche: der Mittelweg zwischen den
+  // beiden gelungenen Beispielen. Die große Painting-Vorschau erreicht nicht
+  // mehr fast 20 % der Gesamtfläche. Keine Vergrößerung kleiner Originale.
+  const areaCap = Math.min(innerWidth*innerHeight*.115, 190000);
+  const absoluteCap = 1200;
+  const preferred = spawnPoint(spawn);
+  const placements = [];
+  for (const r of regions) {
+    const availableW = r.right-r.left;
+    const availableH = r.bottom-r.top;
+    if (availableW < 75 || availableH < 75) continue;
+    const naturalArea = naturalWidth*naturalHeight;
+    const scale = Math.min(
+      1, absoluteCap/naturalWidth, absoluteCap/naturalHeight,
+      Math.sqrt(areaCap/naturalArea),
+      availableW/naturalWidth, availableH/naturalHeight
+    );
+    if (scale <= 0) continue;
+    const width = Math.floor(naturalWidth*scale);
+    const height = Math.floor(naturalHeight*scale);
+    const x = Math.max(r.left+width/2, Math.min(preferred.x, r.right-width/2));
+    const y = Math.max(r.top+height/2, Math.min(preferred.y, r.bottom-height/2));
+    const travel = Math.hypot((x-preferred.x)/innerWidth,(y-preferred.y)/innerHeight);
+    const utilization = (width*height)/areaCap;
+    // Möglichst große Bilder bevorzugen; nur bei ähnlichen Bildgrößen die
+    // Position möglichst nah am ursprünglichen Spawnpunkt wählen.
+    const score = utilization - travel*.65;
+    placements.push({x,y,width,height,score,area:width*height});
+  }
+  return placements.sort((a,b)=>b.score-a.score)[0] || null;
+}
 function positionImage({ keepCurrent = false } = {}) {
-  if (!active || !image.naturalWidth || !image.naturalHeight) return;
+  if (!active || !image.naturalWidth || !image.naturalHeight) return false;
   const zone = safeZone();
   const allowed = allowedSpawns(active);
-  // Beim Linkwechsel den vorherigen sichtbaren Punkt konsequent ausschließen.
-  // Bei einer Größenänderung bleibt der bereits gewählte Punkt erhalten.
   const candidates = keepCurrent && currentSpawn !== null
     ? [currentSpawn]
     : allowed.filter(n => n !== previousSpawn);
-  // Sollte ein Link nur den vorherigen Punkt anbieten, auf alle anderen
-  // acht Punkte ausweichen, statt dieselbe Position zu wiederholen.
   const pool = candidates.length ? candidates
     : Object.keys(mobileMode() ? mobilePoints : desktopPoints)
         .map(Number).filter(n => n !== previousSpawn);
-  const choices = pool.map(n => {
-    const p = spawnPoint(n);
-    return { n, p, scale: maxScale(p, image.naturalWidth, image.naturalHeight, zone) };
-  });
-  // Nur Punkte berücksichtigen, an denen die Vorschau erkennbar groß bleibt.
-  // Dadurch verschwindet die Rotation auf schmalen Mobilgeräten nicht scheinbar.
-  const bestScale = Math.max(...choices.map(c => c.scale));
-  const viable = choices.filter(c => c.scale >= Math.max(.04, bestScale * .65));
-  const selection = viable.length ? viable : choices.filter(c => c.scale === bestScale);
-  const chosen = selection[Math.floor(Math.random() * selection.length)];
-  if (!chosen || chosen.scale < .04) {
+  let choices;
+  if (mobileMode()) {
+    // Bewährte mobile Darstellung und Touch-Interaktion unverändert lassen.
+    choices = pool.map(n => {
+      const p = spawnPoint(n);
+      const scale = maxScale(p,image.naturalWidth,image.naturalHeight,zone);
+      return {n, x:p.x, y:p.y, width:Math.floor(image.naturalWidth*scale),
+        height:Math.floor(image.naturalHeight*scale), scale};
+    });
+  } else {
+    choices = pool.map(n => {
+      const placement = desktopPlacement(n,image.naturalWidth,image.naturalHeight,zone);
+      return placement ? {n,...placement,scale:placement.area/(image.naturalWidth*image.naturalHeight)}
+        : {n,scale:0};
+    });
+  }
+  const bestScale = Math.max(...choices.map(c=>c.scale));
+  const viable = choices.filter(c=>c.scale >= Math.max(mobileMode() ? .04 : .005,bestScale*.68));
+  const selection = viable.length ? viable : choices.filter(c=>c.scale===bestScale);
+  const chosen = selection[Math.floor(Math.random()*selection.length)];
+  if (!chosen || !chosen.width || !chosen.height || chosen.scale <= 0) {
     previewLink.classList.remove('is-visible');
     return false;
   }
   currentSpawn = chosen.n;
   if (!keepCurrent) previousSpawn = chosen.n;
-  const w = Math.max(1, Math.floor(image.naturalWidth * chosen.scale));
-  const h = Math.max(1, Math.floor(image.naturalHeight * chosen.scale));
-  previewLink.style.left = `${chosen.p.x}px`;
-  previewLink.style.top = `${chosen.p.y}px`;
-  image.style.width = `${w}px`;
-  image.style.height = `${h}px`;
+  previewLink.style.left = `${chosen.x}px`;
+  previewLink.style.top = `${chosen.y}px`;
+  image.style.width = `${chosen.width}px`;
+  image.style.height = `${chosen.height}px`;
   previewLink.classList.add('is-visible');
   return true;
 }
