@@ -1,9 +1,9 @@
 /* Graphic: Neue Projekte als Objekte am Ende des Arrays ergänzen. */
 window.GRAPHIC_WORKS = [
   {
-    title: "", // Hier später den Projekttitel eingeben
-    medium: "",
-    dimensions: "",
+    title: "Untitled (Wand), 2025", // Hier später den Projekttitel eingeben
+    medium: "ink, water and white pencil on paper",
+    dimensions: "30 x 42 cm",
     availability: "",
     text: "",
     // Erstes Bild = vorhandene Landingpage-Vorschau; bitte später eigenes Projektfoto einsetzen.
