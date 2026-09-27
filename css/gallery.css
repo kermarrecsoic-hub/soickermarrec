@@ -78,22 +78,26 @@ a { color: inherit; text-decoration: none; }
 .artwork-description .availability { margin-top: 16px; color: var(--muted); font-style: italic; }
 .artwork-description .free-text { margin-top: 18px; white-space: pre-line; }
 .artwork.is-demo .artwork-description { color: #898989; }
-/* Exhibitions / Architecture / XXX: zwei gleich breite Bildspalten.
-   Die HTML-/JS-Reihenfolge entspricht der Leseordnung: 1 oben links,
-   2 oben rechts, 3 in der zweiten Reihe links, 4 rechts usw.
-   Jede Zeile richtet sich nach dem höchsten Bild dieser Zeile.
-   Bilder füllen ihre Spaltenbreite proportional, ohne Beschnitt. */
+/* Exhibitions / Architecture / XXX: zwei unabhängige, gleich breite Kolonnen.
+   Die Bildfolge ist zeilenweise gedacht: 1 links, 2 rechts, 3 links, 4 rechts.
+   Anders als bei CSS-Grid-Zeilen gibt es KEINE leeren Höhen unter kürzeren
+   Bildern: innerhalb jeder Kolonne sind es stets genau 28px Bildabstand.
+   Die beiden Kolonnen dürfen sich bei verschiedenen Seitenverhältnissen
+   vertikal versetzen; die Bildformate bleiben ohne Zuschnitt erhalten. */
 .artwork-images.is-series {
   display: grid; width: 100%;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: clamp(20px, 3vw, 48px);
-  row-gap: clamp(18px, 3vw, 36px);
+  column-gap: 32px;
   align-items: start;
+}
+.artwork-images.is-series .series-column {
+  min-width: 0; width: 100%;
+  display: flex; flex-direction: column; gap: 28px;
 }
 .artwork-images.is-series .hero-wrap {
   display: block; grid-column: auto; grid-row: auto;
   width: 100%; min-width: 0; height: auto;
-  margin: 0; align-self: start;
+  margin: 0; align-self: stretch;
 }
 .artwork-images.is-series .artwork-main {
   display: block; width: 100%; max-width: 100%; height: auto;
@@ -101,8 +105,7 @@ a { color: inherit; text-decoration: none; }
 }
 /* Ist nur ein Bild vorhanden, bleibt es zentriert. */
 .artwork-images.is-series.is-single {
-  grid-template-columns: minmax(0, 1fr);
-  width: min(100%, 650px); margin: 0 auto;
+  display: block; width: min(100%, 650px); margin: 0 auto;
 }
 .artwork-description.is-series-description {
   width: 100%; max-width: none; margin-top: 32px; text-align: left;
@@ -164,13 +167,15 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     transform: translateY(0);
   }
   .artwork-description { margin-top: 13px; }
-  /* Auf Smartphones bleibt die Bildfolge untereinander (1, 2, 3, ...). */
+  /* Mobil: Spaltenhüllen verschwinden aus dem Layout; alle Bilder werden
+     in ihrer ursprünglichen Folge 1, 2, 3, ... untereinander dargestellt. */
   .artwork-images.is-series {
-    display: flex; flex-direction: column; align-items: center;
-    column-gap: 0; row-gap: 32px;
+    display: flex; flex-direction: column; align-items: center; gap: 32px;
   }
+  .artwork-images.is-series .series-column { display: contents; }
   .artwork-images.is-series .hero-wrap {
     width: 100%; height: auto; margin: 0; text-align: center;
+    order: var(--series-order, 0);
   }
   .artwork-images.is-series .artwork-main {
     width: auto; max-width: min(100%, 88vw); max-height: 66svh;

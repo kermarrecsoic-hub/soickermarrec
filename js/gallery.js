@@ -60,9 +60,18 @@
       (series ? ' is-series' : '') +
       (series && paths.length === 1 ? ' is-single' : ''));
 
+    // Zwei unabhängige Bildkolonnen statt gemeinsam berechneter Grid-Zeilen.
+    // So bleibt der sichtbare Abstand nach jedem Bild in BEIDEN Spalten exakt gleich,
+    // auch wenn die Bildformate sehr unterschiedlich sind.
+    // 1 = links, 2 = rechts, 3 = links, 4 = rechts usw.
+    let leftColumn, rightColumn;
     if (series) {
-      images.style.setProperty('--series-columns', String(Math.ceil(paths.length / 2)));
-      images.dataset.count = String(paths.length);
+      leftColumn = element('div', 'series-column series-column-left');
+      images.appendChild(leftColumn);
+      if (paths.length > 1) {
+        rightColumn = element('div', 'series-column series-column-right');
+        images.appendChild(rightColumn);
+      }
     }
 
     const detailIds = `details-${++uid}`;
@@ -95,7 +104,13 @@
       } else {
         hero.appendChild(main);
       }
-      images.appendChild(hero);
+      if (series) {
+        // Auf Mobilgeräten stellt CSS mit --series-order die Originalreihenfolge her.
+        hero.style.setProperty('--series-order', String(index));
+        (index % 2 === 0 ? leftColumn : rightColumn).appendChild(hero);
+      } else {
+        images.appendChild(hero);
+      }
     });
 
     if (hasDetails) {
