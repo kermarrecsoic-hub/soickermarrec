@@ -1,5 +1,5 @@
-// V8: Mobile-Spawnwechsel korrigiert; kein direkter Wiederholungs-Punkt.
-// Keine direkte Wiederholung; Bilder werden proportional verkleinert, falls sie die Navigation schneiden.
+// V8: proportional skalierte Vorschauen, größere untere Desktop-Spawnpunkte,
+// kein direkter Wiederholungs-Punkt und unverändertes Mobilverhalten.
 const links = [...document.querySelectorAll('.navigation a[data-preview]')];
 const navigation = document.querySelector('.navigation');
 const previewLink = document.getElementById('preview-link');
@@ -18,12 +18,12 @@ function mobileMode() { return touch.matches || innerWidth <= 700; }
 const desktopPoints = {
   1: [.075, .185], // oben links
   2: [.615, .16],  // oben, leicht rechts
-  3: [.925, .075], // oben rechts
+  3: [.85, .16],  // oben rechts – weiter innen für erkennbare Bildgröße
   4: [.705, .50],  // rechts der Navigation
-  5: [.335, .555], // links der Navigation
-  6: [.075, .785], // unten links
+  5: [.255, .555], // links der Navigation
+  6: [.17, .755], // unten links – größerer Bildrahmen für Ex. 26
   7: [.415, .86],  // unten, leicht links
-  8: [.91, .80]   // unten rechts
+  8: [.82, .745]  // unten rechts – größerer Bildrahmen für XXX
 };
 // Mobile: eigene, locker verteilte Punkte. Kleinere Preview-Grenzen wie V6.
 const mobilePoints = {
@@ -35,11 +35,8 @@ function spawnPoint(n) {
   return { x: x * innerWidth, y: y * innerHeight };
 }
 function allowedSpawns(link) {
-  // Contact und Painting tauschen die im Screenshot gezeigten Desktop-Spawnpunkte.
-  // Contact: Punkt 1 statt 4; Painting: Punkt 4 statt 1.
-  const assigned = link.getAttribute('href')?.endsWith('/contact.html') ? '1,2,8'
-    : link.getAttribute('href')?.endsWith('/painting.html') ? '4,5,7'
-    : (link.dataset.spawns || '1,2,3');
+  // Nur hier im HTML ändern: data-spawns="1,2,8". Keine versteckten Overrides.
+  const assigned = link.dataset.spawns || '1,2,3';
   return [...new Set(assigned.split(',')
     .map(Number).filter(n => Number.isInteger(n) && n >= 1 && n <= 8))];
 }
@@ -201,11 +198,6 @@ document.addEventListener("contextmenu", (event) => {
 });
 
 document.addEventListener("dragstart", (event) => {
-  if (event.target.closest("img")) {
-    event.preventDefault();
-  }
-});
-document.addEventListener("contextmenu", function (event) {
   if (event.target.closest("img")) {
     event.preventDefault();
   }

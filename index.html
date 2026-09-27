@@ -1,29 +1,79 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Portfolio of Soïc Kermarrec, an artist and architecture student based in Leipzig. Explore painting, graphic design, exhibitions and architecture."">
-  <title>Soïc Kermarrec — Art & Architecture</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Soïc Kermarrec | Art & Architecture</title>
+  <meta name="description" content="Portfolio of Soïc Kermarrec (Soic Kermarrec), an artist and architecture student in Leipzig. Painting, ink, exhibitions and architecture.">
+  <link rel="canonical" href="https://soickermarrec.de/">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Soïc Kermarrec">
+  <meta property="og:title" content="Soïc Kermarrec | Art & Architecture">
+  <meta property="og:description" content="Portfolio of Soïc Kermarrec (Soic Kermarrec), an artist and architecture student in Leipzig. Painting, ink, exhibitions and architecture.">
+  <meta property="og:url" content="https://soickermarrec.de/">
+  <meta property="og:image" content="https://soickermarrec.de/images/about.jpg">
+  <link rel="icon" href="/favicon.png" type="image/png" sizes="any">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/png" href="/favicon.png" sizes="any">
   <script src="script.js" defer></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://soickermarrec.de/#website",
+      "url": "https://soickermarrec.de/",
+      "name": "Soïc Kermarrec",
+      "alternateName": "Soic Kermarrec",
+      "inLanguage": [
+        "de",
+        "en"
+      ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://soickermarrec.de/#person",
+      "name": "Soïc Kermarrec",
+      "alternateName": [
+        "Soic Kermarrec",
+        "Soec Kermarrec",
+        "Soek Kermarrec",
+        "Soik Kermarrec",
+        "Zoek Kermarrec",
+        "Zoec Kermarrec",
+        "Zoic Kermarrec",
+        "Zoïc Kermarrec"
+      ],
+      "url": "https://soickermarrec.de/",
+      "description": "Artist and architecture student based in Leipzig, working across painting, graphic design and architecture.",
+      "homeLocation": {
+        "@type": "Place",
+        "name": "Leipzig, Germany"
+      },
+      "sameAs": [
+        "https://www.instagram.com/soicyv/"
+      ]
+    }
+  ]
+}
+  </script>
 </head>
 <body>
-  <main class="navigation" aria-label="Portfolio">
-    <!-- data-spawns: 2–3 erlaubte, asymmetrische Spawnpunkte pro Link (1–8). Bildnamen im images-Ordner austauschen. -->
-    <a href="pages/about.html" data-preview="images/vorschaubild/about.jpg" data-spawns="1,7,8">Soïc Kermarrec</a>
-    <a href="pages/painting.html" data-preview="images/vorschaubild/painting.jpg" data-spawns="1,5,7">Pain_ing</a>
+  <main class="navigation" aria-label="Portfolio navigation">
+    <!-- Vorschau-Bilder austauschen: images/vorschaubild/; Spawnpunkte: 1 bis 8. -->
+    <h1 class="site-title"><a href="pages/about.html" data-preview="images/vorschaubild/about.jpg" data-spawns="1,7,8">Soïc Kermarrec</a></h1>
+    <a href="pages/painting.html" data-preview="images/vorschaubild/painting.jpg" data-spawns="4,5,7">Pain_ing</a>
     <a href="pages/graphic.html" data-preview="images/vorschaubild/graphic.jpg" data-spawns="2,3,4">Ink</a>
     <a href="pages/ex26.html" data-preview="images/vorschaubild/ex26.jpg" data-spawns="3,6,8">Ex. 26</a>
     <a href="pages/architecture.html" data-preview="images/vorschaubild/architecture.jpg" data-spawns="4,5,7">Arch_0</a>
     <a href="pages/xxx.html" data-preview="images/vorschaubild/xxx.jpg" data-spawns="1,7,8">XXX</a>
-    <a href="pages/contact.html" data-preview="images/vorschaubild/contact.jpg" data-spawns="2,4,8">Contact</a>
+    <a href="pages/contact.html" data-preview="images/vorschaubild/contact.jpg" data-spawns="1,2,8">Contact</a>
   </main>
-  <div class="preview-layer"><a id="preview-link" href="#" aria-label="Projekt öffnen" tabindex="-1"><img id="preview" alt=""></a></div>
+  <div class="preview-layer"><a id="preview-link" href="#" aria-label="Open page" tabindex="-1"><img id="preview" alt="" draggable="false"></a></div>
   <footer class="copyright">© 2026 Soïc Kermarrec, all rights reserved</footer>
 </body>
 </html>

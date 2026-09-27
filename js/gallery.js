@@ -1,48 +1,145 @@
+/* Soïc Kermarrec – V8 / gemeinsamer Galerie-Renderer */
 (() => {
-  "use strict";
-  const target=document.getElementById('artworks');
+  'use strict';
+
+  const target = document.getElementById('artworks');
   if (!target) return;
-  const key=document.body.dataset.works || 'PAINTING_WORKS';
-  const works=window[key] || [];
-  const mobile=window.matchMedia('(max-width: 700px)');
-  function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text)n.textContent=text;return n;}
-  function mainImage(path,title){const i=el('img','artwork-main');i.src=path;i.alt=title;i.loading='lazy';i.decoding='async';i.draggable=false;return i;}
-  function render(work){
-    const paths=(Array.isArray(work.images)&&work.images.length ? work.images : (work.image?[work.image]:[]));
-    if(!paths.length)return document.createDocumentFragment();
-    const series=paths.length>1;
-    const hasDetails=!series && Boolean(work.details && (work.details.left || work.details.right));
-    const section=el('section','artwork'+(hasDetails?' has-details':'')+(work.demo?' is-demo':''));
-    const images=el('div','artwork-images'+(series?' is-series':''));
-    paths.forEach((path,index)=>{
-      const hero=el('div','hero-wrap');const main=mainImage(path,work.title?(work.title+' – Bild '+(index+1)):'Projektbild '+(index+1));
-      if(hasDetails && index===0){
-        main.tabIndex=0;main.setAttribute('role','button');main.setAttribute('aria-expanded','false');
-        main.setAttribute('aria-label','Auf dem Smartphone Details anzeigen oder ausblenden');
-        const toggle=()=>{if(!mobile.matches)return;let visible=section.classList.toggle('details-visible');main.setAttribute('aria-expanded',String(visible));};
-        main.addEventListener('click',toggle);main.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();toggle();}});
+
+  const works = window[document.body.dataset.works || 'PAINTING_WORKS'] || [];
+  const mobile = window.matchMedia('(max-width: 700px)');
+  const forceSeries = target.dataset.layout === 'series';
+  let uid = 0;
+
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text) node.textContent = text;
+    return node;
+  }
+
+  function artworkImage(src, alt, first) {
+    const img = element('img', 'artwork-main');
+    img.src = src;
+    img.alt = alt;
+    img.loading = first ? 'eager' : 'lazy';
+    img.decoding = 'async';
+    img.draggable = false;
+    return img;
+  }
+
+  function detailFrame(src, side, title) {
+    const frame = element('div', `detail-frame detail-frame-${side}`);
+    const inner = element('div', 'detail-inner');
+    const img = element('img', 'detail-image');
+    img.src = src;
+    img.alt = `${title || 'Work'} – ${side} detail`;
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.draggable = false;
+    inner.appendChild(img);
+    frame.appendChild(inner);
+    return frame;
+  }
+
+  function render(work, workIndex) {
+    const paths = Array.isArray(work.images) && work.images.length
+      ? work.images.filter(Boolean)
+      : (work.image ? [work.image] : []);
+    if (!paths.length) return document.createDocumentFragment();
+
+    const series = forceSeries || paths.length > 1;
+    const hasDetails = !series && Boolean(work.details &&
+      (work.details.left || work.details.right));
+    const classes = ['artwork'];
+    if (hasDetails) classes.push('has-details');
+    if (work.demo) classes.push('is-demo');
+    if (series) classes.push('series-artwork');
+
+    const section = element('section', classes.join(' '));
+    const images = element('div', 'artwork-images' +
+      (series ? ' is-series' : '') +
+      (series && paths.length === 1 ? ' is-single' : ''));
+
+    if (series) {
+      images.style.setProperty('--series-columns', String(Math.ceil(paths.length / 2)));
+      images.dataset.count = String(paths.length);
+    }
+
+    const detailIds = `details-${++uid}`;
+    paths.forEach((path, index) => {
+      const hero = element('div', 'hero-wrap');
+      const alt = work.title
+        ? `${work.title} – image ${index + 1}`
+        : `Project image ${index + 1}`;
+      const main = artworkImage(path, alt, workIndex === 0 && index === 0);
+
+      if (hasDetails && index === 0) {
+        const button = element('button', 'artwork-toggle');
+        button.type = 'button';
+        button.setAttribute('aria-expanded', 'false');
+        button.setAttribute('aria-controls', detailIds);
+        button.setAttribute('aria-label', `Show details for ${work.title || 'work'}`);
+        const hint = element('span', 'detail-hint', '+');
+        hint.setAttribute('aria-hidden', 'true');
+        button.append(main, hint);
+        const toggle = () => {
+          if (!mobile.matches) return;
+          const open = section.classList.toggle('details-visible');
+          button.setAttribute('aria-expanded', String(open));
+          button.setAttribute('aria-label', `${open ? 'Hide' : 'Show'} details for ${work.title || 'work'}`);
+          hint.textContent = open ? '−' : '+';
+        };
+        button.addEventListener('click', toggle);
+        button.tabIndex = mobile.matches ? 0 : -1;
+        hero.appendChild(button);
+      } else {
+        hero.appendChild(main);
       }
-      hero.appendChild(main);images.appendChild(hero);
+      images.appendChild(hero);
     });
-    if(hasDetails){for(const side of ['left','right']){if(!work.details[side])continue;const i=el('img','detail detail-'+side);i.src=work.details[side];i.alt=(work.title||'Werk')+' – Detail '+side;i.loading='lazy';i.draggable=false;images.appendChild(i);}}
+
+    if (hasDetails) {
+      images.id = detailIds;
+      for (const side of ['left', 'right']) {
+        if (work.details[side]) {
+          images.appendChild(detailFrame(work.details[side], side, work.title));
+        }
+      }
+    }
+
     section.appendChild(images);
-    const desc=el('div','artwork-description');
-    if(work.title)desc.appendChild(el('h2','artwork-title',work.title));
-    if(work.medium)desc.appendChild(el('p','medium',work.medium));
-    if(work.dimensions)desc.appendChild(el('p','dimensions',work.dimensions));
-    if(work.availability)desc.appendChild(el('p','availability',work.availability));
-    if(work.text)desc.appendChild(el('p','free-text',work.text));
-    section.appendChild(desc);
+    const description = element('div', 'artwork-description' +
+      (series ? ' is-series-description' : ''));
+    if (work.title) description.appendChild(element('h2', 'artwork-title', work.title));
+    if (work.medium) description.appendChild(element('p', 'medium', work.medium));
+    if (work.dimensions) description.appendChild(element('p', 'dimensions', work.dimensions));
+    if (work.availability) description.appendChild(element('p', 'availability', work.availability));
+    if (work.text) description.appendChild(element('p', 'free-text', work.text));
+    section.appendChild(description);
     return section;
   }
-  works.forEach(w=>target.appendChild(render(w)));
-  mobile.addEventListener('change',()=>{if(!mobile.matches)target.querySelectorAll('.details-visible').forEach(n=>{n.classList.remove('details-visible');n.querySelector('.artwork-main')?.setAttribute('aria-expanded','false');});});
+
+  works.forEach((work, i) => target.appendChild(render(work, i)));
+
+  mobile.addEventListener('change', () => {
+    target.querySelectorAll('.artwork-toggle').forEach(button => {
+      button.tabIndex = mobile.matches ? 0 : -1;
+      if (!mobile.matches) {
+        const artwork = button.closest('.artwork');
+        artwork.classList.remove('details-visible');
+        button.setAttribute('aria-expanded', 'false');
+        button.setAttribute('aria-label', 'Show artwork details');
+        button.querySelector('.detail-hint').textContent = '+';
+      }
+    });
+  });
 })();
-// Einfaches Herunterladen erschweren – Screenshots und Browser-Entwicklertools bleiben möglich.
-document.addEventListener('contextmenu',e=>{if(e.target.closest('img'))e.preventDefault();});
-document.addEventListener('dragstart',e=>{if(e.target.closest('img'))e.preventDefault();});
-document.addEventListener("contextmenu", function (event) {
-  if (event.target.closest("img")) {
-    event.preventDefault();
-  }
+
+// Verhindert nur die direkte Bildspeicherung per Kontextmenü / Drag & Drop.
+// Browser-Entwicklertools oder Screenshots können Bilder weiterhin sichern.
+document.addEventListener('contextmenu', (event) => {
+  if (event.target.closest('img')) event.preventDefault();
+});
+document.addEventListener('dragstart', (event) => {
+  if (event.target.closest('img')) event.preventDefault();
 });
