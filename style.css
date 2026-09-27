@@ -1,35 +1,47 @@
-/* Soïc Kermarrec – V8 / Landingpage */
+/* Soïc Kermarrec – V8.1 / Landingpage: feste Zeilen, kompakte Navigation */
 :root { --ink: #414141; --site-font: "Helvetica Neue", Helvetica, Arial, sans-serif; }
 * { box-sizing: border-box; }
 html, body { margin: 0; min-height: 100%; background: #fff; color: var(--ink); }
 body { min-height: 100svh; font-family: var(--site-font); font-weight: 300; letter-spacing: .45px; }
+
+/* Die Navigation hat nur die Höhe ihrer Links, NICHT die Höhe des Fensters.
+   So kann die Vorschau oberhalb und unterhalb der tatsächlichen Link-Hitbox liegen. */
 .navigation {
-  position: relative; z-index: 2; pointer-events: none;
-  min-height: 100svh; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 8px;
-  padding: 24px; text-align: center;
+  position: fixed; z-index: 2; top: 50%; left: 50%;
+  transform: translate(-50%, -50%); width: max-content;
+  max-width: calc(100vw - 36px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 0; text-align: center;
+  pointer-events: none;
   animation: page-intro .8s ease-out both;
 }
+/* Jede Navigationszeile hat dieselbe unveränderliche Höhe.
+   Die Animation darf ausschließlich die sichtbaren Buchstaben verändern. */
 .navigation .site-title {
-  font: inherit; font-size: 16px; line-height: 20px;
-  margin: 0 0 12px; padding: 0; font-weight: 300;
+  display: flex; align-items: center; justify-content: center;
+  flex: 0 0 24px; width: max-content; height: 24px;
+  font: 300 16px/24px var(--site-font); margin: 0 0 12px;
+  padding: 0; white-space: nowrap;
 }
 .navigation a {
-  display: inline-block; position: relative; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  flex: 0 0 24px; position: relative; z-index: 2;
+  height: 24px; padding: 0; margin: 0;
   pointer-events: auto; color: var(--ink); text-decoration: none;
   font-family: var(--site-font); font-size: 16px; font-weight: 300;
-  letter-spacing: .45px; line-height: 20px; height: 20px;
-  white-space: nowrap; vertical-align: top;
+  letter-spacing: .45px; line-height: 24px; white-space: nowrap;
 }
+/* Der Link IM H1 ist in einer horizontalen Flex-Zeile; er darf dort nicht
+   auf eine feste Breite von 24px schrumpfen. */
+.navigation .site-title a { flex: 0 0 auto; height: 24px; line-height: 24px; }
 .navigation a:focus-visible { outline: 1px solid var(--ink); outline-offset: 5px; }
-/* Die Schriftgröße darf die Höhe der Zeilen nicht verändern:
-   16 / 16 / 14 px, aber in jeder Phase exakt 20 px line-height. */
 .navigation a.is-active { animation: font-cycle 1.2s step-end infinite; }
 @keyframes font-cycle {
   0%, 33.332% { font-family: var(--site-font); font-size: 16px; font-weight: 300; }
   33.333%, 66.665% { font-family: Baskerville, "Baskerville Old Face", Georgia, serif; font-size: 16px; font-weight: 300; }
   66.666%, 100% { font-family: Michroma, Arial, sans-serif; font-size: 14px; font-weight: 400; }
 }
+
 .preview-layer { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 #preview-link {
   position: absolute; display: none; transform: translate(-50%, -50%);
@@ -47,17 +59,21 @@ body { min-height: 100svh; font-family: var(--site-font); font-weight: 300; lett
   width: 100%; text-align: center; pointer-events: none;
   font: 300 10px/1.35 var(--site-font); letter-spacing: .35px; color: #999;
 }
+/* Die Translationswerte müssen zu der fixierten Mittelausrichtung passen. */
 @keyframes page-intro {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 8px)); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
 }
 @media (max-width: 700px) {
-  .navigation { gap: 8px; padding: 18px; }
-  .navigation a { padding: 3px; height: 26px; line-height: 20px; }
-  .navigation .site-title { font-size: 16px; line-height: 26px; }
+  .navigation { gap: 8px; max-width: calc(100vw - 36px); }
+  .navigation a, .navigation .site-title a {
+    flex-basis: 26px; height: 26px; line-height: 26px;
+  }
+  .navigation .site-title { flex-basis: 26px; height: 26px; line-height: 26px; }
+  .navigation .site-title a { flex-basis: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   .navigation { animation: none; }
-  .navigation a.is-active { animation: none; font: 300 16px/20px var(--site-font); }
+  .navigation a.is-active { animation: none; font: 300 16px/24px var(--site-font); }
 }
 img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }

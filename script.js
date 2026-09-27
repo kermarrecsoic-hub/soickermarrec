@@ -1,9 +1,10 @@
-// V8: proportional skalierte Vorschauen, größere untere Desktop-Spawnpunkte,
-// kein direkter Wiederholungs-Punkt und unverändertes Mobilverhalten.
+// V8.1: Vorschauen proportional, oberhalb des Copyright-Banners,
+// mit kompakter Hitbox rund um die tatsächlichen Navigationslinks.
 const links = [...document.querySelectorAll('.navigation a[data-preview]')];
 const navigation = document.querySelector('.navigation');
 const previewLink = document.getElementById('preview-link');
 const image = document.getElementById('preview');
+const copyright = document.querySelector('.copyright');
 const touch = matchMedia('(hover: none), (pointer: coarse)');
 let active = null;
 let currentSpawn = null;
@@ -21,14 +22,14 @@ const desktopPoints = {
   3: [.85, .16],  // oben rechts – weiter innen für erkennbare Bildgröße
   4: [.705, .50],  // rechts der Navigation
   5: [.255, .555], // links der Navigation
-  6: [.17, .755], // unten links – größerer Bildrahmen für Ex. 26
-  7: [.415, .86],  // unten, leicht links
-  8: [.82, .745]  // unten rechts – größerer Bildrahmen für XXX
+  6: [.17, .715], // unten links: weiter über dem Copyright, mehr Höhe für Ex. 26
+  7: [.40, .765], // unterhalb der Navigation, über dem Copyright
+  8: [.81, .685] // unten rechts: Platz für eine größere XXX-Vorschau
 };
 // Mobile: eigene, locker verteilte Punkte. Kleinere Preview-Grenzen wie V6.
 const mobilePoints = {
-  1: [.23, .15], 2: [.69, .12], 3: [.83, .29], 4: [.82, .68],
-  5: [.16, .34], 6: [.20, .82], 7: [.46, .89], 8: [.82, .85]
+  1: [.23, .15], 2: [.69, .12], 3: [.83, .29], 4: [.82, .65],
+  5: [.16, .34], 6: [.20, .74], 7: [.46, .77], 8: [.82, .72]
 };
 function spawnPoint(n) {
   const [x, y] = (mobileMode() ? mobilePoints : desktopPoints)[n] || [.5,.5];
@@ -45,8 +46,9 @@ function allowedSpawns(link) {
 // Der vollflächige .navigation-Container wird ausdrücklich NICHT als Schutzzone verwendet.
 function safeZone() {
   const boxes = links.map(link => link.getBoundingClientRect());
-  const paddingX = mobileMode() ? 18 : 65;
-  const paddingY = mobileMode() ? 20 : 42;
+  // Geringerer Abstand vor allem in Y: größere Bilder ober-/unterhalb der Liste.
+  const paddingX = mobileMode() ? 18 : 42;
+  const paddingY = mobileMode() ? 16 : 16;
   return {
     left: Math.min(...boxes.map(r => r.left)) - paddingX,
     right: Math.max(...boxes.map(r => r.right)) + paddingX,
@@ -57,21 +59,29 @@ function safeZone() {
 function intersects(a,b) {
   return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 }
+function previewLimits() {
+  const margin = 8;
+  // Tatsächliche Footer-Kante verwenden, damit Bilder nie über dem
+  // Copyright-Text liegen – unabhängig von Bildschirmhöhe und Schriftgröße.
+  const footerTop = copyright ? copyright.getBoundingClientRect().top : innerHeight;
+  const footerGap = mobileMode() ? 12 : 18;
+  return { margin, bottom: Math.max(0, Math.min(innerHeight - margin, footerTop - footerGap)) };
+}
 function rectAt(p,w,h) {
   return {left:p.x-w/2, right:p.x+w/2, top:p.y-h/2, bottom:p.y+h/2};
 }
 function fits(p,w,h,zone) {
-  const margin = 8;
-  const r=rectAt(p,w,h);
-  return r.left >= margin && r.right <= innerWidth-margin &&
-    r.top >= margin && r.bottom <= innerHeight-margin && !intersects(r,zone);
+  const { margin, bottom } = previewLimits();
+  const r = rectAt(p,w,h);
+  return r.left >= margin && r.right <= innerWidth - margin &&
+    r.top >= margin && r.bottom <= bottom && !intersects(r,zone);
 }
 function maxScale(p, natW, natH, zone) {
-  const margin = 8;
+  const { margin, bottom } = previewLimits();
   // Originalbilder werden niemals vergrößert. Auf Mobile gelten dieselben
   // Grundgrenzen wie V6; zusätzlich schützen wir den zentralen Text.
   const fitW = Math.max(0,2*Math.min(p.x-margin,innerWidth-p.x-margin));
-  const fitH = Math.max(0,2*Math.min(p.y-margin,innerHeight-p.y-margin));
+  const fitH = Math.max(0,2*Math.min(p.y-margin,bottom-p.y));
   const upper = Math.min(1,1200/natW,1200/natH,fitW/natW,fitH/natH);
   if (upper <= 0) return 0;
   if (fits(p,natW*upper,natH*upper,zone)) return upper;
