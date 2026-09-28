@@ -14,7 +14,7 @@ body {
   letter-spacing: .45px;
 }
 
-/* Hintergrund: proportional auf volle Breite, oben 80 % Deckkraft; mittleres Drittel blendet weich nach Weiß aus. */
+/* Hintergrund: proportional auf volle Breite, oben 90 % Deckkraft; der Weißverlauf ist um je 10 Prozentpunkte nach oben und unten erweitert. */
 .landing-background {
   position: fixed;
   inset: 0;
@@ -23,7 +23,8 @@ body {
   background: #fff;
   pointer-events: none;
 }
-#landing-background-image {
+#landing-background-image,
+.landing-background-image-next {
   position: absolute;
   top: 0;
   left: 0;
@@ -31,7 +32,8 @@ body {
   width: 100vw;
   height: auto;
   max-width: none;
-  opacity: .80;
+  opacity: .90;
+  transition: opacity 900ms ease;
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -41,11 +43,12 @@ body {
   background: linear-gradient(
     to bottom,
     rgb(255 255 255 / 0%) 0%,
-    rgb(255 255 255 / 0%) 32%,
-    rgb(255 255 255 / 18%) 39%,
-    rgb(255 255 255 / 50%) 49%,
-    rgb(255 255 255 / 78%) 58%,
-    #fff 68%,
+    rgb(255 255 255 / 0%) 22%,
+    rgb(255 255 255 / 12%) 36%,
+    rgb(255 255 255 / 38%) 55%,
+    rgb(255 255 255 / 68%) 73%,
+    rgb(255 255 255 / 88%) 84%,
+    #fff 90%,
     #fff 100%
   );
 }
@@ -147,3 +150,17 @@ body {
   .navigation a.is-active { animation: none; }
 }
 img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
+
+.landing-background-image-next {
+  z-index: 0;
+  opacity: 0;
+}
+.landing-background-image-next.is-visible {
+  opacity: .90;
+}
+#landing-background-image.is-hidden {
+  opacity: 0;
+}
+.landing-background-fade {
+  z-index: 1;
+}

@@ -21,11 +21,20 @@
     return mode() === 'mobile' ? bg.dataset.mobileFallback : bg.dataset.desktopFallback;
   }
 
-  function activeBackgroundPath() {
+  const ROTATION_MS = 5000;
+  let rotationTimer = 0;
+  let slotIndex = 0;
+  let nextBg = null;
+
+  function backgroundPaths() {
     const section = config?.[mode()];
-    const active = Math.max(1, Math.min(3, Number(section?.active) || 1));
-    const path = section?.slots?.[active - 1];
-    return path || fallbackPath();
+    const slots = Array.isArray(section?.slots) ? section.slots.filter(Boolean) : [];
+    return slots.length ? slots : [fallbackPath()].filter(Boolean);
+  }
+
+  function activeBackgroundPath() {
+    const paths = backgroundPaths();
+    return paths[slotIndex % paths.length] || fallbackPath();
   }
 
   async function loadConfig() {
@@ -39,24 +48,63 @@
     setBackground();
   }
 
-  function setBackground() {
-    const path = activeBackgroundPath();
+  function ensureNextBackground() {
+    if (nextBg) return nextBg;
+    nextBg = document.createElement('img');
+    nextBg.className = 'landing-background-image-next';
+    nextBg.alt = '';
+    nextBg.setAttribute('aria-hidden', 'true');
+    bg.parentNode.insertBefore(nextBg, bg.nextSibling);
+    return nextBg;
+  }
+
+  function showPath(path, animate = false) {
     if (!path) return;
-    const next = new Image();
-    next.onload = () => {
-      bg.src = path;
-      bg.onload = scheduleContrast;
-      if (bg.complete) scheduleContrast();
+    const probe = new Image();
+    probe.onload = () => {
+      if (!animate || !bg.src) {
+        bg.src = path;
+        bg.classList.remove('is-hidden');
+        scheduleContrast();
+        return;
+      }
+
+      const incoming = ensureNextBackground();
+      incoming.src = path;
+      incoming.classList.remove('is-visible');
+      void incoming.offsetWidth;
+      incoming.classList.add('is-visible');
+      bg.classList.add('is-hidden');
+
+      setTimeout(() => {
+        bg.src = path;
+        bg.classList.remove('is-hidden');
+        incoming.classList.remove('is-visible');
+        scheduleContrast();
+      }, 900);
     };
-    next.onerror = () => {
-      const fallback = fallbackPath();
-      if (fallback && path !== fallback) bg.src = fallback;
-    };
-    next.src = path;
+    probe.onerror = rotateBackground;
+    probe.src = path;
+  }
+
+  function setBackground(animate = false) {
+    showPath(activeBackgroundPath(), animate);
+  }
+
+  function rotateBackground() {
+    const paths = backgroundPaths();
+    if (paths.length < 2) return;
+    slotIndex = (slotIndex + 1) % paths.length;
+    setBackground(true);
+  }
+
+  function restartRotation() {
+    clearInterval(rotationTimer);
+    rotationTimer = setInterval(rotateBackground, ROTATION_MS);
   }
 
   // Die CSS-Darstellung ist exakt: Bildbreite = Viewportbreite, Bildhöhe proportional.
-  // Wir sampeln eine kleine Fläche hinter jeder Textzeile, blenden rechnerisch die 80%-Deckkraft
+  // Wir sampeln eine kleine Fläche hinter jeder Textzeile, blenden rechnerisch die 90%-Deckkraft
   // und den Weißverlauf ein und wählen danach Weiß oder Dunkelgrau mit höherem Kontrast.
   function refreshContrast() {
     contrastRAF = 0;
@@ -94,17 +142,17 @@
         rgb = [r / count, g / count, b / count];
       }
 
-      // 80 % Bilddeckkraft über Weiß.
-      rgb = rgb.map(v => v * .80 + 255 * .20);
+      // 90 % Bilddeckkraft über Weiß.
+      rgb = rgb.map(v => v * .90 + 255 * .10);
 
-      // Gleiche Weißblende wie im CSS: oben frei, ab ca. 1/3 weich, bei ca. 2/3 weiß.
+      // Gleiche Weißblende wie im CSS: Verlauf von 22 % bis 78 % der Viewporthöhe.
       const y = Math.max(0, Math.min(1, syScreen / H));
       let white = 0;
-      if (y > .32 && y < .68) {
-        const t = (y - .32) / (.68 - .32);
+      if (y > .22 && y < .90) {
+        const t = (y - .22) / (.90 - .22);
         // Smoothstep für einen weichen statt stufigen Verlauf.
         white = t * t * (3 - 2 * t);
-      } else if (y >= .68) {
+      } else if (y >= .90) {
         white = 1;
       }
       rgb = rgb.map(v => v * (1 - white) + 255 * white);
@@ -149,10 +197,13 @@
   });
 
   addEventListener('resize', () => {
-    setBackground();
     scheduleContrast();
   });
-  mobileQuery.addEventListener?.('change', () => setBackground());
+  mobileQuery.addEventListener?.('change', () => {
+    slotIndex = 0;
+    setBackground();
+    restartRotation();
+  });
 
-  loadConfig();
+  loadConfig().then(() => restartRotation());
 })();
