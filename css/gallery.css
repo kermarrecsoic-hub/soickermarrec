@@ -482,3 +482,29 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 @media (prefers-reduced-motion: reduce) {
   .artwork.has-details.details-visible .detail-image { animation: none; }
 }
+
+/* Privater Studio-Zugang auf der About-Seite. */
+.studio-entry { margin: 62px 0 0; text-align: center; }
+.studio-entry a { color: #999; text-decoration: none; font: inherit; }
+.studio-entry a:hover { color: var(--ink); }
+
+
+/* V11 Navigation: kein linker Zurück-Button, kein mittiger Seitentitel. */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.site-header .back-link,
+.site-header .current-section { display: none !important; }
+.site-nav { right: 6.2%; }
+.site-nav a:first-child { margin-bottom: 12px; }
+@media (max-width: 700px) {
+  .site-nav { right: 15px; }
+}
