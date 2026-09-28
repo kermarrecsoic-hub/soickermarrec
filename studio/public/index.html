@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="noindex,nofollow,noarchive" name="robots"/>
+<title>Soïc Studio</title>
+<link href="https://soickermarrec.de/favicon.png" rel="icon" type="image/png"/>
+<link href="app.css" rel="stylesheet"/>
+<script defer="" src="app.js"></script>
+</head>
+<body>
+<section class="login-shell" hidden="" id="loginShell">
+<form autocomplete="off" class="login-card" id="loginForm">
+<div class="brand">Soïc Studio</div>
+<p>Privater Bereich für Bilder und Projekte.</p>
+<label>
+<span>Passwort</span>
+<input autocomplete="current-password" autofocus="" id="passwordInput" required="" type="password"/>
+</label>
+<button class="primary" type="submit">Anmelden</button>
+<p aria-live="polite" class="form-message" id="loginMessage"></p>
+</form>
+</section>
+<div class="app-shell" hidden="" id="appShell">
+<aside class="sidebar">
+<div class="sidebar-top">
+<div class="brand">Soïc Studio</div>
+<button aria-label="Menü" class="icon-button mobile-menu-button" id="mobileMenuButton" type="button">☰</button>
+</div>
+<nav class="section-nav" id="sectionNav">
+<button data-view="painting" type="button">Malerei</button>
+<button data-view="graphic" type="button">Tinte</button>
+<button data-view="exhibitions" type="button">Ausstellung</button>
+<button data-view="architecture" type="button">Arch.0</button>
+<button data-view="xxx" type="button">Fotografie</button>
+<div class="nav-separator"></div>
+<button data-view="media" type="button">Mediathek</button>
+<button data-view="landing-backgrounds" type="button">Landing-Hintergrund</button><button data-view="site-images" type="button">Seitenbilder</button>
+</nav>
+<div class="sidebar-bottom">
+<a href="https://soickermarrec.de" rel="noreferrer" target="_blank">Website öffnen ↗</a>
+<button class="text-button" id="logoutButton" type="button">Abmelden</button>
+</div>
+</aside>
+<main class="workspace">
+<header class="workspace-header">
+<div>
+<p class="eyebrow" id="workspaceEyebrow">Portfolio</p>
+<h1 id="workspaceTitle">Malerei</h1>
+</div>
+<div class="header-actions" id="headerActions"></div>
+</header>
+<div aria-live="polite" class="status-line" id="statusLine"></div>
+<section class="workspace-content" id="workspaceContent"></section>
+</main>
+</div>
+<dialog class="editor-dialog" id="editorDialog">
+<form class="dialog-shell" id="projectForm" method="dialog">
+<header class="dialog-header">
+<div>
+<p class="eyebrow">Projekt bearbeiten</p>
+<h2 id="editorTitle">Werk</h2>
+</div>
+<button aria-label="Schließen" class="icon-button" type="submit" value="cancel">×</button>
+</header>
+<div class="dialog-body">
+<div class="form-grid">
+<label class="wide"><span>Titel</span><input id="fieldTitle" name="title" type="text"/></label>
+<label><span>Medium</span><input id="fieldMedium" name="medium" type="text"/></label>
+<label><span>Maße</span><input id="fieldDimensions" name="dimensions" type="text"/></label>
+<label class="wide"><span>Verfügbarkeit</span><input id="fieldAvailability" name="availability" placeholder="z. B. unavailable" type="text"/></label>
+<label class="wide"><span>Beschreibung</span><textarea id="fieldText" name="text" rows="5"></textarea></label>
+<label class="wide folder-field"><span>Ordner für neue Uploads</span><div class="folder-row"><span id="folderPrefix"></span><input id="fieldFolder" placeholder="projektname" type="text"/></div></label>
+</div>
+<section class="image-editor-section">
+<div class="section-heading-row">
+<div>
+<h3>Hauptbilder</h3>
+<p>Reihenfolge per Drag &amp; Drop ändern.</p>
+</div>
+<div class="compact-actions">
+<button class="secondary" hidden="" id="sortMainBySaturation" type="button">Nach Sättigung</button><button class="secondary" id="chooseMainFromMedia" type="button">Aus Mediathek</button>
+<label class="secondary file-button">Hochladen<input accept="image/*" hidden="" id="mainImageInput" multiple="" type="file"/></label>
+</div>
+</div>
+<div class="image-strip" id="mainImageStrip"></div>
+</section>
+<section class="image-editor-section" id="detailSection">
+<div class="section-heading-row">
+<div>
+<h3>Detailbilder</h3>
+<p>Optional: links und rechts aufklappbar.</p>
+</div>
+</div>
+<div class="detail-grid">
+<div class="detail-slot" data-detail="left">
+<span class="slot-label">Links</span>
+<div class="detail-preview" id="detailLeftPreview"></div>
+<div class="compact-actions">
+<button class="secondary detail-media-button" data-side="left" type="button">Mediathek</button>
+<label class="secondary file-button">Upload<input accept="image/*" class="detail-file-input" data-side="left" hidden="" type="file"/></label>
+<button class="text-button danger detail-clear-button" data-side="left" type="button">Entfernen</button>
+</div>
+</div>
+<div class="detail-slot" data-detail="right">
+<span class="slot-label">Rechts</span>
+<div class="detail-preview" id="detailRightPreview"></div>
+<div class="compact-actions">
+<button class="secondary detail-media-button" data-side="right" type="button">Mediathek</button>
+<label class="secondary file-button">Upload<input accept="image/*" class="detail-file-input" data-side="right" hidden="" type="file"/></label>
+<button class="text-button danger detail-clear-button" data-side="right" type="button">Entfernen</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<footer class="dialog-footer">
+<button class="text-button danger" id="deleteProjectButton" type="button">Projekt entfernen</button>
+<div class="dialog-footer-right">
+<button class="secondary" id="cancelEditorButton" type="button">Abbrechen</button>
+<button class="primary" id="saveProjectButton" type="button">Speichern &amp; veröffentlichen</button>
+</div>
+</footer>
+</form>
+</dialog>
+<dialog class="media-dialog" id="mediaDialog">
+<div class="dialog-shell">
+<header class="dialog-header">
+<div><p class="eyebrow">Mediathek</p><h2>Bild auswählen</h2></div>
+<button aria-label="Schließen" class="icon-button" id="closeMediaDialog" type="button">×</button>
+</header>
+<div class="media-dialog-toolbar">
+<input id="mediaSearch" placeholder="Pfad durchsuchen …" type="search"/>
+<span id="mediaSelectionHint"></span><button class="primary" hidden="" id="mediaDoneButton" type="button">Auswahl übernehmen</button>
+</div>
+<div class="media-picker-grid" id="mediaPickerGrid"></div>
+</div>
+</dialog>
+<div aria-live="polite" class="toast" id="toast" role="status"></div>
+</body>
+</html>

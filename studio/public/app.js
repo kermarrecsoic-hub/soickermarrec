@@ -1,0 +1,1007 @@
+(() => {
+  'use strict';
+
+  const API = '/.netlify/functions/';
+  const SITE = 'https://soickermarrec.de/';
+  const SECTION_CONFIG = {
+    painting: { label: 'Malerei', root: 'images/painting', kind: 'art' },
+    graphic: { label: 'Tinte', root: 'images/ink', kind: 'art' },
+    exhibitions: { label: 'Ausstellung', root: 'images/exhibitions', kind: 'series' },
+    architecture: { label: 'Arch.0', root: 'images/architecture', kind: 'series' },
+    xxx: { label: 'Fotografie', root: 'images/xxx', kind: 'series' },
+  };
+  const SITE_IMAGES = [
+    { label: 'About – Hauptbild', path: 'images/about.jpg' },
+    { label: 'Kontakt – Hauptbild', path: 'images/contact.jpg' },
+  ];
+
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+  const loginShell = $('#loginShell');
+  const appShell = $('#appShell');
+  const loginForm = $('#loginForm');
+  const loginMessage = $('#loginMessage');
+  const workspaceTitle = $('#workspaceTitle');
+  const workspaceEyebrow = $('#workspaceEyebrow');
+  const workspaceContent = $('#workspaceContent');
+  const headerActions = $('#headerActions');
+  const statusLine = $('#statusLine');
+  const sectionNav = $('#sectionNav');
+  const editorDialog = $('#editorDialog');
+  const mediaDialog = $('#mediaDialog');
+  const toast = $('#toast');
+
+  const state = {
+    view: 'painting',
+    section: 'painting',
+    works: [],
+    media: [],
+    mediaLoaded: false,
+    editor: null,
+    picker: null,
+    busy: false,
+    landingConfig: null,
+  };
+
+  async function api(name, options = {}) {
+    const res = await fetch(`${API}${name}`, {
+      credentials: 'same-origin',
+      cache: 'no-store',
+      ...options,
+      headers: {
+        ...(options.body ? { 'content-type': 'application/json' } : {}),
+        ...(options.headers || {}),
+      },
+    });
+    let data = {};
+    try { data = await res.json(); } catch {}
+    if (!res.ok || data.ok === false) {
+      if (res.status === 401 && name !== 'login') showLogin();
+      throw new Error(data.error || `Fehler ${res.status}`);
+    }
+    return data;
+  }
+
+  function setStatus(message = '', isError = false) {
+    statusLine.textContent = message;
+    statusLine.style.color = isError ? '#9a4242' : '';
+  }
+
+  let toastTimer;
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add('is-visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2200);
+  }
+
+  function showLogin() {
+    appShell.hidden = true;
+    loginShell.hidden = false;
+    setTimeout(() => $('#passwordInput')?.focus(), 20);
+  }
+
+  function showApp() {
+    loginShell.hidden = true;
+    appShell.hidden = false;
+  }
+
+  async function boot() {
+    try {
+      await api('session');
+      showApp();
+      await setView('painting');
+    } catch {
+      showLogin();
+    }
+  }
+
+  loginForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    loginMessage.textContent = '';
+    const button = loginForm.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      await api('login', { method: 'POST', body: JSON.stringify({ password: $('#passwordInput').value }) });
+      $('#passwordInput').value = '';
+      showApp();
+      await setView('painting');
+    } catch (error) {
+      loginMessage.textContent = error.message;
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  $('#logoutButton').addEventListener('click', async () => {
+    try { await api('logout', { method: 'POST', body: '{}' }); } catch {}
+    showLogin();
+  });
+
+  $('#mobileMenuButton').addEventListener('click', () => $('.sidebar').classList.toggle('is-open'));
+
+  sectionNav.addEventListener('click', async event => {
+    const button = event.target.closest('button[data-view]');
+    if (!button) return;
+    $('.sidebar').classList.remove('is-open');
+    await setView(button.dataset.view);
+  });
+
+  function markActiveNav(view) {
+    $$('button[data-view]', sectionNav).forEach(button => button.classList.toggle('is-active', button.dataset.view === view));
+  }
+
+  async function setView(view) {
+    state.view = view;
+    markActiveNav(view);
+    headerActions.innerHTML = '';
+    workspaceContent.innerHTML = '';
+    setStatus('Lade …');
+
+    if (SECTION_CONFIG[view]) {
+      state.section = view;
+      workspaceEyebrow.textContent = 'Portfolio';
+      workspaceTitle.textContent = SECTION_CONFIG[view].label;
+      const add = button('Neues Projekt', 'primary', () => openProjectEditor(-1));
+      headerActions.appendChild(add);
+      if (view === 'xxx') {
+        headerActions.prepend(button('Alle Bilder nach Sättigung', 'secondary', sortAllPhotographyBySaturation));
+      }
+      try {
+        const data = await api(`content?section=${encodeURIComponent(view)}`);
+        state.works = Array.isArray(data.works) ? data.works : [];
+        renderProjects();
+        setStatus(`${state.works.length} ${state.works.length === 1 ? 'Projekt' : 'Projekte'} · Änderungen werden direkt auf GitHub veröffentlicht.`);
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+      return;
+    }
+
+    if (view === 'media') {
+      workspaceEyebrow.textContent = 'Dateien';
+      workspaceTitle.textContent = 'Mediathek';
+      await renderMediaPage();
+      return;
+    }
+
+    if (view === 'site-images') {
+      workspaceEyebrow.textContent = 'Website';
+      workspaceTitle.textContent = 'Seitenbilder';
+      renderSiteImages();
+      setStatus('Diese Uploads ersetzen das jeweilige Bild direkt auf der Website.');
+      return;
+    }
+
+    if (view === 'landing-backgrounds') {
+      workspaceEyebrow.textContent = 'Landingpage';
+      workspaceTitle.textContent = 'Hintergrund-Slots';
+      await renderLandingBackgrounds();
+      return;
+    }
+  }
+
+  function button(text, className, onClick) {
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.textContent = text;
+    if (className) el.className = className;
+    if (onClick) el.addEventListener('click', onClick);
+    return el;
+  }
+
+  function toRepoPath(path = '') {
+    return String(path).replace(/^\.\.\//, '').replace(/^\/+/, '');
+  }
+
+  function toDataPath(path = '') {
+    const clean = toRepoPath(path);
+    return clean ? `../${clean}` : '';
+  }
+
+  function publicUrl(path = '') {
+    return `${SITE}${encodeURI(toRepoPath(path))}?studio=${Date.now()}`;
+  }
+
+  function workImages(work) {
+    if (Array.isArray(work.images) && work.images.length) return work.images.filter(Boolean);
+    return work.image ? [work.image] : [];
+  }
+
+  function renderProjects() {
+    workspaceContent.innerHTML = '';
+    if (!state.works.length) {
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.innerHTML = '<p>Noch keine Projekte.</p>';
+      empty.appendChild(button('Erstes Projekt anlegen', 'primary', () => openProjectEditor(-1)));
+      workspaceContent.appendChild(empty);
+      return;
+    }
+
+    const list = document.createElement('div');
+    list.className = 'project-list';
+    state.works.forEach((work, index) => list.appendChild(projectCard(work, index)));
+    workspaceContent.appendChild(list);
+  }
+
+  function projectCard(work, index) {
+    const card = document.createElement('article');
+    card.className = 'project-card';
+    card.draggable = true;
+    card.dataset.index = index;
+    const images = workImages(work);
+
+    const thumb = document.createElement('div');
+    thumb.className = `project-thumb${images.length ? '' : ' empty'}`;
+    if (images[0]) {
+      const img = document.createElement('img');
+      img.src = publicUrl(images[0]);
+      img.alt = '';
+      img.loading = 'lazy';
+      thumb.appendChild(img);
+      if (images.length > 1) {
+        const count = document.createElement('span');
+        count.className = 'project-count';
+        count.textContent = `${images.length} Bilder`;
+        thumb.appendChild(count);
+      }
+    } else {
+      thumb.textContent = 'Kein Bild';
+    }
+
+    const body = document.createElement('div');
+    body.className = 'project-card-body';
+    const title = document.createElement('div');
+    title.className = 'project-card-title';
+    title.textContent = work.title || 'Untitled';
+    const meta = document.createElement('div');
+    meta.className = 'project-card-meta';
+    meta.textContent = [work.medium, work.dimensions].filter(Boolean).join(' · ') || '—';
+    const actions = document.createElement('div');
+    actions.className = 'project-card-actions';
+    const handle = document.createElement('span');
+    handle.className = 'drag-handle';
+    handle.textContent = '⋮⋮';
+    handle.title = 'Zum Sortieren ziehen';
+    actions.append(handle, button('Bearbeiten', 'secondary', () => openProjectEditor(index)));
+    body.append(title, meta, actions);
+    card.append(thumb, body);
+
+    card.addEventListener('dragstart', event => {
+      card.classList.add('is-dragging');
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', String(index));
+    });
+    card.addEventListener('dragend', () => card.classList.remove('is-dragging'));
+    card.addEventListener('dragover', event => { event.preventDefault(); card.classList.add('drag-over'); });
+    card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+    card.addEventListener('drop', async event => {
+      event.preventDefault();
+      card.classList.remove('drag-over');
+      const from = Number(event.dataTransfer.getData('text/plain'));
+      const to = Number(card.dataset.index);
+      if (!Number.isInteger(from) || from === to) return;
+      const [moved] = state.works.splice(from, 1);
+      state.works.splice(to, 0, moved);
+      renderProjects();
+      try {
+        setStatus('Reihenfolge wird gespeichert …');
+        await saveWorks();
+        setStatus('Reihenfolge veröffentlicht.');
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    });
+    return card;
+  }
+
+  function clone(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function slugify(value = '') {
+    return String(value)
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/ß/g, 'ss')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 52) || 'untitled';
+  }
+
+  function deriveFolder(work, config) {
+    const first = toRepoPath(workImages(work)[0] || '');
+    const prefix = `${config.root}/`;
+    if (first.startsWith(prefix)) {
+      const rest = first.slice(prefix.length);
+      const segment = rest.split('/')[0];
+      if (segment && rest.includes('/')) return segment;
+    }
+    return slugify(work.title || 'untitled');
+  }
+
+  function openProjectEditor(index) {
+    const config = SECTION_CONFIG[state.section];
+    const isNew = index < 0;
+    const work = isNew ? { title: '', medium: '', dimensions: '', availability: '', text: '', images: [] } : clone(state.works[index]);
+    const main = workImages(work).map(path => ({ path: toRepoPath(path), preview: publicUrl(path) }));
+    const details = {
+      left: work.details?.left ? { path: toRepoPath(work.details.left), preview: publicUrl(work.details.left) } : null,
+      right: work.details?.right ? { path: toRepoPath(work.details.right), preview: publicUrl(work.details.right) } : null,
+    };
+    state.editor = { index, isNew, work, main, details, config };
+
+    $('#editorTitle').textContent = isNew ? 'Neues Projekt' : (work.title || 'Untitled');
+    $('#fieldTitle').value = work.title || '';
+    $('#fieldMedium').value = work.medium || '';
+    $('#fieldDimensions').value = work.dimensions || '';
+    $('#fieldAvailability').value = work.availability || '';
+    $('#fieldText').value = work.text || '';
+    $('#fieldFolder').value = deriveFolder(work, config);
+    $('#folderPrefix').textContent = `${config.root}/`;
+    $('#detailSection').hidden = config.kind !== 'art';
+    $('#sortMainBySaturation').hidden = state.section !== 'xxx';
+    $('#deleteProjectButton').hidden = isNew;
+    renderEditorImages();
+    editorDialog.showModal();
+  }
+
+  function renderEditorImages() {
+    const editor = state.editor;
+    if (!editor) return;
+    const strip = $('#mainImageStrip');
+    strip.innerHTML = '';
+    editor.main.forEach((item, index) => {
+      const box = document.createElement('div');
+      box.className = 'image-item';
+      box.draggable = true;
+      box.dataset.index = index;
+      const img = document.createElement('img');
+      img.src = item.preview || publicUrl(item.path);
+      img.alt = '';
+      const remove = button('×', 'image-remove', () => {
+        if (item.preview?.startsWith('blob:')) URL.revokeObjectURL(item.preview);
+        editor.main.splice(index, 1);
+        renderEditorImages();
+      });
+      remove.setAttribute('aria-label', 'Bild entfernen');
+      const path = document.createElement('span');
+      path.className = 'image-path';
+      path.textContent = item.file ? item.file.name : item.path;
+      box.append(img, remove, path);
+      box.addEventListener('dragstart', event => {
+        box.classList.add('is-dragging');
+        event.dataTransfer.setData('text/plain', String(index));
+      });
+      box.addEventListener('dragend', () => box.classList.remove('is-dragging'));
+      box.addEventListener('dragover', event => event.preventDefault());
+      box.addEventListener('drop', event => {
+        event.preventDefault();
+        const from = Number(event.dataTransfer.getData('text/plain'));
+        const to = Number(box.dataset.index);
+        if (!Number.isInteger(from) || from === to) return;
+        const [moved] = editor.main.splice(from, 1);
+        editor.main.splice(to, 0, moved);
+        renderEditorImages();
+      });
+      strip.appendChild(box);
+    });
+    renderDetailPreview('left');
+    renderDetailPreview('right');
+  }
+
+  function renderDetailPreview(side) {
+    const box = $(`#detail${side[0].toUpperCase() + side.slice(1)}Preview`);
+    box.innerHTML = '';
+    const item = state.editor?.details?.[side];
+    if (!item) {
+      box.textContent = 'Kein Detailbild';
+      return;
+    }
+    const img = document.createElement('img');
+    img.src = item.preview || publicUrl(item.path);
+    img.alt = '';
+    box.appendChild(img);
+  }
+
+  $('#fieldTitle').addEventListener('input', () => {
+    if (!state.editor?.isNew) return;
+    const folder = $('#fieldFolder');
+    if (!folder.dataset.touched) folder.value = slugify($('#fieldTitle').value);
+  });
+  $('#fieldFolder').addEventListener('input', event => { event.target.dataset.touched = '1'; });
+
+  $('#mainImageInput').addEventListener('change', event => {
+    const files = [...event.target.files];
+    files.forEach(file => state.editor.main.push({ file, preview: URL.createObjectURL(file) }));
+    event.target.value = '';
+    renderEditorImages();
+  });
+
+  $$('.detail-file-input').forEach(input => input.addEventListener('change', event => {
+    const side = input.dataset.side;
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const old = state.editor.details[side];
+    if (old?.preview?.startsWith('blob:')) URL.revokeObjectURL(old.preview);
+    state.editor.details[side] = { file, preview: URL.createObjectURL(file) };
+    input.value = '';
+    renderDetailPreview(side);
+  }));
+
+  $$('.detail-clear-button').forEach(buttonEl => buttonEl.addEventListener('click', () => {
+    const side = buttonEl.dataset.side;
+    const item = state.editor.details[side];
+    if (item?.preview?.startsWith('blob:')) URL.revokeObjectURL(item.preview);
+    state.editor.details[side] = null;
+    renderDetailPreview(side);
+  }));
+
+  $('#chooseMainFromMedia').addEventListener('click', () => openMediaPicker({ multiple: true, onPick(paths) {
+    paths.forEach(path => {
+      if (!state.editor.main.some(item => item.path === path)) state.editor.main.push({ path, preview: publicUrl(path) });
+    });
+    renderEditorImages();
+  }}));
+
+  $$('.detail-media-button').forEach(buttonEl => buttonEl.addEventListener('click', () => {
+    const side = buttonEl.dataset.side;
+    openMediaPicker({ multiple: false, onPick(paths) {
+      const path = paths[0];
+      if (path) state.editor.details[side] = { path, preview: publicUrl(path) };
+      renderDetailPreview(side);
+    }});
+  }));
+
+  $('#cancelEditorButton').addEventListener('click', () => editorDialog.close());
+
+  $('#deleteProjectButton').addEventListener('click', async () => {
+    const editor = state.editor;
+    if (!editor || editor.isNew) return;
+    if (!confirm(`„${editor.work.title || 'Untitled'}“ wirklich von der Seite entfernen? Die Bilddateien bleiben in der Mediathek.`)) return;
+    state.works.splice(editor.index, 1);
+    try {
+      setBusy(true);
+      await saveWorks();
+      editorDialog.close();
+      renderProjects();
+      showToast('Projekt entfernt');
+    } catch (error) {
+      alert(error.message);
+    } finally { setBusy(false); }
+  });
+
+  $('#saveProjectButton').addEventListener('click', saveProject);
+
+  function cleanFolder(value) {
+    return slugify(value || 'untitled');
+  }
+
+
+  async function saturationScoreForItem(item) {
+    let blob;
+    if (item.file) {
+      blob = item.file;
+    } else if (item.path) {
+      const response = await fetch(`${API}image-proxy?path=${encodeURIComponent(toRepoPath(item.path))}`, {
+        credentials: 'same-origin',
+        cache: 'no-store',
+      });
+      if (!response.ok) throw new Error(`Bild konnte nicht analysiert werden: ${item.path}`);
+      blob = await response.blob();
+    } else {
+      return 0;
+    }
+    const bitmap = await createImageBitmap(blob, { imageOrientation: 'from-image' });
+    const maxSide = 160;
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+    const w = Math.max(1, Math.round(bitmap.width * scale));
+    const h = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    bitmap.close();
+    const data = ctx.getImageData(0, 0, w, h).data;
+    let sum = 0, weightSum = 0;
+    for (let i = 0; i < data.length; i += 16) { // jedes vierte Pixel genügt
+      const r = data[i] / 255, g = data[i + 1] / 255, b = data[i + 2] / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      const sat = max === 0 ? 0 : (max - min) / max;
+      // Sehr dunkle oder nahezu weiße Pixel weniger stark gewichten: relevante Bildfarbe zählt mehr.
+      const valueWeight = .28 + .72 * (1 - Math.abs(max - .55) / .55);
+      const weight = Math.max(.08, valueWeight);
+      sum += sat * weight;
+      weightSum += weight;
+    }
+    return weightSum ? sum / weightSum : 0;
+  }
+
+  async function sortItemsBySaturation(items) {
+    const scored = [];
+    for (let i = 0; i < items.length; i++) {
+      setStatus(`Sättigung wird analysiert … ${i + 1}/${items.length}`);
+      scored.push({ item: items[i], score: await saturationScoreForItem(items[i]), original: i });
+    }
+    scored.sort((a, b) => (b.score - a.score) || (a.original - b.original));
+    return scored.map(entry => entry.item);
+  }
+
+  $('#sortMainBySaturation').addEventListener('click', async () => {
+    if (!state.editor || state.section !== 'xxx' || state.editor.main.length < 2) return;
+    const btn = $('#sortMainBySaturation');
+    btn.disabled = true;
+    try {
+      state.editor.main = await sortItemsBySaturation(state.editor.main);
+      renderEditorImages();
+      showToast('Satte Bilder oben, ungesättigte unten');
+      setStatus('Automatisch sortiert. Du kannst die Reihenfolge jetzt per Drag & Drop weiter ändern.');
+    } catch (error) {
+      setStatus(error.message, true);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  async function sortAllPhotographyBySaturation() {
+    if (state.section !== 'xxx' || !state.works.length) return;
+    if (!confirm('Alle Bilder innerhalb der Fotografie-Projekte nach Sättigung sortieren? Satte Bilder stehen danach oben; anschließend kannst du weiter manuell sortieren.')) return;
+    try {
+      for (let wi = 0; wi < state.works.length; wi++) {
+        const work = state.works[wi];
+        const raw = workImages(work).map(path => ({ path: toRepoPath(path) }));
+        if (raw.length < 2) continue;
+        setStatus(`Projekt ${wi + 1}/${state.works.length}: Sättigung wird analysiert …`);
+        const sorted = await sortItemsBySaturation(raw);
+        work.images = sorted.map(item => toDataPath(item.path));
+        delete work.image;
+      }
+      await saveWorks();
+      renderProjects();
+      showToast('Fotografie nach Sättigung sortiert');
+      setStatus('Gespeichert: satte Bilder oben, ungesättigte unten. Manuelles Drag & Drop bleibt möglich.');
+    } catch (error) {
+      setStatus(error.message, true);
+    }
+  }
+
+  async function saveProject() {
+    const editor = state.editor;
+    if (!editor) return;
+    if (!editor.main.length) {
+      alert('Bitte mindestens ein Hauptbild hinzufügen.');
+      return;
+    }
+    const folder = cleanFolder($('#fieldFolder').value);
+    if (!folder) {
+      alert('Bitte einen Ordnernamen angeben.');
+      return;
+    }
+
+    try {
+      setBusy(true);
+      setStatus('Bilder werden optimiert und hochgeladen …');
+      const stamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
+      const mainPaths = [];
+      for (let i = 0; i < editor.main.length; i++) {
+        const item = editor.main[i];
+        if (item.file) {
+          const blob = await optimizeImage(item.file);
+          const path = `${editor.config.root}/${folder}/main-${stamp}-${String(i + 1).padStart(2, '0')}.jpg`;
+          await uploadBlob(path, blob);
+          mainPaths.push(path);
+        } else if (item.path) {
+          mainPaths.push(item.path);
+        }
+      }
+
+      const detailPaths = {};
+      for (const side of ['left', 'right']) {
+        const item = editor.details[side];
+        if (!item) continue;
+        if (item.file) {
+          const blob = await optimizeImage(item.file);
+          const path = `${editor.config.root}/${folder}/detail-${side}-${stamp}.jpg`;
+          await uploadBlob(path, blob);
+          detailPaths[side] = path;
+        } else if (item.path) {
+          detailPaths[side] = item.path;
+        }
+      }
+
+      const updated = {
+        ...editor.work,
+        title: $('#fieldTitle').value.trim(),
+        medium: $('#fieldMedium').value.trim(),
+        dimensions: $('#fieldDimensions').value.trim(),
+        availability: $('#fieldAvailability').value.trim(),
+        text: $('#fieldText').value.trim(),
+        images: mainPaths.map(toDataPath),
+      };
+      delete updated.image;
+      if (editor.config.kind === 'art' && (detailPaths.left || detailPaths.right)) {
+        updated.details = {};
+        if (detailPaths.left) updated.details.left = toDataPath(detailPaths.left);
+        if (detailPaths.right) updated.details.right = toDataPath(detailPaths.right);
+      } else {
+        delete updated.details;
+      }
+
+      if (editor.isNew) state.works.push(updated);
+      else state.works[editor.index] = updated;
+
+      setStatus('Projektdatei wird veröffentlicht …');
+      await saveWorks();
+      state.mediaLoaded = false;
+      editorDialog.close();
+      renderProjects();
+      setStatus(`${state.works.length} Projekte · zuletzt gerade eben aktualisiert.`);
+      showToast('Veröffentlicht');
+    } catch (error) {
+      alert(`Speichern fehlgeschlagen:\n${error.message}`);
+      setStatus(error.message, true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function setBusy(busy) {
+    state.busy = busy;
+    $$('#editorDialog button, #editorDialog input, #editorDialog textarea').forEach(el => {
+      if (el.id === 'cancelEditorButton') return;
+      el.disabled = busy;
+    });
+  }
+
+  async function saveWorks() {
+    return api('save-data', { method: 'POST', body: JSON.stringify({ section: state.section, works: state.works }) });
+  }
+
+  async function optimizeImage(file, maxSide = 2200, quality = 0.9) {
+    const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+    let blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+    if (!blob) throw new Error('Das Bild konnte nicht verarbeitet werden.');
+    if (blob.size > 3_900_000) {
+      blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.78));
+    }
+    if (!blob || blob.size > 4_000_000) throw new Error(`${file.name} ist auch nach Optimierung zu groß.`);
+    return blob;
+  }
+
+  async function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function uploadBlob(path, blob) {
+    const base64 = await blobToBase64(blob);
+    return api('upload-image', { method: 'POST', body: JSON.stringify({ path, base64 }) });
+  }
+
+  async function ensureMedia() {
+    if (state.mediaLoaded) return state.media;
+    const data = await api('media');
+    state.media = data.images || [];
+    state.mediaLoaded = true;
+    return state.media;
+  }
+
+  async function openMediaPicker({ multiple, onPick }) {
+    state.picker = { multiple, selected: new Set(), onPick };
+    $('#mediaSelectionHint').textContent = multiple ? 'Mehrere Bilder möglich' : 'Ein Bild auswählen';
+    $('#mediaDoneButton').hidden = !multiple;
+    $('#mediaDoneButton').disabled = true;
+    $('#mediaDoneButton').textContent = 'Auswahl übernehmen';
+    $('#mediaSearch').value = '';
+    mediaDialog.showModal();
+    $('#mediaPickerGrid').innerHTML = '<div class="empty-state">Lade Mediathek …</div>';
+    try {
+      await ensureMedia();
+      renderMediaPicker();
+    } catch (error) {
+      $('#mediaPickerGrid').innerHTML = `<div class="empty-state">${escapeHtml(error.message)}</div>`;
+    }
+  }
+
+  function renderMediaPicker() {
+    const grid = $('#mediaPickerGrid');
+    const query = $('#mediaSearch').value.trim().toLowerCase();
+    grid.innerHTML = '';
+    state.media.filter(path => !query || path.toLowerCase().includes(query)).forEach(path => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'media-picker-item';
+      const img = document.createElement('img');
+      img.src = publicUrl(path);
+      img.alt = '';
+      img.loading = 'lazy';
+      const label = document.createElement('span');
+      label.textContent = path;
+      item.append(img, label);
+      item.addEventListener('click', () => {
+        if (state.picker.multiple) {
+          if (state.picker.selected.has(path)) {
+            state.picker.selected.delete(path);
+            item.style.outline = '';
+          } else {
+            state.picker.selected.add(path);
+            item.style.outline = '2px solid #2e2e2e';
+          }
+          $('#mediaSelectionHint').textContent = `${state.picker.selected.size} ausgewählt`;
+          $('#mediaDoneButton').disabled = state.picker.selected.size === 0;
+          $('#mediaDoneButton').textContent = `Auswahl übernehmen (${state.picker.selected.size})`;
+        } else {
+          state.picker.onPick([path]);
+          mediaDialog.close();
+        }
+      });
+      item.addEventListener('dblclick', () => {
+        if (!state.picker.multiple) return;
+        if (!state.picker.selected.has(path)) state.picker.selected.add(path);
+        state.picker.onPick([...state.picker.selected]);
+        mediaDialog.close();
+      });
+      grid.appendChild(item);
+    });
+  }
+
+  $('#mediaSearch').addEventListener('input', renderMediaPicker);
+  $('#mediaDoneButton').addEventListener('click', () => {
+    if (!state.picker?.multiple || !state.picker.selected.size) return;
+    state.picker.onPick([...state.picker.selected]);
+    mediaDialog.close();
+  });
+  $('#closeMediaDialog').addEventListener('click', () => mediaDialog.close());
+
+  async function renderMediaPage() {
+    workspaceContent.innerHTML = '';
+    const toolbar = document.createElement('div');
+    toolbar.className = 'media-page-toolbar';
+    const search = document.createElement('input');
+    search.type = 'search';
+    search.placeholder = 'Bilder durchsuchen …';
+    const folder = document.createElement('input');
+    folder.type = 'text';
+    folder.value = 'images/uploads';
+    folder.placeholder = 'images/ordner';
+    const uploadLabel = document.createElement('label');
+    uploadLabel.className = 'primary file-button';
+    uploadLabel.textContent = 'Bilder ablegen';
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.multiple = true;
+    fileInput.hidden = true;
+    uploadLabel.appendChild(fileInput);
+    toolbar.append(search, folder, uploadLabel);
+    const grid = document.createElement('div');
+    grid.className = 'media-page-grid';
+    workspaceContent.append(toolbar, grid);
+
+    function paint() {
+      const query = search.value.trim().toLowerCase();
+      grid.innerHTML = '';
+      state.media.filter(path => !query || path.toLowerCase().includes(query)).forEach(path => {
+        const card = document.createElement('article');
+        card.className = 'media-card';
+        const img = document.createElement('img');
+        img.src = publicUrl(path);
+        img.loading = 'lazy';
+        img.alt = '';
+        const p = document.createElement('p');
+        p.textContent = path;
+        card.append(img, p);
+        grid.appendChild(card);
+      });
+    }
+
+    search.addEventListener('input', paint);
+    fileInput.addEventListener('change', async () => {
+      const files = [...fileInput.files];
+      if (!files.length) return;
+      let target = folder.value.trim().replace(/^\/+|\/+$/g, '');
+      if (!target.startsWith('images/')) target = `images/${target}`;
+      if (target.includes('..')) return alert('Ungültiger Ordner.');
+      uploadLabel.style.opacity = '.55';
+      fileInput.disabled = true;
+      try {
+        for (let i = 0; i < files.length; i++) {
+          setStatus(`Upload ${i + 1}/${files.length}: ${files[i].name}`);
+          const blob = await optimizeImage(files[i]);
+          const base = slugify(files[i].name.replace(/\.[^.]+$/, ''));
+          const path = `${target}/${base}-${Date.now()}-${i + 1}.jpg`;
+          await uploadBlob(path, blob);
+        }
+        state.mediaLoaded = false;
+        await ensureMedia();
+        paint();
+        showToast(`${files.length} Bilder hochgeladen`);
+        setStatus(`${state.media.length} Bilder in der Mediathek.`);
+      } catch (error) {
+        setStatus(error.message, true);
+      } finally {
+        fileInput.value = '';
+        fileInput.disabled = false;
+        uploadLabel.style.opacity = '';
+      }
+    });
+
+    try {
+      await ensureMedia();
+      paint();
+      setStatus(`${state.media.length} Bilder im Repository. Uploads landen direkt in GitHub.`);
+    } catch (error) {
+      setStatus(error.message, true);
+    }
+  }
+
+  function renderSiteImages() {
+    workspaceContent.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = 'site-image-grid';
+    SITE_IMAGES.forEach(target => {
+      const card = document.createElement('article');
+      card.className = 'site-image-card';
+      const img = document.createElement('img');
+      img.src = publicUrl(target.path);
+      img.alt = '';
+      const body = document.createElement('div');
+      body.className = 'site-image-card-body';
+      const title = document.createElement('h3');
+      title.textContent = target.label;
+      const path = document.createElement('p');
+      path.textContent = target.path;
+      const label = document.createElement('label');
+      label.className = 'secondary file-button';
+      label.textContent = 'Bild ersetzen';
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.hidden = true;
+      label.appendChild(input);
+      input.addEventListener('change', async () => {
+        const file = input.files?.[0];
+        if (!file) return;
+        label.style.opacity = '.55';
+        input.disabled = true;
+        try {
+          setStatus(`${target.label} wird ersetzt …`);
+          const blob = await optimizeImage(file, 2400, .92);
+          await uploadBlob(target.path, blob);
+          img.src = publicUrl(target.path);
+          state.mediaLoaded = false;
+          showToast('Bild ersetzt');
+          setStatus('Veröffentlicht. GitHub Pages benötigt eventuell kurz zum Aktualisieren.');
+        } catch (error) {
+          setStatus(error.message, true);
+        } finally {
+          input.value = '';
+          input.disabled = false;
+          label.style.opacity = '';
+        }
+      });
+      body.append(title, path, label);
+      card.append(img, body);
+      grid.appendChild(card);
+    });
+    workspaceContent.appendChild(grid);
+  }
+
+
+  async function loadLandingConfig() {
+    const data = await api('landing-config');
+    state.landingConfig = data.config;
+    return state.landingConfig;
+  }
+
+  async function saveLandingConfig() {
+    return api('save-landing-config', { method: 'POST', body: JSON.stringify({ config: state.landingConfig }) });
+  }
+
+  async function renderLandingBackgrounds() {
+    workspaceContent.innerHTML = '<div class="empty-state">Lade Hintergrund-Slots …</div>';
+    try {
+      const cfg = await loadLandingConfig();
+      workspaceContent.innerHTML = '';
+      const intro = document.createElement('p');
+      intro.className = 'landing-slot-intro';
+      intro.textContent = 'Je Gerät gibt es drei Slots. Nur der aktivierte Slot erscheint auf der Landingpage. Mobile startet mit Ausstellung, Desktop mit Fotografie.';
+      workspaceContent.appendChild(intro);
+
+      for (const device of ['mobile', 'desktop']) {
+        const section = document.createElement('section');
+        section.className = 'landing-slot-section';
+        const h = document.createElement('h2');
+        h.textContent = device === 'mobile' ? 'Mobile' : 'Desktop / Web';
+        const grid = document.createElement('div');
+        grid.className = 'landing-slot-grid';
+        const group = cfg[device];
+        group.slots.forEach((path, index) => {
+          const slotNumber = index + 1;
+          const card = document.createElement('article');
+          card.className = `landing-slot-card${Number(group.active) === slotNumber ? ' is-active' : ''}`;
+          const preview = document.createElement('div');
+          preview.className = 'landing-slot-preview';
+          const img = document.createElement('img');
+          img.src = publicUrl(path);
+          img.alt = '';
+          img.onerror = () => { preview.classList.add('is-empty'); img.remove(); preview.textContent = 'Slot leer'; };
+          preview.appendChild(img);
+          const body = document.createElement('div');
+          body.className = 'landing-slot-body';
+          const title = document.createElement('h3');
+          title.textContent = `Slot ${slotNumber}`;
+          const p = document.createElement('p');
+          p.textContent = path;
+          const actions = document.createElement('div');
+          actions.className = 'compact-actions';
+          const activate = button(Number(group.active) === slotNumber ? 'Aktiv' : 'Aktivieren', Number(group.active) === slotNumber ? 'primary' : 'secondary', async () => {
+            state.landingConfig[device].active = slotNumber;
+            setStatus('Aktiver Hintergrund wird gespeichert …');
+            await saveLandingConfig();
+            showToast('Landing-Hintergrund aktiviert');
+            await renderLandingBackgrounds();
+          });
+          activate.disabled = Number(group.active) === slotNumber;
+          const label = document.createElement('label');
+          label.className = 'secondary file-button';
+          label.textContent = 'Bild einsetzen';
+          const input = document.createElement('input');
+          input.type = 'file'; input.accept = 'image/*'; input.hidden = true;
+          label.appendChild(input);
+          input.addEventListener('change', async () => {
+            const file = input.files?.[0];
+            if (!file) return;
+            input.disabled = true; label.style.opacity = '.55';
+            try {
+              setStatus(`${device === 'mobile' ? 'Mobile' : 'Desktop'} Slot ${slotNumber} wird hochgeladen …`);
+              const blob = await optimizeImage(file, 2800, .92);
+              await uploadBlob(path, blob);
+              showToast(`Slot ${slotNumber} aktualisiert`);
+              await renderLandingBackgrounds();
+            } catch (error) {
+              setStatus(error.message, true);
+            } finally {
+              input.value = ''; input.disabled = false; label.style.opacity = '';
+            }
+          });
+          actions.append(activate, label);
+          body.append(title, p, actions);
+          card.append(preview, body);
+          grid.appendChild(card);
+        });
+        section.append(h, grid);
+        workspaceContent.appendChild(section);
+      }
+      setStatus('Drei Mobile- und drei Desktop-Slots. Ein Austausch oder Aktivieren wird direkt auf GitHub veröffentlicht.');
+    } catch (error) {
+      workspaceContent.innerHTML = `<div class="empty-state">${escapeHtml(error.message)}</div>`;
+      setStatus(error.message, true);
+    }
+  }
+
+  function escapeHtml(value) {
+    const div = document.createElement('div');
+    div.textContent = String(value);
+    return div.innerHTML;
+  }
+
+  boot();
+})();
