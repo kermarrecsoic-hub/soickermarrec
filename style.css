@@ -77,3 +77,42 @@ body { min-height: 100svh; font-family: var(--site-font); font-weight: 300; lett
   .navigation a.is-active { animation: none; font: 300 16px/24px var(--site-font); }
 }
 img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
+
+/* V9 Mobile: autonome, große Spawn-Vorschauen. Die Vorschau darf über den
+   Viewport hinausreichen; der Bildschirmrand schneidet sie bewusst ab. */
+@media (max-width: 700px), (hover: none) and (pointer: coarse) {
+  html, body { overflow: hidden; }
+
+  /* Der oberste Link rotiert auf Mobile permanent durch die drei Schriften. */
+  .navigation .site-title a {
+    animation: font-cycle 1.2s step-end infinite;
+  }
+
+  #preview-link.mobile-auto-preview {
+    display: block;
+    pointer-events: none !important;
+    opacity: 0;
+    filter: blur(8px);
+    transform: translate(-50%, -50%) scale(.985);
+    transition:
+      opacity .36s ease,
+      filter .36s ease,
+      transform .36s ease;
+  }
+
+  #preview-link.mobile-auto-preview.is-materialized {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 700px),
+       (prefers-reduced-motion: reduce) and (hover: none) and (pointer: coarse) {
+  .navigation .site-title a { animation: none; }
+  #preview-link.mobile-auto-preview {
+    filter: none;
+    transform: translate(-50%, -50%);
+    transition: opacity .2s linear;
+  }
+}

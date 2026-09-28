@@ -1,4 +1,4 @@
-/* Soïc Kermarrec – V8 / gemeinsamer Galerie-Renderer */
+/* Soïc Kermarrec – V9 / gemeinsamer Galerie-Renderer mit 4–2–1-Spalten-Toggle */
 (() => {
   'use strict';
 
@@ -8,12 +8,14 @@
   const works = window[document.body.dataset.works || 'PAINTING_WORKS'] || [];
   const mobile = window.matchMedia('(max-width: 700px)');
   const forceSeries = target.dataset.layout === 'series';
+  const STORAGE_KEY = 'soic-series-columns';
   let uid = 0;
+  let currentColumns = null;
 
   function element(tag, className, text) {
     const node = document.createElement(tag);
     if (className) node.className = className;
-    if (text) node.textContent = text;
+    if (text !== undefined && text !== null) node.textContent = text;
     return node;
   }
 
@@ -41,6 +43,77 @@
     return frame;
   }
 
+  function orderedSeriesItems(images) {
+    return [...images.querySelectorAll('.hero-wrap[data-series-index]')]
+      .sort((a, b) => Number(a.dataset.seriesIndex) - Number(b.dataset.seriesIndex));
+  }
+
+  function layoutSeries(images, columns) {
+    if (!images.classList.contains('is-series')) return;
+    const items = orderedSeriesItems(images);
+    if (!items.length) return;
+
+    images.querySelectorAll(':scope > .series-column').forEach(column => column.remove());
+    images.dataset.columns = String(columns);
+    images.style.setProperty('--series-columns', String(columns));
+
+    const wrappers = Array.from({ length: columns }, (_, index) => {
+      const column = element('div', 'series-column');
+      column.dataset.column = String(index + 1);
+      images.appendChild(column);
+      return column;
+    });
+
+    items.forEach((item, index) => wrappers[index % columns].appendChild(item));
+  }
+
+  function setColumns(columns, persist = true) {
+    if (![1, 2, 4].includes(columns)) return;
+    currentColumns = columns;
+    target.dataset.columns = String(columns);
+    target.querySelectorAll('.artwork-images.is-series').forEach(images => layoutSeries(images, columns));
+
+    document.querySelectorAll('.series-view-toggle button').forEach(button => {
+      const active = Number(button.dataset.columns) === columns;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+
+    if (persist) {
+      try { localStorage.setItem(STORAGE_KEY, String(columns)); } catch (_) {}
+    }
+  }
+
+  function initialColumns() {
+    try {
+      const stored = Number(localStorage.getItem(STORAGE_KEY));
+      if ([1, 2, 4].includes(stored)) return stored;
+    } catch (_) {}
+    return mobile.matches ? 1 : 2;
+  }
+
+  function makeViewToggle() {
+    if (!forceSeries) return;
+    const header = document.querySelector('.site-header');
+    if (!header) return;
+
+    const controls = element('div', 'series-view-toggle');
+    controls.setAttribute('role', 'group');
+    controls.setAttribute('aria-label', 'Images per row');
+
+    [4, 2, 1].forEach(columns => {
+      const button = element('button', '', String(columns));
+      button.type = 'button';
+      button.dataset.columns = String(columns);
+      button.setAttribute('aria-label', `${columns} ${columns === 1 ? 'column' : 'columns'}`);
+      button.setAttribute('aria-pressed', 'false');
+      button.addEventListener('click', () => setColumns(columns, true));
+      controls.appendChild(button);
+    });
+
+    header.appendChild(controls);
+  }
+
   function render(work, workIndex) {
     const paths = Array.isArray(work.images) && work.images.length
       ? work.images.filter(Boolean)
@@ -60,23 +133,12 @@
       (series ? ' is-series' : '') +
       (series && paths.length === 1 ? ' is-single' : ''));
 
-    // Zwei unabhängige Bildkolonnen statt gemeinsam berechneter Grid-Zeilen.
-    // So bleibt der sichtbare Abstand nach jedem Bild in BEIDEN Spalten exakt gleich,
-    // auch wenn die Bildformate sehr unterschiedlich sind.
-    // 1 = links, 2 = rechts, 3 = links, 4 = rechts usw.
-    let leftColumn, rightColumn;
-    if (series) {
-      leftColumn = element('div', 'series-column series-column-left');
-      images.appendChild(leftColumn);
-      if (paths.length > 1) {
-        rightColumn = element('div', 'series-column series-column-right');
-        images.appendChild(rightColumn);
-      }
-    }
-
     const detailIds = `details-${++uid}`;
+
     paths.forEach((path, index) => {
       const hero = element('div', 'hero-wrap');
+      if (series) hero.dataset.seriesIndex = String(index);
+
       const alt = work.title
         ? `${work.title} – image ${index + 1}`
         : `Project image ${index + 1}`;
@@ -91,38 +153,32 @@
         const hint = element('span', 'detail-hint', '+');
         hint.setAttribute('aria-hidden', 'true');
         button.append(main, hint);
-        const toggle = () => {
+
+        button.addEventListener('click', () => {
           if (!mobile.matches) return;
           const open = section.classList.toggle('details-visible');
           button.setAttribute('aria-expanded', String(open));
           button.setAttribute('aria-label', `${open ? 'Hide' : 'Show'} details for ${work.title || 'work'}`);
           hint.textContent = open ? '−' : '+';
-        };
-        button.addEventListener('click', toggle);
+        });
         button.tabIndex = mobile.matches ? 0 : -1;
         hero.appendChild(button);
       } else {
         hero.appendChild(main);
       }
-      if (series) {
-        // Auf Mobilgeräten stellt CSS mit --series-order die Originalreihenfolge her.
-        hero.style.setProperty('--series-order', String(index));
-        (index % 2 === 0 ? leftColumn : rightColumn).appendChild(hero);
-      } else {
-        images.appendChild(hero);
-      }
+
+      images.appendChild(hero);
     });
 
     if (hasDetails) {
       images.id = detailIds;
       for (const side of ['left', 'right']) {
-        if (work.details[side]) {
-          images.appendChild(detailFrame(work.details[side], side, work.title));
-        }
+        if (work.details[side]) images.appendChild(detailFrame(work.details[side], side, work.title));
       }
     }
 
     section.appendChild(images);
+
     const description = element('div', 'artwork-description' +
       (series ? ' is-series-description' : ''));
     if (work.title) description.appendChild(element('h2', 'artwork-title', work.title));
@@ -131,10 +187,16 @@
     if (work.availability) description.appendChild(element('p', 'availability', work.availability));
     if (work.text) description.appendChild(element('p', 'free-text', work.text));
     section.appendChild(description);
+
     return section;
   }
 
-  works.forEach((work, i) => target.appendChild(render(work, i)));
+  works.forEach((work, index) => target.appendChild(render(work, index)));
+
+  if (forceSeries) {
+    makeViewToggle();
+    setColumns(initialColumns(), false);
+  }
 
   mobile.addEventListener('change', () => {
     target.querySelectorAll('.artwork-toggle').forEach(button => {
@@ -144,17 +206,22 @@
         artwork.classList.remove('details-visible');
         button.setAttribute('aria-expanded', 'false');
         button.setAttribute('aria-label', 'Show artwork details');
-        button.querySelector('.detail-hint').textContent = '+';
+        const hint = button.querySelector('.detail-hint');
+        if (hint) hint.textContent = '+';
       }
     });
+
+    // Eine vom Nutzer gewählte Ansicht bleibt beim Drehen/Resizen erhalten.
+    // Ohne gespeicherte Wahl gilt beim ersten Laden mobil 1, Desktop 2.
+    if (forceSeries && currentColumns) setColumns(currentColumns, false);
   });
 })();
 
 // Verhindert nur die direkte Bildspeicherung per Kontextmenü / Drag & Drop.
 // Browser-Entwicklertools oder Screenshots können Bilder weiterhin sichern.
-document.addEventListener('contextmenu', (event) => {
+document.addEventListener('contextmenu', event => {
   if (event.target.closest('img')) event.preventDefault();
 });
-document.addEventListener('dragstart', (event) => {
+document.addEventListener('dragstart', event => {
   if (event.target.closest('img')) event.preventDefault();
 });

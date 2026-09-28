@@ -1,203 +1,439 @@
-/* Soïc Kermarrec – V8 / gemeinsame Typografie, Galerie und Editorial */
+/* Soïc Kermarrec – V9 / gemeinsame Typografie, Galerie und Editorial */
 :root {
-  --ink: #414141; --muted: #adadad; --site-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --header-height: 180px; --page-width: 1240px;
+  --ink: #414141;
+  --muted: #adadad;
+  --site-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --header-height: 180px;
+  --page-width: 1240px;
+  --series-gap-x: 32px;
+  --series-gap-y: 28px;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body.gallery-page {
-  margin: 0; background: #fff; color: var(--ink);
-  font: 300 14px/1.4 var(--site-font); letter-spacing: .45px;
+  margin: 0;
+  background: #fff;
+  color: var(--ink);
+  font: 300 14px/1.4 var(--site-font);
+  letter-spacing: .45px;
 }
 a { color: inherit; text-decoration: none; }
 .site-header {
-  position: fixed; z-index: 100; inset: 0 0 auto;
-  height: var(--header-height); pointer-events: none;
+  position: fixed;
+  z-index: 100;
+  inset: 0 0 auto;
+  height: var(--header-height);
+  pointer-events: none;
 }
-/* Nur zwei deckende Stops und eine stetige Alpha-Interpolation: keine sichtbaren Abstufungen. */
 .site-header::before {
-  content: ""; position: absolute; inset: 0;
+  content: "";
+  position: absolute;
+  inset: 0;
   background: linear-gradient(to bottom, #fff 0%, #fff 33%, rgb(255 255 255 / 0%) 100%);
   pointer-events: none;
 }
-.back-link, .current-section, .site-nav { position: absolute; z-index: 1; top: 54px; }
-.back-link { left: 9.2%; font-size: 17px; line-height: 20px; pointer-events: auto; }
+.back-link, .current-section, .site-nav {
+  position: absolute;
+  z-index: 1;
+  top: 54px;
+}
+.back-link {
+  left: 9.2%;
+  font-size: 17px;
+  line-height: 20px;
+  pointer-events: auto;
+}
 .current-section {
-  left: 50%; transform: translateX(-50%); margin: 0;
-  font: inherit; line-height: 20px; white-space: nowrap;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font: inherit;
+  line-height: 20px;
+  white-space: nowrap;
 }
 .site-nav {
-  right: 6.2%; display: flex; flex-direction: column; align-items: flex-end;
-  gap: 0; min-width: 120px; text-align: right; line-height: 20px;
+  right: 6.2%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+  min-width: 120px;
+  text-align: right;
+  line-height: 20px;
   pointer-events: auto;
 }
 .site-nav a:first-child { margin-bottom: 12px; }
 .site-nav a[aria-current="page"] { color: var(--muted); }
 .site-nav a:hover, .back-link:hover, .editorial-contact a:hover { color: #898989; }
-.site-nav a:focus-visible, .back-link:focus-visible, .editorial-contact a:focus-visible,
-.artwork-toggle:focus-visible { outline: 1px solid var(--ink); outline-offset: 5px; }
+.site-nav a:focus-visible,
+.back-link:focus-visible,
+.editorial-contact a:focus-visible,
+.artwork-toggle:focus-visible,
+.series-view-toggle button:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 5px;
+}
+
+/* 4 / 2 / 1 – nur auf den Serienseiten. Minimaler Toggle direkt im Kopfbereich. */
+.series-view-toggle {
+  position: absolute;
+  z-index: 2;
+  top: 86px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+  font: 300 11px/16px var(--site-font);
+  letter-spacing: .35px;
+}
+.series-view-toggle button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  line-height: inherit;
+  cursor: pointer;
+}
+.series-view-toggle button:hover { color: #777; }
+.series-view-toggle button.is-active { color: var(--ink); }
+
 .artwork-list {
   padding: calc(var(--header-height) + 36px) 5% 110px;
-  display: flex; flex-direction: column; align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: clamp(130px, 23vh, 270px);
 }
-.artwork { width: min(100%, var(--page-width)); display: flex; flex-direction: column; align-items: center; }
+.artwork {
+  width: min(100%, var(--page-width));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 /* Einzelbild mit seitlichen Details auf Desktop. */
 .artwork-images {
-  display: grid; width: 100%;
+  display: grid;
+  width: 100%;
   grid-template-columns: minmax(0,1fr) minmax(0,440px) minmax(0,1fr);
-  gap: clamp(14px, 4vw, 78px); align-items: center;
+  gap: clamp(14px, 4vw, 78px);
+  align-items: center;
 }
-.hero-wrap { grid-column: 2; grid-row: 1; min-width: 0; display: flex; justify-content: center; align-items: center; }
-.artwork-main { display: block; width: auto; height: auto; max-width: 100%; max-height: min(70svh, 720px); object-fit: contain; }
+.hero-wrap {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.artwork-main {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(70svh, 720px);
+  object-fit: contain;
+}
 .artwork-toggle {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  max-width: 100%; border: 0; padding: 0; margin: 0; background: transparent;
-  color: inherit; font: inherit; cursor: default;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: default;
 }
 .detail-hint { display: none; }
 .detail-frame {
-  min-width: 0; width: 100%; display: grid; grid-template-rows: 1fr;
-  justify-self: center; align-self: center;
-  opacity: 0; visibility: hidden; transform: translateY(7px);
+  min-width: 0;
+  width: 100%;
+  display: grid;
+  grid-template-rows: 1fr;
+  justify-self: center;
+  align-self: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(7px);
   transition: opacity .32s ease, transform .32s ease, visibility .32s;
 }
 .detail-frame-left { grid-column: 1; grid-row: 1; }
 .detail-frame-right { grid-column: 3; grid-row: 1; }
-.detail-inner { min-height: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; }
-.detail-image { display: block; width: auto; height: auto; max-width: 100%; max-height: min(53svh, 530px); object-fit: contain; }
+.detail-inner {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.detail-image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(53svh, 530px);
+  object-fit: contain;
+}
 @media (hover: hover) and (min-width: 701px) {
   .artwork.has-details:hover .detail-frame,
   .artwork.has-details:focus-within .detail-frame {
-    opacity: 1; visibility: visible; transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
   }
 }
-.artwork-description { max-width: min(620px, 90%); text-align: center; margin-top: 17px; line-height: 1.45; }
+.artwork-description {
+  max-width: min(620px, 90%);
+  text-align: center;
+  margin-top: 17px;
+  line-height: 1.45;
+}
 .artwork-title { margin: 0 0 14px; font: inherit; }
 .artwork-description p { margin: 0; }
 .artwork-description .availability { margin-top: 16px; color: var(--muted); font-style: italic; }
 .artwork-description .free-text { margin-top: 18px; white-space: pre-line; }
 .artwork.is-demo .artwork-description { color: #898989; }
-/* Exhibitions / Architecture / XXX: zwei unabhängige, gleich breite Kolonnen.
-   Die Bildfolge ist zeilenweise gedacht: 1 links, 2 rechts, 3 links, 4 rechts.
-   Anders als bei CSS-Grid-Zeilen gibt es KEINE leeren Höhen unter kürzeren
-   Bildern: innerhalb jeder Kolonne sind es stets genau 28px Bildabstand.
-   Die beiden Kolonnen dürfen sich bei verschiedenen Seitenverhältnissen
-   vertikal versetzen; die Bildformate bleiben ohne Zuschnitt erhalten. */
+
+/* Exhibition / Architecture / XXX
+   Die Ansicht besteht aus 1, 2 oder 4 unabhaengigen Spalten. Die Bildreihenfolge
+   bleibt immer zeilenweise: 1,2,3,4 oben; danach 5,6,7,8 usw. Unterschiedliche
+   Bildformate werden NIE beschnitten. Innerhalb jeder Spalte ist der vertikale
+   Abstand zwischen zwei Bildern immer identisch. */
 .artwork-images.is-series {
-  display: grid; width: 100%;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 32px;
+  --series-columns: 2;
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(var(--series-columns), minmax(0, 1fr));
+  column-gap: var(--series-gap-x);
   align-items: start;
 }
+.artwork-images.is-series[data-columns="4"] { --series-gap-x: 18px; }
+.artwork-images.is-series[data-columns="2"] { --series-gap-x: 32px; }
+.artwork-images.is-series[data-columns="1"] {
+  --series-gap-x: 0px;
+  width: min(100%, 860px);
+  margin: 0 auto;
+}
 .artwork-images.is-series .series-column {
-  min-width: 0; width: 100%;
-  display: flex; flex-direction: column; gap: 28px;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--series-gap-y);
 }
 .artwork-images.is-series .hero-wrap {
-  display: block; grid-column: auto; grid-row: auto;
-  width: 100%; min-width: 0; height: auto;
-  margin: 0; align-self: stretch;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  margin: 0;
 }
 .artwork-images.is-series .artwork-main {
-  display: block; width: 100%; max-width: 100%; height: auto;
-  max-height: none; object-fit: contain;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
 }
-/* Ist nur ein Bild vorhanden, bleibt es zentriert. */
 .artwork-images.is-series.is-single {
-  display: block; width: min(100%, 650px); margin: 0 auto;
+  width: min(100%, 650px);
+  margin: 0 auto;
 }
 .artwork-description.is-series-description {
-  width: 100%; max-width: none; margin-top: 32px; text-align: left;
+  width: 100%;
+  max-width: none;
+  margin-top: 32px;
+  text-align: left;
 }
+
 /* Editorial: die sichtbare about.jpg-Breite definiert exakt die Textbreite. */
 .editorial-page { padding: calc(var(--header-height) + 38px) 20px 125px; }
 .about-content {
   width: min(100%, 551px, 51.65svh);
   margin: 0 auto;
 }
-.editorial-picture { display: block; width: 100%; height: auto; margin: 0 auto 40px; }
-.editorial-text { width: 100%; font: inherit; line-height: 1.5; overflow-wrap: break-word; }
-.about-page .editorial-text p { margin: 0 0 36px; text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+.editorial-picture {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto 40px;
+}
+.editorial-text {
+  width: 100%;
+  font: inherit;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+.about-page .editorial-text p {
+  margin: 0 0 36px;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
 .vita-title { margin: 60px 0 36px; font: inherit; text-align: center; }
 .vita {
-  display: grid; grid-template-columns: 110px minmax(0,1fr);
-  column-gap: 20px; row-gap: 18px; text-align: left; font: inherit;
+  display: grid;
+  grid-template-columns: 110px minmax(0,1fr);
+  column-gap: 20px;
+  row-gap: 18px;
+  text-align: left;
+  font: inherit;
 }
 .vita-year { white-space: nowrap; }
 .contact-content { width: min(100%, 620px); margin: 0 auto; text-align: center; }
 .contact-content .editorial-text { margin: 0; text-align: center; }
 .editorial-contact {
-  margin-top: 32px; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 12px;
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 }
 .editorial-contact a { display: block; max-width: 100%; overflow-wrap: anywhere; }
 .copyright {
-  position: fixed; bottom: 14px; left: 0; z-index: 100;
-  width: 100%; color: #999; text-align: center; pointer-events: none;
-  font: 300 10px/1.35 var(--site-font); letter-spacing: .35px;
+  position: fixed;
+  bottom: 14px;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  color: #999;
+  text-align: center;
+  pointer-events: none;
+  font: 300 10px/1.35 var(--site-font);
+  letter-spacing: .35px;
 }
 img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
+
 @media (max-width: 700px) {
-  :root { --header-height: 154px; }
+  :root {
+    --header-height: 154px;
+    --series-gap-y: 12px;
+  }
   body.gallery-page { font-size: 12px; }
   .back-link, .current-section, .site-nav { top: 27px; }
   .back-link { left: 20px; }
-  .site-nav { right: 15px; min-width: auto; font-size: 11px; line-height: 16px; }
+  .site-nav {
+    right: 15px;
+    min-width: auto;
+    font-size: 11px;
+    line-height: 16px;
+  }
   .current-section { font-size: 11px; line-height: 16px; }
-  .site-header::before { background: linear-gradient(to bottom, #fff 0%, #fff 39%, rgb(255 255 255 / 0%) 100%); }
-  .artwork-list { padding: calc(var(--header-height) + 28px) 12px 100px; gap: 140px; }
-  .artwork-images { display: flex; align-items: center; flex-direction: column; gap: 0; }
+  .site-header::before {
+    background: linear-gradient(to bottom, #fff 0%, #fff 39%, rgb(255 255 255 / 0%) 100%);
+  }
+  .series-view-toggle {
+    top: 54px;
+    gap: 11px;
+    font-size: 10px;
+    line-height: 14px;
+  }
+  .artwork-list {
+    padding: calc(var(--header-height) + 28px) 12px 100px;
+    gap: 140px;
+  }
+  .artwork-images {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 0;
+  }
   .hero-wrap { width: 100%; flex-direction: column; }
   .artwork-main { max-width: 88vw; max-height: 61svh; }
   .has-details .artwork-toggle { cursor: pointer; }
   .detail-hint {
-    display: block; margin-top: 7px; font: 300 20px/24px var(--site-font);
-    letter-spacing: 0; color: #999; text-align: center;
+    display: block;
+    margin-top: 7px;
+    font: 300 20px/24px var(--site-font);
+    letter-spacing: 0;
+    color: #999;
+    text-align: center;
   }
-  /* Detailbereich erscheint sofort in voller Hoehe: kein Aufrollen mehr. */
+  /* Kein Aufrollen: der Raum ist sofort da, nur die Bildpixel materialisieren. */
   .detail-frame {
-    display: none; width: min(80vw, 320px); align-self: center;
-    margin-top: 12px; opacity: 1; visibility: visible;
-    transform: none; transition: none; grid-template-rows: none;
+    display: none;
+    width: min(80vw, 320px);
+    align-self: center;
+    margin-top: 12px;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: none;
+    grid-template-rows: none;
   }
   .detail-frame .detail-image { max-width: 100%; max-height: 45svh; }
   .artwork.has-details.details-visible .detail-frame { display: block; }
   .artwork.has-details.details-visible .detail-image {
     animation: detail-materialize .32s ease-out both;
   }
-  .artwork.has-details.details-visible .detail-frame-right .detail-image {
-    animation-delay: .06s;
-  }
+  .artwork.has-details.details-visible .detail-frame-right .detail-image { animation-delay: .06s; }
   .artwork-description { margin-top: 13px; }
-  /* Mobil: Spaltenhüllen verschwinden aus dem Layout; alle Bilder werden
-     in ihrer ursprünglichen Folge 1, 2, 3, ... untereinander dargestellt. */
+
+  /* Auch mobil echte 1/2/4-Spaltenansicht. */
   .artwork-images.is-series {
-    display: flex; flex-direction: column; align-items: center; gap: 32px;
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(var(--series-columns), minmax(0, 1fr));
+    align-items: start;
   }
-  .artwork-images.is-series .series-column { display: contents; }
+  .artwork-images.is-series[data-columns="4"] { --series-gap-x: 6px; }
+  .artwork-images.is-series[data-columns="2"] { --series-gap-x: 9px; }
+  .artwork-images.is-series[data-columns="1"] {
+    --series-gap-x: 0px;
+    width: min(100%, 88vw);
+  }
+  .artwork-images.is-series .series-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--series-gap-y);
+  }
   .artwork-images.is-series .hero-wrap {
-    width: 100%; height: auto; margin: 0; text-align: center;
-    order: var(--series-order, 0);
+    width: 100%;
+    height: auto;
+    margin: 0;
+    text-align: center;
   }
   .artwork-images.is-series .artwork-main {
-    width: auto; max-width: min(100%, 88vw); max-height: 66svh;
-    height: auto; margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+    height: auto;
+    margin: 0;
   }
-  .artwork-images.is-series.is-single { width: 100%; }
-  .artwork-description.is-series-description { margin-top: 24px; text-align: left; }
+  .artwork-images.is-series.is-single { width: min(100%, 88vw); }
+  .artwork-description.is-series-description {
+    margin-top: 24px;
+    text-align: left;
+  }
+
   .editorial-page { padding: calc(var(--header-height) + 36px) 18px 110px; }
   .editorial-picture { margin-bottom: 34px; }
   .about-content { width: min(100%, 551px, 51.65svh); }
-  .vita { grid-template-columns: 92px minmax(0,1fr); column-gap: 12px; row-gap: 15px; }
+  .vita {
+    grid-template-columns: 92px minmax(0,1fr);
+    column-gap: 12px;
+    row-gap: 15px;
+  }
   .vita-title { margin-top: 50px; margin-bottom: 28px; }
 }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .detail-frame { transition: none; }
 }
 
-/* Nur die Bildpixel materialisieren; Layout und Beschreibung sind sofort da. */
 @keyframes detail-materialize {
   from { opacity: 0; filter: blur(5px); }
   to { opacity: 1; filter: blur(0); }
