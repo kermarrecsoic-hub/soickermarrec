@@ -94,6 +94,5 @@ window.GRAPHIC_WORKS = [
               "../images/ink/random/main4.jpg",
               "../images/ink/random/main5.jpg",
               "../images/ink/random/main6.jpg",]
-    details:
   },
 ];
