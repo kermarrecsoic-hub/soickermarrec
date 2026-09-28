@@ -61,26 +61,15 @@ window.GRAPHIC_WORKS = [
     }
   },
   {
-    title: "Akira, 2025", // Hier später den Projekttitel eingeben
-    medium: "ink, kyougi on paper",
-    dimensions: "30 x 42 cm",
-    availability: "",
-    text: "",
-      image: "../images/ink/akira/main.jpg",
-    details: {
-      left: "../images/ink/akira/detail-left.jpg",
-      right: "../images/ink/akira/detail-right.jpg"
-    }
-  },
-  {
     title: "Marionetten 1&2, 2025", // Hier später den Projekttitel eingeben
     medium: "ink, Watercolor on paper",
     dimensions: "21 x 30 cm",
     availability: "",
     text: "",
       images: ["../images/ink/marionetten/main1.jpg",
-               "../images/ink/marionetten/main1.jpg"]
-    details:
+               "../images/ink/marionetten/main2.jpg"
+              ]
+    
   },
   {
     title: "", // Hier später den Projekttitel eingeben
