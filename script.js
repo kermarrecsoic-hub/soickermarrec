@@ -21,7 +21,7 @@
     return mode() === 'mobile' ? bg.dataset.mobileFallback : bg.dataset.desktopFallback;
   }
 
-  const ROTATION_MS = 5000;
+  const ROTATION_MS = 10000;
   let rotationTimer = 0;
   let slotIndex = 0;
   let nextBg = null;
@@ -148,11 +148,11 @@
       // Gleiche Weißblende wie im CSS: Verlauf von 22 % bis 78 % der Viewporthöhe.
       const y = Math.max(0, Math.min(1, syScreen / H));
       let white = 0;
-      if (y > .22 && y < .90) {
-        const t = (y - .22) / (.90 - .22);
+      if (y > .22 && y < .78) {
+        const t = (y - .22) / (.78 - .22);
         // Smoothstep für einen weichen statt stufigen Verlauf.
         white = t * t * (3 - 2 * t);
-      } else if (y >= .90) {
+      } else if (y >= .78) {
         white = 1;
       }
       rgb = rgb.map(v => v * (1 - white) + 255 * white);
