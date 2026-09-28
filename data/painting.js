@@ -54,7 +54,7 @@ window.PAINTING_WORKS = [
     dimensions: "12 x 21 x 3 cm",
     availability: "",
     text: "",
-    image:[ "../images/painting/holzdruck/main.jpg", 
+    images:[ "../images/painting/holzdruck/main.jpg", 
            "../images/painting/holzdruck/main2.jpg",
            "../images/painting/holzdruck/main3.jpg",
            "../images/painting/holzdruck/main4.jpg",
