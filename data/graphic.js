@@ -66,8 +66,8 @@ window.GRAPHIC_WORKS = [
     dimensions: "21 x 30 cm",
     availability: "",
     text: "",
-      images: ["../images/ink/marionetten/main1.jpg",
-               "../images/ink/marionetten/main2.jpg"
+      images: ["../images/ink/Marionetten/main1.jpg",
+               "../images/ink/Marionetten/main2.jpg"
               ]
     
   },
@@ -78,10 +78,6 @@ window.GRAPHIC_WORKS = [
     availability: "",
     text: "",
       images: ["../images/ink/random/main1.jpg",
-               "../images/ink/random/main2.jpg",
-              "../images/ink/random/main3.jpg",
-              "../images/ink/random/main4.jpg",
-              "../images/ink/random/main5.jpg",
-              "../images/ink/random/main6.jpg",]
+              ]
   },
 ];
