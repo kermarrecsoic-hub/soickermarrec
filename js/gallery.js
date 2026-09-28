@@ -1,4 +1,4 @@
-/* Soïc Kermarrec – V9 / gemeinsamer Galerie-Renderer mit 4–2–1-Spalten-Toggle */
+/* Soïc Kermarrec – V9.1 / Galerie-Renderer: Mehrfach-Hauptbilder + 4–2–1-Toggle */
 (() => {
   'use strict';
 
@@ -114,61 +114,93 @@
     header.appendChild(controls);
   }
 
+  function setupDetailToggle(button, section, hint, work, detailIds) {
+    button.type = 'button';
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', detailIds);
+    button.setAttribute('aria-label', `Show details for ${work.title || 'work'}`);
+    button.addEventListener('click', () => {
+      if (!mobile.matches) return;
+      const open = section.classList.toggle('details-visible');
+      button.setAttribute('aria-expanded', String(open));
+      button.setAttribute('aria-label', `${open ? 'Hide' : 'Show'} details for ${work.title || 'work'}`);
+      hint.textContent = open ? '−' : '+';
+    });
+    button.tabIndex = mobile.matches ? 0 : -1;
+  }
+
   function render(work, workIndex) {
     const paths = Array.isArray(work.images) && work.images.length
       ? work.images.filter(Boolean)
       : (work.image ? [work.image] : []);
     if (!paths.length) return document.createDocumentFragment();
 
-    const series = forceSeries || paths.length > 1;
-    const hasDetails = !series && Boolean(work.details &&
+    // Nur Exhibition / Architecture / XXX sind echte Serien-Layouts mit 1/2/4 Toggle.
+    // Painting und Ink duerfen mehrere gleichwertige Hauptbilder haben, ohne dadurch
+    // ihre optionalen Detailbilder zu verlieren.
+    const series = forceSeries;
+    const multiMain = !forceSeries && paths.length > 1;
+    const hasDetails = !forceSeries && Boolean(work.details &&
       (work.details.left || work.details.right));
+
     const classes = ['artwork'];
     if (hasDetails) classes.push('has-details');
     if (work.demo) classes.push('is-demo');
     if (series) classes.push('series-artwork');
+    if (multiMain) classes.push('multi-main-artwork');
 
     const section = element('section', classes.join(' '));
     const images = element('div', 'artwork-images' +
       (series ? ' is-series' : '') +
+      (multiMain ? ' is-multi-main' : '') +
       (series && paths.length === 1 ? ' is-single' : ''));
 
     const detailIds = `details-${++uid}`;
 
-    paths.forEach((path, index) => {
-      const hero = element('div', 'hero-wrap');
-      if (series) hero.dataset.seriesIndex = String(index);
+    if (multiMain) {
+      const mainStack = element('div', 'main-stack');
+      paths.forEach((path, index) => {
+        const hero = element('div', 'hero-wrap');
+        const alt = work.title
+          ? `${work.title} – image ${index + 1}`
+          : `Artwork image ${index + 1}`;
+        hero.appendChild(artworkImage(path, alt, workIndex === 0 && index === 0));
+        mainStack.appendChild(hero);
+      });
+      images.appendChild(mainStack);
 
-      const alt = work.title
-        ? `${work.title} – image ${index + 1}`
-        : `Project image ${index + 1}`;
-      const main = artworkImage(path, alt, workIndex === 0 && index === 0);
-
-      if (hasDetails && index === 0) {
-        const button = element('button', 'artwork-toggle');
-        button.type = 'button';
-        button.setAttribute('aria-expanded', 'false');
-        button.setAttribute('aria-controls', detailIds);
-        button.setAttribute('aria-label', `Show details for ${work.title || 'work'}`);
+      if (hasDetails) {
+        const button = element('button', 'artwork-toggle multi-main-detail-toggle');
         const hint = element('span', 'detail-hint', '+');
         hint.setAttribute('aria-hidden', 'true');
-        button.append(main, hint);
-
-        button.addEventListener('click', () => {
-          if (!mobile.matches) return;
-          const open = section.classList.toggle('details-visible');
-          button.setAttribute('aria-expanded', String(open));
-          button.setAttribute('aria-label', `${open ? 'Hide' : 'Show'} details for ${work.title || 'work'}`);
-          hint.textContent = open ? '−' : '+';
-        });
-        button.tabIndex = mobile.matches ? 0 : -1;
-        hero.appendChild(button);
-      } else {
-        hero.appendChild(main);
+        button.appendChild(hint);
+        setupDetailToggle(button, section, hint, work, detailIds);
+        images.appendChild(button);
       }
+    } else {
+      paths.forEach((path, index) => {
+        const hero = element('div', 'hero-wrap');
+        if (series) hero.dataset.seriesIndex = String(index);
 
-      images.appendChild(hero);
-    });
+        const alt = work.title
+          ? `${work.title} – image ${index + 1}`
+          : `Project image ${index + 1}`;
+        const main = artworkImage(path, alt, workIndex === 0 && index === 0);
+
+        if (hasDetails && index === 0) {
+          const button = element('button', 'artwork-toggle');
+          const hint = element('span', 'detail-hint', '+');
+          hint.setAttribute('aria-hidden', 'true');
+          button.append(main, hint);
+          setupDetailToggle(button, section, hint, work, detailIds);
+          hero.appendChild(button);
+        } else {
+          hero.appendChild(main);
+        }
+
+        images.appendChild(hero);
+      });
+    }
 
     if (hasDetails) {
       images.id = detailIds;

@@ -1,7 +1,7 @@
-// V9 Landingpage
+// V9.1 Landingpage
 // Desktop: exakt das bewährte Hover-/Klick-Prinzip der V8.5.
 // Mobile: Links öffnen beim ersten Tap. Die Vorschauen erscheinen unabhängig
-// von der Navigation automatisch, zufällig an den bisherigen Spawnpunkten.
+// von der Navigation automatisch in fester Bildrotation an zufälligen Spawnpunkten.
 
 const links = [...document.querySelectorAll('.navigation a[data-preview]')];
 const navigation = document.querySelector('.navigation');
@@ -239,7 +239,7 @@ window.addEventListener('keydown', event => {
 });
 
 // ---------- Mobile: zufällige autonome Vorschauen ----------
-const MOBILE_VISIBLE_MS = 2000;
+const MOBILE_VISIBLE_MS = 3000;
 const MOBILE_FADE_MS = 360;
 const MOBILE_GAP_MS = 500;
 const MOBILE_START_MS = 1150; // nach der 0,8-s-Navigatoranimation etwas Ruhe
@@ -247,7 +247,7 @@ let mobileSequenceTimer = null;
 let mobileFadeTimer = null;
 let mobileRunning = false;
 let mobileItems = [];
-let previousMobileLink = null;
+let mobileItemIndex = 0;
 let previousMobileSpawn = null;
 
 function navZoneMobile() {
@@ -292,38 +292,84 @@ function rectForCenter(x, y, width, height) {
 
 function mobilePlacement(spawn, naturalWidth, naturalHeight) {
   const preferred = spawnPoint(spawn);
-  const { width, height } = mobilePreviewSize(naturalWidth, naturalHeight);
+  const base = mobilePreviewSize(naturalWidth, naturalHeight);
   const zone = navZoneMobile();
   const gap = 10;
+  const viewportH = innerHeight;
 
-  // Ausgangspunkt ist immer der bisherige Spawnpunkt. Nur wenn das größere Bild
-  // die Navigation verdecken würde, wird es nach außen geschoben – auch über
-  // den Rand des Handybildschirms hinaus. Genau dort darf der Viewport es clippen.
-  const candidates = [
-    { x: preferred.x, y: preferred.y },
-    { x: zone.left - gap - width / 2, y: preferred.y },
-    { x: zone.right + gap + width / 2, y: preferred.y },
-    { x: preferred.x, y: zone.top - gap - height / 2 },
-    { x: preferred.x, y: zone.bottom + gap + height / 2 }
-  ];
+  function scaledSize(maxHeight = Infinity) {
+    const scale = Math.min(1, maxHeight / base.height);
+    return {
+      width: Math.max(64, Math.round(base.width * scale)),
+      height: Math.max(64, Math.round(base.height * scale))
+    };
+  }
 
-  const nonOverlapping = candidates.filter(c => !intersects(rectForCenter(c.x, c.y, width, height), zone));
+  function candidate(x, y, size, kind) {
+    // Der Mittelpunkt bleibt vertikal innerhalb des Viewports. Dadurch sind
+    // selbst bei bewusst abgeschnittenen Bildern immer mindestens 50 % der
+    // Bildhöhe sichtbar. Links/rechts darf das Bild weiterhin weit hinausragen.
+    const safeY = Math.max(0, Math.min(viewportH, y));
+    return { x, y: safeY, width: size.width, height: size.height, kind };
+  }
+
+  const full = scaledSize();
+  const candidates = [];
+
+  // 1) Originaler Spawnpunkt, wenn er die Navigation nicht verdeckt.
+  candidates.push(candidate(preferred.x, preferred.y, full, 'spawn'));
+
+  // 2) Links/rechts: volle Bildgröße, horizontales Clipping ist ausdrücklich erlaubt.
+  candidates.push(candidate(zone.left - gap - full.width / 2, preferred.y, full, 'left'));
+  candidates.push(candidate(zone.right + gap + full.width / 2, preferred.y, full, 'right'));
+
+  // 3) Oberhalb/unterhalb: falls nötig proportional verkleinern, damit trotz
+  // Clipping mindestens 50 % der Höhe sichtbar bleiben und die Navigation frei bleibt.
+  const topRoom = Math.max(32, zone.top - gap);
+  const topSize = scaledSize(topRoom * 2);
+  candidates.push(candidate(
+    preferred.x,
+    zone.top - gap - topSize.height / 2,
+    topSize,
+    'top'
+  ));
+
+  const bottomRoom = Math.max(32, viewportH - zone.bottom - gap);
+  const bottomSize = scaledSize(bottomRoom * 2);
+  candidates.push(candidate(
+    preferred.x,
+    zone.bottom + gap + bottomSize.height / 2,
+    bottomSize,
+    'bottom'
+  ));
+
+  const nonOverlapping = candidates.filter(c =>
+    !intersects(rectForCenter(c.x, c.y, c.width, c.height), zone)
+  );
   const usable = nonOverlapping.length ? nonOverlapping : candidates;
 
-  // Bevorzugt wird die kleinste Verschiebung vom ursprünglichen Spawnpunkt.
+  // Möglichst nah am ursprünglichen Spawnpunkt bleiben, aber eine unnötige
+  // Verkleinerung vermeiden. Dadurch wirken die Bilder groß und frei wie in der Skizze.
   usable.sort((a, b) => {
-    const da = (a.x - preferred.x) ** 2 + (a.y - preferred.y) ** 2;
-    const db = (b.x - preferred.x) ** 2 + (b.y - preferred.y) ** 2;
+    const da = Math.hypot(
+      (a.x - preferred.x) / innerWidth,
+      (a.y - preferred.y) / innerHeight
+    ) + (1 - (a.width * a.height) / (full.width * full.height)) * .35;
+    const db = Math.hypot(
+      (b.x - preferred.x) / innerWidth,
+      (b.y - preferred.y) / innerHeight
+    ) + (1 - (b.width * b.height) / (full.width * full.height)) * .35;
     return da - db;
   });
 
-  return { ...usable[0], width, height };
+  return usable[0];
 }
 
-function randomMobileItem() {
-  const candidates = mobileItems.filter(item => item.link !== previousMobileLink);
-  const pool = candidates.length ? candidates : mobileItems;
-  return pool[Math.floor(Math.random() * pool.length)];
+function nextMobileItem() {
+  if (!mobileItems.length) return null;
+  const item = mobileItems[mobileItemIndex % mobileItems.length];
+  mobileItemIndex = (mobileItemIndex + 1) % mobileItems.length;
+  return item;
 }
 
 function randomSpawnFor(link) {
@@ -354,11 +400,11 @@ function scheduleNextMobilePreview(delay = MOBILE_GAP_MS) {
 function showNextMobilePreview() {
   if (!mobileRunning || !mobileMode() || !mobileItems.length) return;
 
-  const item = randomMobileItem();
+  const item = nextMobileItem();
+  if (!item) return;
   const spawn = randomSpawnFor(item.link);
   const placement = mobilePlacement(spawn, item.width, item.height);
 
-  previousMobileLink = item.link;
   previousMobileSpawn = spawn;
 
   previewLink.removeAttribute('href');
@@ -378,7 +424,7 @@ function showNextMobilePreview() {
     if (mobileRunning && mobileMode()) previewLink.classList.add('is-materialized');
   }));
 
-  // Zwei Sekunden sichtbar, dann Materialisierung rückwärts.
+  // Drei Sekunden sichtbar, dann Materialisierung rückwärts.
   mobileSequenceTimer = setTimeout(() => {
     previewLink.classList.remove('is-materialized');
     mobileFadeTimer = setTimeout(() => {
@@ -406,6 +452,7 @@ async function preloadMobileItems() {
 async function startMobileSequence() {
   if (mobileRunning || !mobileMode()) return;
   mobileRunning = true;
+  mobileItemIndex = 0;
   active = null;
   links.forEach(a => a.classList.remove('is-active'));
   previewLink.style.pointerEvents = 'none';
@@ -422,7 +469,7 @@ function stopMobileSequence() {
   hideMobilePreviewInstant();
   previewLink.style.pointerEvents = '';
   previewLink.removeAttribute('aria-hidden');
-  previousMobileLink = null;
+  mobileItemIndex = 0;
   previousMobileSpawn = null;
 }
 
