@@ -39,20 +39,6 @@ window.PAINTING_WORKS = [
     }
   },
   {
-    "title": "Untitled (Gipfel), 2026",
-    "medium": "acrylic, white wall paint, ink, kyougi on canvas",
-    "dimensions": "80 × 60 cm",
-    "availability": "",
-    "text": "",
-    "details": {
-      "left": "../images/painting/gipfel/detail-left.jpg",
-      "right": "../images/painting/gipfel/detail-right.jpg"
-    },
-    "images": [
-      "../images/painting/gipfel/main.jpg"
-    ]
-  },
-  {
     "title": "Untitled (8 Holzplatten), 2026",
     "medium": "phototransfer medium, ink, pencil on wood",
     "dimensions": "12 x 21 x 3 cm",
@@ -78,6 +64,20 @@ window.PAINTING_WORKS = [
       "left": "../images/painting/kapelle/detail-left.jpg",
       "right": "../images/painting/kapelle/detail-right.jpg"
     }
+  },
+  {
+    "title": "Untitled (Gipfel), 2026",
+    "medium": "acrylic, white wall paint, ink, kyougi on canvas",
+    "dimensions": "80 × 60 cm",
+    "availability": "",
+    "text": "",
+    "details": {
+      "left": "../images/painting/gipfel/detail-left.jpg",
+      "right": "../images/painting/gipfel/detail-right.jpg"
+    },
+    "images": [
+      "../images/painting/gipfel/main.jpg"
+    ]
   },
   {
     "title": "parigiparigiparigi2, 2026",
