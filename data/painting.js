@@ -46,11 +46,11 @@ window.PAINTING_WORKS = [
     "text": "",
     "images": [
       "../images/painting/holzdruck/main.jpg",
-      "../images/painting/holzdruck/main2.jpg",
-      "../images/painting/holzdruck/main3.jpg",
-      "../images/painting/holzdruck/main4.jpg",
-      "../images/painting/holzdruck/main5.jpg",
-      "../images/painting/holzdruck/main6.jpg"
+      "../images/painting/holzdruck/main-20260929102927-02.jpg",
+      "../images/painting/holzdruck/main-20260929102927-03.jpg",
+      "../images/painting/holzdruck/main-20260929102927-04.jpg",
+      "../images/painting/holzdruck/main-20260929102927-05.jpg",
+      "../images/painting/holzdruck/main-20260929102927-06.jpg"
     ]
   },
   {
