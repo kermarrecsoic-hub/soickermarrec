@@ -11,7 +11,6 @@
   const tr = (key, fallback) => i18n?.t ? i18n.t(key) : fallback;
   const mobile = window.matchMedia('(max-width: 700px)');
   const forceSeries = target.dataset.layout === 'series';
-  const STORAGE_KEY = 'soic-series-columns';
   let uid = 0;
   let currentColumns = null;
 
@@ -70,7 +69,7 @@
     items.forEach((item, index) => wrappers[index % columns].appendChild(item));
   }
 
-  function setColumns(columns, persist = true) {
+  function setColumns(columns) {
     if (![1, 2, 4].includes(columns)) return;
     currentColumns = columns;
     target.dataset.columns = String(columns);
@@ -81,19 +80,9 @@
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
-
-    if (persist) {
-      try { localStorage.setItem(STORAGE_KEY, String(columns)); } catch (_) {}
-    }
   }
 
-  function initialColumns() {
-    try {
-      const stored = Number(localStorage.getItem(STORAGE_KEY));
-      if ([1, 2, 4].includes(stored)) return stored;
-    } catch (_) {}
-    return mobile.matches ? 1 : 2;
-  }
+  function initialColumns() { return mobile.matches ? 1 : 2; }
 
   function makeViewToggle() {
     if (!forceSeries) return;
@@ -110,7 +99,7 @@
       button.dataset.columns = String(columns);
       button.setAttribute('aria-label', columns === 1 ? tr('gallery.oneColumn', '1 column') : `${columns} ${tr('gallery.columns', 'columns')}`);
       button.setAttribute('aria-pressed', 'false');
-      button.addEventListener('click', () => setColumns(columns, true));
+      button.addEventListener('click', () => setColumns(columns));
       controls.appendChild(button);
     });
 
@@ -230,7 +219,7 @@
 
   if (forceSeries) {
     makeViewToggle();
-    setColumns(initialColumns(), false);
+    setColumns(initialColumns());
   }
 
   mobile.addEventListener('change', () => {
@@ -248,15 +237,7 @@
 
     // Eine vom Nutzer gewählte Ansicht bleibt beim Drehen/Resizen erhalten.
     // Ohne gespeicherte Wahl gilt beim ersten Laden mobil 1, Desktop 2.
-    if (forceSeries && currentColumns) setColumns(currentColumns, false);
+    if (forceSeries && currentColumns) setColumns(currentColumns);
   });
 })();
 
-// Verhindert nur die direkte Bildspeicherung per Kontextmenü / Drag & Drop.
-// Browser-Entwicklertools oder Screenshots können Bilder weiterhin sichern.
-document.addEventListener('contextmenu', event => {
-  if (event.target.closest('img')) event.preventDefault();
-});
-document.addEventListener('dragstart', event => {
-  if (event.target.closest('img')) event.preventDefault();
-});

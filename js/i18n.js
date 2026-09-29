@@ -3,7 +3,6 @@
   'use strict';
 
   const VALID = ['de', 'fr', 'en'];
-  const STORAGE_KEY = 'soic-language';
 
   const copy = {
     de: {
@@ -17,6 +16,7 @@
         contact: 'Kontakt'
       },
       footer: '© 2026 Soïc Kermarrec, alle Rechte vorbehalten',
+      legal: { imprint: 'Impressum', privacy: 'Datenschutz' },
       about: {
         bio1: 'Soïc Kermarrec wurde 2004 in Leipzig geboren und lebt und arbeitet in dieser Stadt als Künstler und Architekturstudent.<br>In seiner Jugend wollte er den großen Mangaka nacheifern und kam so zur Grafik mit Tinte und Feder. Als er 2025 nach Paris zog, fing er an, seine Eindrücke und Erlebnisse in Farben auf die Leinwand zu bannen, was zu seinem jetzigen Werk führte.',
         bio2: 'Er arbeitet intuitiv und stellt mit Tinte und Acryl, verschiedenen Fragmenten und Schrift Abhängigkeiten zwischen den einzelnen Elementen her. So entstehen visuelle Eindrücke, in denen sich komplexe und manchmal zufällige Zusammenhänge unserer subjektiv wahrgenommenen Realität widerspiegeln.',
@@ -66,7 +66,11 @@
         aboutTitle: 'About | Soïc Kermarrec – Leipzig & Paris',
         aboutDescription: 'Soïc Kermarrec über seine künstlerische Arbeit und seine Zeit in Leipzig und Paris.',
         contactTitle: 'Kontakt | Soïc Kermarrec',
-        contactDescription: 'Kontakt zu Soïc Kermarrec für Verfügbarkeit von Werken, Projekte und Ausstellungen.'
+        contactDescription: 'Kontakt zu Soïc Kermarrec für Verfügbarkeit von Werken, Projekte und Ausstellungen.',
+        imprintTitle: 'Impressum | Soïc Kermarrec',
+        imprintDescription: 'Anbieterkennzeichnung und Kontaktdaten von Soïc Kermarrec.',
+        privacyTitle: 'Datenschutz | Soïc Kermarrec',
+        privacyDescription: 'Datenschutzhinweise für das Portfolio von Soïc Kermarrec.'
       }
     },
     fr: {
@@ -80,6 +84,7 @@
         contact: 'Contact'
       },
       footer: '© 2026 Soïc Kermarrec, tous droits réservés',
+      legal: { imprint: 'Mentions légales', privacy: 'Confidentialité' },
       about: {
         bio1: 'Soïc Kermarrec est né à Leipzig en 2004 et y vit et travaille comme artiste et étudiant en architecture.<br>Dans sa jeunesse, il voulait suivre les traces des grands mangakas et s’est ainsi tourné vers le dessin à l’encre et à la plume. Lorsqu’il s’installe à Paris en 2025, il commence à transposer sur la toile, par la couleur, ses impressions et ses expériences, ce qui l’amène à son travail actuel.',
         bio2: 'Il travaille de manière intuitive et crée, avec l’encre et l’acrylique, différents fragments et l’écriture, des relations entre les éléments. Il en résulte des impressions visuelles dans lesquelles se reflètent les liens complexes et parfois fortuits de notre réalité perçue subjectivement.',
@@ -129,7 +134,11 @@
         aboutTitle: 'À propos | Soïc Kermarrec – Leipzig & Paris',
         aboutDescription: 'Soïc Kermarrec présente son travail artistique et son parcours entre Leipzig et Paris.',
         contactTitle: 'Contact | Soïc Kermarrec',
-        contactDescription: 'Contacter Soïc Kermarrec pour la disponibilité des œuvres, les projets et les expositions.'
+        contactDescription: 'Contacter Soïc Kermarrec pour la disponibilité des œuvres, les projets et les expositions.',
+        imprintTitle: 'Mentions légales | Soïc Kermarrec',
+        imprintDescription: 'Mentions légales et coordonnées de Soïc Kermarrec.',
+        privacyTitle: 'Confidentialité | Soïc Kermarrec',
+        privacyDescription: 'Informations relatives à la protection des données pour le portfolio de Soïc Kermarrec.'
       }
     },
     en: {
@@ -143,6 +152,7 @@
         contact: 'Contact'
       },
       footer: '© 2026 Soïc Kermarrec, all rights reserved',
+      legal: { imprint: 'Legal notice', privacy: 'Privacy' },
       about: {
         bio1: 'Soïc Kermarrec was born in Leipzig in 2004 and lives and works there as an artist and architecture student.<br>In his youth, he wanted to follow in the footsteps of the great manga artists and thus came to drawing with ink and nib. When he moved to Paris in 2025, he began translating his impressions and experiences into colour on canvas, leading to his current body of work.',
         bio2: 'He works intuitively, using ink and acrylic, various fragments and writing to establish relationships between individual elements. The result is a series of visual impressions in which the complex and sometimes accidental connections of our subjectively perceived reality are reflected.',
@@ -192,7 +202,11 @@
         aboutTitle: 'About | Soïc Kermarrec – Leipzig & Paris',
         aboutDescription: 'Soïc Kermarrec on his artistic practice and his time between Leipzig and Paris.',
         contactTitle: 'Contact | Soïc Kermarrec',
-        contactDescription: 'Contact Soïc Kermarrec about artwork availability, projects and exhibitions.'
+        contactDescription: 'Contact Soïc Kermarrec about artwork availability, projects and exhibitions.',
+        imprintTitle: 'Legal notice | Soïc Kermarrec',
+        imprintDescription: 'Legal notice and contact details for Soïc Kermarrec.',
+        privacyTitle: 'Privacy | Soïc Kermarrec',
+        privacyDescription: 'Privacy information for the portfolio of Soïc Kermarrec.'
       }
     }
   };
@@ -259,14 +273,21 @@
   }
 
   function currentLanguage() {
-    const url = new URL(location.href);
-    const fromUrl = url.searchParams.get('lang');
-    if (VALID.includes(fromUrl)) return fromUrl;
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (VALID.includes(saved)) return saved;
-    } catch (_) {}
-    return browserLanguage();
+    const fromUrl = new URL(location.href).searchParams.get('lang');
+    return VALID.includes(fromUrl) ? fromUrl : browserLanguage();
+  }
+
+  function propagateLanguage(lang) {
+    document.querySelectorAll('a[href]').forEach(link => {
+      const href = link.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+      try {
+        const url = new URL(href, location.href);
+        if (url.origin !== location.origin) return;
+        url.searchParams.set('lang', lang);
+        link.href = url.href;
+      } catch (_) {}
+    });
   }
 
   function pageKey() {
@@ -279,7 +300,9 @@
       'architecture.html': 'architecture',
       'xxx.html': 'photography',
       'about.html': 'about',
-      'contact.html': 'contact'
+      'contact.html': 'contact',
+      'impressum.html': 'imprint',
+      'datenschutz.html': 'privacy'
     })[name] || 'home';
   }
 
@@ -317,7 +340,6 @@
       button.classList.toggle('is-active', code === lang);
       button.setAttribute('aria-pressed', String(code === lang));
       button.addEventListener('click', () => {
-        try { localStorage.setItem(STORAGE_KEY, code); } catch (_) {}
         const url = new URL(location.href);
         url.searchParams.set('lang', code);
         location.href = url.href;
@@ -346,6 +368,7 @@
   const lang = currentLanguage();
   applyStaticText(lang);
   makeSwitch(lang);
+  propagateLanguage(lang);
 
   window.SoicI18n = {
     language: lang,
