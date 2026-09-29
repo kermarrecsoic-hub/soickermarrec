@@ -291,7 +291,7 @@ a { color: inherit; text-decoration: none; }
   text-align: left;
 }
 
-/* Editorial: die sichtbare about.jpg-Breite definiert exakt die Textbreite. */
+/* Editorial: die sichtbare About-Bildbreite definiert exakt die Textbreite. */
 .editorial-page { padding: calc(var(--header-height) + 38px) 20px 125px; }
 .about-content {
   width: min(100%, 551px, 51.65svh);
@@ -336,18 +336,39 @@ a { color: inherit; text-decoration: none; }
   gap: 12px;
 }
 .editorial-contact a { display: block; max-width: 100%; overflow-wrap: anywhere; }
-.copyright {
+.site-footer {
   position: fixed;
-  bottom: 14px;
-  left: 0;
   z-index: 100;
+  left: 0;
+  bottom: 12px;
   width: 100%;
-  color: #999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.copyright {
+  margin: 0;
   text-align: center;
   pointer-events: none;
   font: 300 10px/1.35 var(--site-font);
   letter-spacing: .35px;
+  color: #999;
 }
+.footer-links {
+  display: flex;
+  gap: 14px;
+  font: 300 9px/1.35 var(--site-font);
+  letter-spacing: .35px;
+  color: #aaa;
+}
+.footer-links a { color: inherit; text-decoration: none; }
+.footer-links a:hover, .footer-links a:focus-visible, .footer-links a[aria-current="page"] {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.footer-links a:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; }
 img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
 
 @media (max-width: 700px) {
@@ -566,4 +587,21 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     gap: 8px;
     font-size: 9px;
   }
+}
+
+
+/* Impressum / Datenschutz */
+.legal-shell { padding-bottom: 150px; }
+.legal-content { width: min(100%, 720px); margin: 0 auto; }
+.legal-title { margin: 0 0 34px; font: inherit; text-align: center; }
+.legal-section + .legal-section { margin-top: 34px; }
+.legal-section h3 { margin: 0 0 12px; font: inherit; }
+.legal-text p { margin: 0 0 13px; }
+.legal-text p:last-child { margin-bottom: 0; }
+.legal-text a { text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 700px) {
+  .site-footer { bottom: 9px; gap: 4px; }
+  .footer-links { gap: 12px; font-size: 9px; }
+  .legal-content { width: min(100%, 92vw); }
+  .legal-section + .legal-section { margin-top: 28px; }
 }
