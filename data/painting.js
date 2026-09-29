@@ -42,13 +42,15 @@ window.PAINTING_WORKS = [
     "title": "Untitled (Gipfel), 2026",
     "medium": "acrylic, white wall paint, ink, kyougi on canvas",
     "dimensions": "80 × 60 cm",
-    "availability": "unavailable",
+    "availability": "",
     "text": "",
-    "image": "../images/painting/gipfel/main.jpg",
     "details": {
       "left": "../images/painting/gipfel/detail-left.jpg",
       "right": "../images/painting/gipfel/detail-right.jpg"
-    }
+    },
+    "images": [
+      "../images/painting/gipfel/main.jpg"
+    ]
   },
   {
     "title": "Untitled (8 Holzplatten), 2026",
