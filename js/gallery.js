@@ -5,7 +5,10 @@
   const target = document.getElementById('artworks');
   if (!target) return;
 
-  const works = window[document.body.dataset.works || 'PAINTING_WORKS'] || [];
+  const rawWorks = window[document.body.dataset.works || 'PAINTING_WORKS'] || [];
+  const i18n = window.SoicI18n || null;
+  const works = rawWorks.map(work => i18n?.localizeWork ? i18n.localizeWork(work) : work);
+  const tr = (key, fallback) => i18n?.t ? i18n.t(key) : fallback;
   const mobile = window.matchMedia('(max-width: 700px)');
   const forceSeries = target.dataset.layout === 'series';
   const STORAGE_KEY = 'soic-series-columns';
@@ -99,13 +102,13 @@
 
     const controls = element('div', 'series-view-toggle');
     controls.setAttribute('role', 'group');
-    controls.setAttribute('aria-label', 'Images per row');
+    controls.setAttribute('aria-label', tr('gallery.imagesPerRow', 'Images per row'));
 
     [4, 2, 1].forEach(columns => {
       const button = element('button', '', String(columns));
       button.type = 'button';
       button.dataset.columns = String(columns);
-      button.setAttribute('aria-label', `${columns} ${columns === 1 ? 'column' : 'columns'}`);
+      button.setAttribute('aria-label', columns === 1 ? tr('gallery.oneColumn', '1 column') : `${columns} ${tr('gallery.columns', 'columns')}`);
       button.setAttribute('aria-pressed', 'false');
       button.addEventListener('click', () => setColumns(columns, true));
       controls.appendChild(button);
@@ -118,12 +121,12 @@
     button.type = 'button';
     button.setAttribute('aria-expanded', 'false');
     button.setAttribute('aria-controls', detailIds);
-    button.setAttribute('aria-label', `Show details for ${work.title || 'work'}`);
+    button.setAttribute('aria-label', `${tr('gallery.showDetails', 'Show details')}: ${work.title || tr('gallery.work', 'work')}`);
     button.addEventListener('click', () => {
       if (!mobile.matches) return;
       const open = section.classList.toggle('details-visible');
       button.setAttribute('aria-expanded', String(open));
-      button.setAttribute('aria-label', `${open ? 'Hide' : 'Show'} details for ${work.title || 'work'}`);
+      button.setAttribute('aria-label', `${open ? tr('gallery.hideDetails', 'Hide details') : tr('gallery.showDetails', 'Show details')}: ${work.title || tr('gallery.work', 'work')}`);
       hint.textContent = open ? '−' : '+';
     });
     button.tabIndex = mobile.matches ? 0 : -1;

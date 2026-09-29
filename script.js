@@ -120,7 +120,8 @@
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     try { ctx.drawImage(bg, 0, 0); } catch { return; }
 
-    for (const link of links) {
+    const contrastTargets = [...links, ...document.querySelectorAll('.language-switch button')];
+    for (const link of contrastTargets) {
       const rect = link.getBoundingClientRect();
       const sxScreen = rect.left + rect.width / 2;
       const syScreen = rect.top + rect.height / 2;

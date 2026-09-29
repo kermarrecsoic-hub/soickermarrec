@@ -163,3 +163,43 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 .landing-background-fade {
   z-index: 1;
 }
+
+
+/* DE / FR / EN – sichtbar oben links. */
+.language-switch {
+  position: fixed;
+  z-index: 5;
+  top: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 300 10px/1 var(--site-font);
+  letter-spacing: .45px;
+}
+.language-switch button {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 2px 0;
+  background: transparent;
+  color: #777;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  opacity: .58;
+}
+.language-switch button:hover,
+.language-switch button:focus-visible { opacity: 1; }
+.language-switch button.is-active {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.language-switch button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 4px;
+}
+@media (max-width: 700px), (hover: none) and (pointer: coarse) {
+  .language-switch { top: 20px; left: 18px; gap: 9px; font-size: 9px; }
+}
