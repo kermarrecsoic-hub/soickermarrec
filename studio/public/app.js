@@ -915,10 +915,6 @@
     return state.landingConfig;
   }
 
-  async function saveLandingConfig() {
-    return api('save-landing-config', { method: 'POST', body: JSON.stringify({ config: state.landingConfig }) });
-  }
-
   async function renderLandingBackgrounds() {
     workspaceContent.innerHTML = '<div class="empty-state">Lade Hintergrund-Slots …</div>';
     try {
