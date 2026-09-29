@@ -42,7 +42,11 @@ window.XXX_WORKS = [
       "../images/foto1/fotogalerie_sortiert/35.jpg",
       "../images/foto1/fotogalerie_sortiert/37.jpg",
       "../images/foto1/fotogalerie_sortiert/38.jpg",
-      "../images/foto1/fotogalerie_sortiert/39.jpg"
+      "../images/foto1/fotogalerie_sortiert/39.jpg",
+      "../images/xxx/untitled/main-20260929084446-37.jpg",
+      "../images/xxx/untitled/main-20260929084446-38.jpg",
+      "../images/xxx/untitled/main-20260929084446-39.jpg",
+      "../images/xxx/untitled/main-20260929084446-40.jpg"
     ]
   }
 ];
