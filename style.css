@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Michroma";
+  src: url("Michroma-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 /* Soïc Kermarrec – V11 Landing */
 :root {
   --ink: #414141;
@@ -118,18 +126,39 @@ body {
   }
 }
 
-.copyright {
+.site-footer {
   position: fixed;
-  z-index: 3;
+  z-index: 100;
   left: 0;
-  bottom: 14px;
+  bottom: 12px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.copyright {
+  margin: 0;
   text-align: center;
   pointer-events: none;
   font: 300 10px/1.35 var(--site-font);
   letter-spacing: .35px;
   color: #999;
 }
+.footer-links {
+  display: flex;
+  gap: 14px;
+  font: 300 9px/1.35 var(--site-font);
+  letter-spacing: .35px;
+  color: #aaa;
+}
+.footer-links a { color: inherit; text-decoration: none; }
+.footer-links a:hover, .footer-links a:focus-visible, .footer-links a[aria-current="page"] {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.footer-links a:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; }
 @keyframes page-intro {
   from { opacity: 0; transform: translate(-50%, calc(-50% + 8px)); }
   to { opacity: 1; transform: translate(-50%, -50%); }
@@ -202,4 +231,21 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 }
 @media (max-width: 700px), (hover: none) and (pointer: coarse) {
   .language-switch { top: 20px; left: 18px; gap: 9px; font-size: 9px; }
+}
+
+
+/* Impressum / Datenschutz */
+.legal-shell { padding-bottom: 150px; }
+.legal-content { width: min(100%, 720px); margin: 0 auto; }
+.legal-title { margin: 0 0 34px; font: inherit; text-align: center; }
+.legal-section + .legal-section { margin-top: 34px; }
+.legal-section h3 { margin: 0 0 12px; font: inherit; }
+.legal-text p { margin: 0 0 13px; }
+.legal-text p:last-child { margin-bottom: 0; }
+.legal-text a { text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 700px) {
+  .site-footer { bottom: 9px; gap: 4px; }
+  .footer-links { gap: 12px; font-size: 9px; }
+  .legal-content { width: min(100%, 92vw); }
+  .legal-section + .legal-section { margin-top: 28px; }
 }
