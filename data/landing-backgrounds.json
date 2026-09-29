@@ -1,6 +1,5 @@
 {
   "mobile": {
-    "active": 1,
     "slots": [
       "images/landing/mobile-1.jpg",
       "images/landing/mobile-2.jpg",
@@ -8,7 +7,6 @@
     ]
   },
   "desktop": {
-    "active": 1,
     "slots": [
       "images/landing/desktop-1.jpg",
       "images/landing/desktop-2.jpg",
