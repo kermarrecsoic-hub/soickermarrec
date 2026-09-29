@@ -68,18 +68,6 @@ window.PAINTING_WORKS = [
     ]
   },
   {
-    "title": "parigiparigiparigi2, 2026",
-    "medium": "acrylic, ink, on canvas",
-    "dimensions": "60 × 80 cm",
-    "availability": "",
-    "text": "",
-    "image": "../images/painting/parigi2/main.jpg",
-    "details": {
-      "left": "../images/painting/parigi2/detail-left.jpg",
-      "right": "../images/painting/parigi2/detail-right.jpg"
-    }
-  },
-  {
     "title": "Untitled (Kapelle), 2026",
     "medium": "acrylic, ink, on canvas",
     "dimensions": "61 × 46 cm",
@@ -89,6 +77,18 @@ window.PAINTING_WORKS = [
     "details": {
       "left": "../images/painting/kapelle/detail-left.jpg",
       "right": "../images/painting/kapelle/detail-right.jpg"
+    }
+  },
+  {
+    "title": "parigiparigiparigi2, 2026",
+    "medium": "acrylic, ink, on canvas",
+    "dimensions": "60 × 80 cm",
+    "availability": "",
+    "text": "",
+    "image": "../images/painting/parigi2/main.jpg",
+    "details": {
+      "left": "../images/painting/parigi2/detail-left.jpg",
+      "right": "../images/painting/parigi2/detail-right.jpg"
     }
   },
   {
