@@ -164,9 +164,25 @@ export async function getRepoFile(path) {
   const encodedPath = path.split('/').map(encodeURIComponent).join('/');
   const res = await githubFetch(`/repos/${REPO.owner}/${REPO.repo}/contents/${encodedPath}?ref=${encodeURIComponent(REPO.branch)}`);
   const data = await res.json();
-  if (Array.isArray(data) || !data.content) throw new Error(`Datei nicht lesbar: ${path}`);
-  const content = Buffer.from(String(data.content).replace(/\n/g, ''), 'base64');
-  return { content, sha: data.sha, path: data.path };
+
+  if (Array.isArray(data)) throw new Error(`Pfad ist ein Ordner statt einer Datei: ${path}`);
+
+  // GitHub liefert beim Contents-Endpunkt für Dateien > 1 MB kein Base64-Feld
+  // mehr mit. In diesem Fall lesen wir den Blob über seine SHA nach.
+  if (data?.content) {
+    const content = Buffer.from(String(data.content).replace(/\n/g, ''), 'base64');
+    return { content, sha: data.sha, path: data.path };
+  }
+
+  if (data?.sha) {
+    const blobRes = await githubFetch(`/repos/${REPO.owner}/${REPO.repo}/git/blobs/${encodeURIComponent(data.sha)}`);
+    const blob = await blobRes.json();
+    if (!blob?.content) throw new Error(`Datei nicht lesbar: ${path}`);
+    const content = Buffer.from(String(blob.content).replace(/\n/g, ''), 'base64');
+    return { content, sha: data.sha, path: data.path || path };
+  }
+
+  throw new Error(`Datei nicht lesbar: ${path}`);
 }
 
 export async function getRepoFileIfExists(path) {

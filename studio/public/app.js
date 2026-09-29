@@ -204,6 +204,10 @@
     return `${SITE}${encodeURI(toRepoPath(path))}?studio=${Date.now()}`;
   }
 
+  function studioImageUrl(path = '') {
+    return `${API}image-proxy?path=${encodeURIComponent(toRepoPath(path))}&v=${Date.now()}`;
+  }
+
   function workImages(work) {
     if (Array.isArray(work.images) && work.images.length) return work.images.filter(Boolean);
     return work.image ? [work.image] : [];
@@ -922,7 +926,7 @@
       workspaceContent.innerHTML = '';
       const intro = document.createElement('p');
       intro.className = 'landing-slot-intro';
-      intro.textContent = 'Je Gerät gibt es drei Slots. Nur der aktivierte Slot erscheint auf der Landingpage. Mobile startet mit Ausstellung, Desktop mit Fotografie.';
+      intro.textContent = 'Mobile und Desktop haben jeweils drei feste Bild-Slots. Alle vorhandenen Bilder wechseln auf der Landingpage automatisch alle 10 Sekunden.';
       workspaceContent.appendChild(intro);
 
       for (const device of ['mobile', 'desktop']) {
@@ -933,64 +937,76 @@
         const grid = document.createElement('div');
         grid.className = 'landing-slot-grid';
         const group = cfg[device];
+
         group.slots.forEach((path, index) => {
           const slotNumber = index + 1;
           const card = document.createElement('article');
-          card.className = `landing-slot-card${Number(group.active) === slotNumber ? ' is-active' : ''}`;
+          card.className = 'landing-slot-card';
+
           const preview = document.createElement('div');
           preview.className = 'landing-slot-preview';
           const img = document.createElement('img');
-          img.src = publicUrl(path);
+          img.src = studioImageUrl(path);
           img.alt = '';
-          img.onerror = () => { preview.classList.add('is-empty'); img.remove(); preview.textContent = 'Slot leer'; };
+          img.onerror = () => {
+            preview.classList.add('is-empty');
+            img.remove();
+            preview.textContent = 'Slot leer';
+          };
           preview.appendChild(img);
+
           const body = document.createElement('div');
           body.className = 'landing-slot-body';
           const title = document.createElement('h3');
           title.textContent = `Slot ${slotNumber}`;
           const p = document.createElement('p');
           p.textContent = path;
+
           const actions = document.createElement('div');
           actions.className = 'compact-actions';
-          const activate = button(Number(group.active) === slotNumber ? 'Aktiv' : 'Aktivieren', Number(group.active) === slotNumber ? 'primary' : 'secondary', async () => {
-            state.landingConfig[device].active = slotNumber;
-            setStatus('Aktiver Hintergrund wird gespeichert …');
-            await saveLandingConfig();
-            showToast('Landing-Hintergrund aktiviert');
-            await renderLandingBackgrounds();
-          });
-          activate.disabled = Number(group.active) === slotNumber;
           const label = document.createElement('label');
           label.className = 'secondary file-button';
-          label.textContent = 'Bild einsetzen';
+          label.textContent = 'Bild ersetzen';
           const input = document.createElement('input');
-          input.type = 'file'; input.accept = 'image/*'; input.hidden = true;
+          input.type = 'file';
+          input.accept = 'image/*';
+          input.hidden = true;
           label.appendChild(input);
+
           input.addEventListener('change', async () => {
             const file = input.files?.[0];
             if (!file) return;
-            input.disabled = true; label.style.opacity = '.55';
+            input.disabled = true;
+            label.style.opacity = '.55';
+
             try {
               setStatus(`${device === 'mobile' ? 'Mobile' : 'Desktop'} Slot ${slotNumber} wird hochgeladen …`);
               const blob = await optimizeImage(file, 2800, .92);
               await uploadBlob(path, blob);
+              state.mediaLoaded = false;
               showToast(`Slot ${slotNumber} aktualisiert`);
+              setStatus('In GitHub gespeichert. Die Studio-Vorschau liest das neue Bild direkt aus dem Repository.');
               await renderLandingBackgrounds();
             } catch (error) {
               setStatus(error.message, true);
             } finally {
-              input.value = ''; input.disabled = false; label.style.opacity = '';
+              input.value = '';
+              input.disabled = false;
+              label.style.opacity = '';
             }
           });
-          actions.append(activate, label);
+
+          actions.append(label);
           body.append(title, p, actions);
           card.append(preview, body);
           grid.appendChild(card);
         });
+
         section.append(h, grid);
         workspaceContent.appendChild(section);
       }
-      setStatus('Drei Mobile- und drei Desktop-Slots. Ein Austausch oder Aktivieren wird direkt auf GitHub veröffentlicht.');
+
+      setStatus('3 Mobile- und 3 Desktop-Slots · Wechsel auf der Landingpage alle 10 Sekunden.');
     } catch (error) {
       workspaceContent.innerHTML = `<div class="empty-state">${escapeHtml(error.message)}</div>`;
       setStatus(error.message, true);
