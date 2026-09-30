@@ -13,7 +13,7 @@
         s2h: 'Kontakt',
         s2b: '<p>E-Mail: <a href="mailto:soickermarrec@gmail.com">soickermarrec@gmail.com</a></p>',
         s3h: 'Inhalte und Urheberrecht',
-        s3b: '<p>Die auf dieser Website gezeigten Werke, Fotografien und sonstigen Inhalte sind urheberrechtlich geschützt. Eine Verwendung außerhalb der gesetzlichen Schranken des Urheberrechts bedarf der vorherigen Zustimmung.</p>'
+        s3b: '<p>Die auf dieser Website gezeigten Werke, Fotografien und sonstigen Inhalte sind urheberrechtlich geschützt. Eine Verwendung außerhalb der gesetzlichen Schranken des Urheberrechts bedarf der vorherigen Zustimmung.</p><p>© 2026 Soïc Kermarrec. Alle Rechte vorbehalten.</p>'
       },
       privacy: {
         title: 'Datenschutz',
@@ -22,7 +22,7 @@
         s2h: 'Hosting über GitHub Pages',
         s2b: '<p>Diese Website wird über GitHub Pages bereitgestellt. Beim Besuch einer GitHub-Pages-Website protokolliert GitHub die IP-Adresse des Besuchers zu Sicherheitszwecken. Dabei können außerdem technisch notwendige Zugriffsdaten verarbeitet werden. Weitere Informationen finden sich in der <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">Datenschutzerklärung von GitHub</a>.</p><p>Die Verarbeitung erfolgt zur sicheren und technisch zuverlässigen Bereitstellung der Website auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO.</p>',
         s3h: 'Cookies, Tracking und Schriftarten',
-        s3b: '<p>Das öffentliche Portfolio verwendet keine Analyse- oder Marketing-Tracker und setzt selbst keine Cookies. Sprache und Galerieansicht werden nicht dauerhaft im Browser gespeichert. Die Schriftart Michroma wird lokal von dieser Website geladen; beim Laden der Schrift wird keine Verbindung zu Google Fonts hergestellt.</p><p>Der separat passwortgeschützte Studio-Bereich verwendet ausschließlich eine technisch notwendige Sitzung, damit die Anmeldung funktioniert.</p>',
+        s3b: '<p>Das öffentliche Portfolio verwendet keine Analyse- oder Marketing-Tracker und setzt selbst keine Cookies. Sprache und Galerieansicht werden nicht dauerhaft im Browser gespeichert. Die Schriftart Michroma wird lokal von dieser Website geladen; beim Laden der Schrift wird keine Verbindung zu Google Fonts hergestellt.</p><p>Der separat passwortgeschützte Studio-Bereich verwendet ausschließlich eine technisch notwendige Sitzung, damit die Anmeldung funktioniert.</p><p>Instagram ist nur als externer Link eingebunden. Beim Laden dieser Website werden dadurch keine Inhalte von Instagram oder Meta geladen. Erst beim Anklicken des Links verlassen Sie diese Website.</p>',
         s4h: 'Kontaktaufnahme',
         s4b: '<p>Wenn Sie per E-Mail Kontakt aufnehmen, werden die von Ihnen übermittelten Daten ausschließlich zur Bearbeitung der Anfrage verarbeitet. Rechtsgrundlage ist je nach Inhalt der Anfrage Art. 6 Abs. 1 lit. b oder lit. f DSGVO.</p>',
         s5h: 'Ihre Rechte',
@@ -37,7 +37,7 @@
         s2h: 'Contact',
         s2b: '<p>E-mail : <a href="mailto:soickermarrec@gmail.com">soickermarrec@gmail.com</a></p>',
         s3h: 'Contenus et droit d’auteur',
-        s3b: '<p>Les œuvres, photographies et autres contenus présentés sur ce site sont protégés par le droit d’auteur. Toute utilisation dépassant les exceptions prévues par la loi nécessite une autorisation préalable.</p>'
+        s3b: '<p>Les œuvres, photographies et autres contenus présentés sur ce site sont protégés par le droit d’auteur. Toute utilisation dépassant les exceptions prévues par la loi nécessite une autorisation préalable.</p><p>© 2026 Soïc Kermarrec. Tous droits réservés.</p>'
       },
       privacy: {
         title: 'Confidentialité',
@@ -46,7 +46,7 @@
         s2h: 'Hébergement via GitHub Pages',
         s2b: '<p>Ce site est publié via GitHub Pages. Lors de la visite d’un site GitHub Pages, GitHub journalise l’adresse IP du visiteur à des fins de sécurité. D’autres données techniques nécessaires au fonctionnement peuvent également être traitées. Pour plus d’informations, consultez la <a href="https://docs.github.com/fr/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">politique de confidentialité de GitHub</a>.</p><p>Le traitement repose sur l’art. 6, par. 1, let. f RGPD afin de fournir le site de manière sûre et techniquement fiable.</p>',
         s3h: 'Cookies, suivi et polices',
-        s3b: '<p>Le portfolio public n’utilise ni outils d’analyse ni suivi marketing et ne dépose lui-même aucun cookie. La langue et l’affichage de la galerie ne sont pas enregistrés durablement dans le navigateur. La police Michroma est chargée localement depuis ce site ; aucune connexion à Google Fonts n’est établie pour son chargement.</p><p>L’espace Studio séparé et protégé par mot de passe utilise uniquement une session techniquement nécessaire à la connexion.</p>',
+        s3b: '<p>Le portfolio public n’utilise ni outils d’analyse ni suivi marketing et ne dépose lui-même aucun cookie. La langue et l’affichage de la galerie ne sont pas enregistrés durablement dans le navigateur. La police Michroma est chargée localement depuis ce site ; aucune connexion à Google Fonts n’est établie pour son chargement.</p><p>L’espace Studio séparé et protégé par mot de passe utilise uniquement une session techniquement nécessaire à la connexion.</p><p>Instagram est intégré uniquement sous forme de lien externe. Aucun contenu d’Instagram ou de Meta n’est chargé lors de l’ouverture de ce site ; vous quittez ce site uniquement lorsque vous cliquez sur le lien.</p>',
         s4h: 'Prise de contact',
         s4b: '<p>Si vous me contactez par e-mail, les données transmises sont traitées uniquement pour répondre à votre demande. Selon la nature de la demande, la base juridique est l’art. 6, par. 1, let. b ou let. f RGPD.</p>',
         s5h: 'Vos droits',
@@ -61,7 +61,7 @@
         s2h: 'Contact',
         s2b: '<p>Email: <a href="mailto:soickermarrec@gmail.com">soickermarrec@gmail.com</a></p>',
         s3h: 'Content and copyright',
-        s3b: '<p>The artworks, photographs and other content shown on this website are protected by copyright. Any use beyond statutory copyright exceptions requires prior permission.</p>'
+        s3b: '<p>The artworks, photographs and other content shown on this website are protected by copyright. Any use beyond statutory copyright exceptions requires prior permission.</p><p>© 2026 Soïc Kermarrec. All rights reserved.</p>'
       },
       privacy: {
         title: 'Privacy',
@@ -70,7 +70,7 @@
         s2h: 'Hosting via GitHub Pages',
         s2b: '<p>This website is published through GitHub Pages. When a GitHub Pages website is visited, GitHub logs the visitor’s IP address for security purposes. Other technically necessary access data may also be processed. Further information is available in <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHub’s privacy statement</a>.</p><p>Processing is based on Art. 6(1)(f) GDPR for the secure and technically reliable provision of the website.</p>',
         s3h: 'Cookies, tracking and fonts',
-        s3b: '<p>The public portfolio uses no analytics or marketing trackers and does not itself set cookies. Language and gallery view are not stored permanently in the browser. The Michroma font is loaded locally from this website; loading the font does not establish a connection to Google Fonts.</p><p>The separate password-protected Studio area uses only a technically necessary session so that login can function.</p>',
+        s3b: '<p>The public portfolio uses no analytics or marketing trackers and does not itself set cookies. Language and gallery view are not stored permanently in the browser. The Michroma font is loaded locally from this website; loading the font does not establish a connection to Google Fonts.</p><p>The separate password-protected Studio area uses only a technically necessary session so that login can function.</p><p>Instagram is included only as an external link. No content from Instagram or Meta is loaded when this website opens; you leave this website only after clicking the link.</p>',
         s4h: 'Contact',
         s4b: '<p>If you contact me by email, the data you provide is processed solely in order to handle your enquiry. Depending on the enquiry, the legal basis is Art. 6(1)(b) or Art. 6(1)(f) GDPR.</p>',
         s5h: 'Your rights',

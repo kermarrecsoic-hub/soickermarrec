@@ -39,7 +39,7 @@ export const SECTIONS = {
     label: 'XXX',
     dataPath: 'data/xxx.js',
     globalName: 'XXX_WORKS',
-    imageRoot: 'images/xxx',
+    imageRoot: 'images/foto1/fotogalerie_sortiert',
     kind: 'series',
   },
 };

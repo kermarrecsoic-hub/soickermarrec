@@ -17,8 +17,7 @@
 <link href="/favicon.png" rel="icon" sizes="any" type="image/png"/>
 <link href="style.css" rel="stylesheet"/>
 <script defer="" src="js/i18n.js"></script><script defer="" src="script.js"></script>
-<script type="application/ld+json">
-{
+<script type="application/ld+json">{
   "@context": "https://schema.org",
   "@graph": [
     {
@@ -26,25 +25,68 @@
       "@id": "https://soickermarrec.de/#website",
       "url": "https://soickermarrec.de/",
       "name": "Soïc Kermarrec",
-      "alternateName": "Soic Kermarrec",
-      "inLanguage": ["de", "fr", "en"]
+      "alternateName": [
+        "Soic Kermarrec",
+        "S. Kermarrec"
+      ],
+      "inLanguage": [
+        "de",
+        "fr",
+        "en"
+      ],
+      "about": {
+        "@id": "https://soickermarrec.de/#person"
+      }
     },
     {
       "@type": "Person",
       "@id": "https://soickermarrec.de/#person",
       "name": "Soïc Kermarrec",
-      "alternateName": ["Soic Kermarrec","Soec Kermarrec","Soek Kermarrec","Soik Kermarrec","Zoek Kermarrec","Zoec Kermarrec","Zoic Kermarrec","Zoïc Kermarrec"],
+      "alternateName": [
+        "Soic Kermarrec",
+        "S. Kermarrec",
+        "@soicyv"
+      ],
       "url": "https://soickermarrec.de/",
       "description": "Künstler und Architekturstudent aus Leipzig. Seine Malereipraxis entwickelte sich während einer Studien- und Lebensphase in Paris 2025–2026; seine Arbeit umfasst Malerei, Tinte, Fotografie und Architektur.",
-      "knowsAbout": ["Malerei", "Tinte", "Fotografie", "Architektur", "Paris"],
-      "hasOccupation": [{"@type":"Occupation","name":"Künstler"},{"@type":"Occupation","name":"Architekturstudent"}],
-      "homeLocation": {"@type":"Place","name":"Leipzig, Germany"},
-      "sameAs": ["https://www.instagram.com/soicyv/"]
+      "knowsAbout": [
+        "Malerei",
+        "Tinte",
+        "Fotografie",
+        "Architektur",
+        "Paris"
+      ],
+      "hasOccupation": [
+        {
+          "@type": "Occupation",
+          "name": "Künstler"
+        },
+        {
+          "@type": "Occupation",
+          "name": "Architekturstudent"
+        }
+      ],
+      "homeLocation": {
+        "@type": "Place",
+        "name": "Leipzig, Germany"
+      },
+      "sameAs": [
+        "https://www.instagram.com/soicyv/"
+      ],
+      "givenName": "Soïc",
+      "familyName": "Kermarrec",
+      "image": {
+        "@type": "ImageObject",
+        "@id": "https://soickermarrec.de/images/contact.jpg#portrait",
+        "contentUrl": "https://soickermarrec.de/images/contact.jpg",
+        "caption": "Porträt von Soïc Kermarrec",
+        "width": 595,
+        "height": 800
+      }
     }
   ]
-}
-  </script>
-</head>
+}</script>
+<meta content="Soïc Kermarrec" name="author"/><meta content="Soïc Kermarrec — Künstlerportfolio" property="og:image:alt"/><meta content="summary_large_image" name="twitter:card"/><meta content="Soïc Kermarrec — Malerei, Tinte, Fotografie &amp; Architektur" name="twitter:title"/><meta content="Portfolio von Soïc Kermarrec: Malerei, Tinte, Ausstellungen, Fotografie und Architektur zwischen Leipzig und einer prägenden Studienzeit in Paris." name="twitter:description"/><meta content="https://soickermarrec.de/images/about.jpg" name="twitter:image"/></head>
 <body>
 <div aria-hidden="true" class="landing-background">
 <img alt="" data-desktop-fallback="images/landing/desktop-1.jpg" data-mobile-fallback="images/landing/mobile-1.jpg" draggable="false" id="landing-background-image"/>
@@ -61,7 +103,7 @@
 <a data-i18n="nav.contact" href="pages/contact.html">Kontakt</a>
 </main>
 <footer class="site-footer">
-<p class="copyright" data-i18n="footer">© 2026 Soïc Kermarrec, all rights reserved</p>
+<a class="footer-instagram" href="https://www.instagram.com/soicyv/" rel="noopener noreferrer me" target="_blank">Instagram</a>
 <nav aria-label="Legal links" class="footer-links">
 <a data-i18n="legal.imprint" href="pages/impressum.html">Impressum</a>
 <a data-i18n="legal.privacy" href="pages/datenschutz.html">Datenschutz</a>

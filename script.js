@@ -26,6 +26,34 @@
   let slotIndex = 0;
   let nextBg = null;
 
+  function rememberedSlot() {
+    const value = Number(history.state?.landingSlot);
+    return Number.isInteger(value) ? value : null;
+  }
+
+  function rememberSlot() {
+    try {
+      history.replaceState({ ...(history.state || {}), landingSlot: slotIndex }, '');
+    } catch (_) {}
+  }
+
+  function chooseInitialSlot() {
+    const paths = backgroundPaths();
+    if (paths.length < 2) {
+      slotIndex = 0;
+      rememberSlot();
+      return;
+    }
+    const previous = rememberedSlot();
+    if (previous === null) {
+      slotIndex = 0;
+    } else {
+      const candidates = paths.map((_, index) => index).filter(index => index !== (previous % paths.length));
+      slotIndex = candidates[Math.floor(Math.random() * candidates.length)];
+    }
+    rememberSlot();
+  }
+
   function backgroundPaths() {
     const section = config?.[mode()];
     const slots = Array.isArray(section?.slots) ? section.slots.filter(Boolean) : [];
@@ -45,6 +73,7 @@
     } catch {
       config = null;
     }
+    chooseInitialSlot();
     setBackground();
   }
 
@@ -95,6 +124,7 @@
     const paths = backgroundPaths();
     if (paths.length < 2) return;
     slotIndex = (slotIndex + 1) % paths.length;
+    rememberSlot();
     setBackground(true);
   }
 
@@ -201,7 +231,7 @@
     scheduleContrast();
   });
   mobileQuery.addEventListener?.('change', () => {
-    slotIndex = 0;
+    chooseInitialSlot();
     setBackground();
     restartRotation();
   });

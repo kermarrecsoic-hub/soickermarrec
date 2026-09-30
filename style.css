@@ -137,14 +137,20 @@ body {
   align-items: center;
   gap: 5px;
 }
-.copyright {
+.footer-instagram {
   margin: 0;
   text-align: center;
-  pointer-events: none;
   font: 300 10px/1.35 var(--site-font);
   letter-spacing: .35px;
   color: #999;
+  text-decoration: none;
 }
+.footer-instagram:hover, .footer-instagram:focus-visible {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.footer-instagram:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; }
 .footer-links {
   display: flex;
   gap: 14px;

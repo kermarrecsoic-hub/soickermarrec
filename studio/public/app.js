@@ -8,7 +8,7 @@
     graphic: { label: 'Tinte', root: 'images/ink', kind: 'art' },
     exhibitions: { label: 'Ausstellung', root: 'images/exhibitions', kind: 'series' },
     architecture: { label: 'Arch.0', root: 'images/architecture', kind: 'series' },
-    xxx: { label: 'Fotografie', root: 'images/xxx', kind: 'series' },
+    xxx: { label: 'Fotografie', root: 'images/foto1/fotogalerie_sortiert', kind: 'series' },
   };
   const SITE_IMAGES = [
     { label: 'About – Hauptbild', path: 'images/about.jpg' },
@@ -345,6 +345,8 @@
     $('#fieldText').value = work.text || '';
     $('#fieldFolder').value = deriveFolder(work, config);
     $('#folderPrefix').textContent = `${config.root}/`;
+    const folderField = document.querySelector('.folder-field');
+    if (folderField) folderField.hidden = state.section === 'xxx';
     $('#detailSection').hidden = config.kind !== 'art';
     $('#sortMainBySaturation').hidden = state.section !== 'xxx';
     $('#deleteProjectButton').hidden = isNew;
@@ -483,6 +485,19 @@
     return slugify(value || 'untitled');
   }
 
+  function nextPhotographyNumber(paths, rootPath) {
+    const prefix = `${rootPath}/`;
+    let max = 0;
+    for (const raw of paths || []) {
+      const path = toRepoPath(raw);
+      if (!path.startsWith(prefix)) continue;
+      const name = path.slice(prefix.length);
+      const match = name.match(/^(\d+)\.(?:jpe?g|png|webp)$/i);
+      if (match) max = Math.max(max, Number(match[1]));
+    }
+    return max + 1;
+  }
+
 
   async function saturationScoreForItem(item) {
     let blob;
@@ -578,8 +593,9 @@
       alert('Bitte mindestens ein Hauptbild hinzufügen.');
       return;
     }
-    const folder = cleanFolder($('#fieldFolder').value);
-    if (!folder) {
+    const isPhotography = state.section === 'xxx';
+    const folder = isPhotography ? '' : cleanFolder($('#fieldFolder').value);
+    if (!isPhotography && !folder) {
       alert('Bitte einen Ordnernamen angeben.');
       return;
     }
@@ -589,11 +605,18 @@
       setStatus('Bilder werden optimiert und hochgeladen …');
       const stamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
       const mainPaths = [];
+      let nextPhoto = 1;
+      if (isPhotography) {
+        const media = await ensureMedia();
+        nextPhoto = nextPhotographyNumber(media, editor.config.root);
+      }
       for (let i = 0; i < editor.main.length; i++) {
         const item = editor.main[i];
         if (item.file) {
           const blob = await optimizeImage(item.file);
-          const path = `${editor.config.root}/${folder}/main-${stamp}-${String(i + 1).padStart(2, '0')}.jpg`;
+          const path = isPhotography
+            ? `${editor.config.root}/${String(nextPhoto++).padStart(2, '0')}.jpg`
+            : `${editor.config.root}/${folder}/main-${stamp}-${String(i + 1).padStart(2, '0')}.jpg`;
           await uploadBlob(path, blob);
           mainPaths.push(path);
         } else if (item.path) {

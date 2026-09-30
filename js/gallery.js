@@ -1,4 +1,4 @@
-/* Soïc Kermarrec – V9.1 / Galerie-Renderer: Mehrfach-Hauptbilder + 4–2–1-Toggle */
+/* Soïc Kermarrec – Galerie-Renderer: Projekt-Layouts + Serien-Layouts */
 (() => {
   'use strict';
 
@@ -8,11 +8,22 @@
   const rawWorks = window[document.body.dataset.works || 'PAINTING_WORKS'] || [];
   const i18n = window.SoicI18n || null;
   const works = rawWorks.map(work => i18n?.localizeWork ? i18n.localizeWork(work) : work);
-  const tr = (key, fallback) => i18n?.t ? i18n.t(key) : fallback;
+  const tr = (key, fallback) => {
+    if (!i18n?.t) return fallback;
+    const value = i18n.t(key);
+    return value === key ? fallback : value;
+  };
+
   const mobile = window.matchMedia('(max-width: 700px)');
   const forceSeries = target.dataset.layout === 'series';
+  const projectGrid = !forceSeries && (
+    document.body.classList.contains('painting-page') ||
+    document.body.classList.contains('graphic-page')
+  );
+
   let uid = 0;
   let currentColumns = null;
+  let currentProjectColumns = 1;
 
   function element(tag, className, text) {
     const node = document.createElement(tag);
@@ -29,6 +40,23 @@
     img.decoding = 'async';
     img.draggable = false;
     return img;
+  }
+
+  function classifyOrientation(img, hero, section, primary = false) {
+    const apply = () => {
+      if (!img.naturalWidth || !img.naturalHeight) return;
+      const landscape = img.naturalWidth > img.naturalHeight;
+      hero.classList.toggle('is-landscape', landscape);
+      hero.classList.toggle('is-portrait', !landscape);
+
+      if (primary) {
+        section.classList.toggle('is-landscape-main', landscape);
+        section.classList.toggle('is-portrait-main', !landscape);
+      }
+    };
+
+    if (img.complete) apply();
+    else img.addEventListener('load', apply, { once: true });
   }
 
   function detailFrame(src, side, title) {
@@ -75,14 +103,28 @@
     target.dataset.columns = String(columns);
     target.querySelectorAll('.artwork-images.is-series').forEach(images => layoutSeries(images, columns));
 
-    document.querySelectorAll('.series-view-toggle button').forEach(button => {
+    document.querySelectorAll('.series-view-toggle:not(.project-view-toggle) button').forEach(button => {
       const active = Number(button.dataset.columns) === columns;
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
   }
 
-  function initialColumns() { return mobile.matches ? 1 : 2; }
+  function setProjectColumns(columns) {
+    if (![1, 2].includes(columns)) return;
+    currentProjectColumns = columns;
+    target.dataset.projectColumns = String(columns);
+
+    document.querySelectorAll('.project-view-toggle button').forEach(button => {
+      const active = Number(button.dataset.columns) === columns;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+  }
+
+  function initialColumns() {
+    return mobile.matches ? 1 : 2;
+  }
 
   function makeViewToggle() {
     if (!forceSeries) return;
@@ -97,9 +139,35 @@
       const button = element('button', '', String(columns));
       button.type = 'button';
       button.dataset.columns = String(columns);
-      button.setAttribute('aria-label', columns === 1 ? tr('gallery.oneColumn', '1 column') : `${columns} ${tr('gallery.columns', 'columns')}`);
+      button.setAttribute('aria-label', columns === 1
+        ? tr('gallery.oneColumn', '1 column')
+        : `${columns} ${tr('gallery.columns', 'columns')}`);
       button.setAttribute('aria-pressed', 'false');
       button.addEventListener('click', () => setColumns(columns));
+      controls.appendChild(button);
+    });
+
+    header.appendChild(controls);
+  }
+
+  function makeProjectViewToggle() {
+    if (!projectGrid) return;
+    const header = document.querySelector('.site-header');
+    if (!header) return;
+
+    const controls = element('div', 'series-view-toggle project-view-toggle');
+    controls.setAttribute('role', 'group');
+    controls.setAttribute('aria-label', tr('gallery.projectsPerRow', 'Projects per row'));
+
+    [1, 2].forEach(columns => {
+      const button = element('button', '', String(columns));
+      button.type = 'button';
+      button.dataset.columns = String(columns);
+      button.setAttribute('aria-label', columns === 1
+        ? tr('gallery.oneColumn', '1 column')
+        : `2 ${tr('gallery.columns', 'columns')}`);
+      button.setAttribute('aria-pressed', 'false');
+      button.addEventListener('click', () => setProjectColumns(columns));
       controls.appendChild(button);
     });
 
@@ -127,19 +195,21 @@
       : (work.image ? [work.image] : []);
     if (!paths.length) return document.createDocumentFragment();
 
-    // Nur Exhibition / Architecture / XXX sind echte Serien-Layouts mit 1/2/4 Toggle.
-    // Painting und Ink duerfen mehrere gleichwertige Hauptbilder haben, ohne dadurch
-    // ihre optionalen Detailbilder zu verlieren.
     const series = forceSeries;
     const multiMain = !forceSeries && paths.length > 1;
+    const twoMain = multiMain && paths.length === 2;
+    const sixMain = multiMain && (work.layout === 'six-grid' || paths.length === 6);
     const hasDetails = !forceSeries && Boolean(work.details &&
       (work.details.left || work.details.right));
 
     const classes = ['artwork'];
+    if (projectGrid) classes.push('project-grid-artwork');
     if (hasDetails) classes.push('has-details');
     if (work.demo) classes.push('is-demo');
     if (series) classes.push('series-artwork');
     if (multiMain) classes.push('multi-main-artwork');
+    if (twoMain) classes.push('two-main-artwork');
+    if (sixMain) classes.push('six-main-artwork');
 
     const section = element('section', classes.join(' '));
     const images = element('div', 'artwork-images' +
@@ -153,10 +223,13 @@
       const mainStack = element('div', 'main-stack');
       paths.forEach((path, index) => {
         const hero = element('div', 'hero-wrap');
+        hero.dataset.mainIndex = String(index);
         const alt = work.title
           ? `${work.title} – image ${index + 1}`
           : `Artwork image ${index + 1}`;
-        hero.appendChild(artworkImage(path, alt, workIndex === 0 && index === 0));
+        const main = artworkImage(path, alt, workIndex === 0 && index === 0);
+        classifyOrientation(main, hero, section, index === 0);
+        hero.appendChild(main);
         mainStack.appendChild(hero);
       });
       images.appendChild(mainStack);
@@ -178,6 +251,7 @@
           ? `${work.title} – image ${index + 1}`
           : `Project image ${index + 1}`;
         const main = artworkImage(path, alt, workIndex === 0 && index === 0);
+        classifyOrientation(main, hero, section, index === 0);
 
         if (hasDetails && index === 0) {
           const button = element('button', 'artwork-toggle');
@@ -222,6 +296,11 @@
     setColumns(initialColumns());
   }
 
+  if (projectGrid) {
+    makeProjectViewToggle();
+    setProjectColumns(1);
+  }
+
   mobile.addEventListener('change', () => {
     target.querySelectorAll('.artwork-toggle').forEach(button => {
       button.tabIndex = mobile.matches ? 0 : -1;
@@ -235,9 +314,7 @@
       }
     });
 
-    // Eine vom Nutzer gewählte Ansicht bleibt beim Drehen/Resizen erhalten.
-    // Ohne gespeicherte Wahl gilt beim ersten Laden mobil 1, Desktop 2.
     if (forceSeries && currentColumns) setColumns(currentColumns);
+    if (projectGrid) setProjectColumns(currentProjectColumns);
   });
 })();
-

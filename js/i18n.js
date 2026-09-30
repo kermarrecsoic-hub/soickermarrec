@@ -15,7 +15,6 @@
         about: 'About',
         contact: 'Kontakt'
       },
-      footer: '© 2026 Soïc Kermarrec, alle Rechte vorbehalten',
       legal: { imprint: 'Impressum', privacy: 'Datenschutz' },
       about: {
         bio1: 'Soïc Kermarrec wurde 2004 in Leipzig geboren und lebt und arbeitet in dieser Stadt als Künstler und Architekturstudent.<br>In seiner Jugend wollte er den großen Mangaka nacheifern und kam so zur Grafik mit Tinte und Feder. Als er 2025 nach Paris zog, fing er an, seine Eindrücke und Erlebnisse in Farben auf die Leinwand zu bannen, was zu seinem jetzigen Werk führte.',
@@ -42,6 +41,7 @@
       },
       gallery: {
         imagesPerRow: 'Bilder pro Reihe',
+        projectsPerRow: 'Projekte pro Reihe',
         oneColumn: '1 Spalte',
         columns: 'Spalten',
         showDetails: 'Details zeigen',
@@ -83,7 +83,6 @@
         about: 'À propos',
         contact: 'Contact'
       },
-      footer: '© 2026 Soïc Kermarrec, tous droits réservés',
       legal: { imprint: 'Mentions légales', privacy: 'Confidentialité' },
       about: {
         bio1: 'Soïc Kermarrec est né à Leipzig en 2004 et y vit et travaille comme artiste et étudiant en architecture.<br>Dans sa jeunesse, il voulait suivre les traces des grands mangakas et s’est ainsi tourné vers le dessin à l’encre et à la plume. Lorsqu’il s’installe à Paris en 2025, il commence à transposer sur la toile, par la couleur, ses impressions et ses expériences, ce qui l’amène à son travail actuel.',
@@ -110,6 +109,7 @@
       },
       gallery: {
         imagesPerRow: 'Images par rangée',
+        projectsPerRow: 'Projets par rangée',
         oneColumn: '1 colonne',
         columns: 'colonnes',
         showDetails: 'Afficher les détails',
@@ -151,7 +151,6 @@
         about: 'About',
         contact: 'Contact'
       },
-      footer: '© 2026 Soïc Kermarrec, all rights reserved',
       legal: { imprint: 'Legal notice', privacy: 'Privacy' },
       about: {
         bio1: 'Soïc Kermarrec was born in Leipzig in 2004 and lives and works there as an artist and architecture student.<br>In his youth, he wanted to follow in the footsteps of the great manga artists and thus came to drawing with ink and nib. When he moved to Paris in 2025, he began translating his impressions and experiences into colour on canvas, leading to his current body of work.',
@@ -178,6 +177,7 @@
       },
       gallery: {
         imagesPerRow: 'Images per row',
+        projectsPerRow: 'Projects per row',
         oneColumn: '1 column',
         columns: 'columns',
         showDetails: 'Show details',
