@@ -63,17 +63,6 @@ window.GRAPHIC_WORKS = [
     }
   },
   {
-    "title": "Marionetten 1&2, 2025",
-    "medium": "ink, Watercolor on paper",
-    "dimensions": "21 x 30 cm",
-    "availability": "",
-    "text": "",
-    "images": [
-      "../images/ink/marionetten/main-20260930110519-01.jpg",
-      "../images/ink/marionetten/main-20260930110519-02.jpg"
-    ]
-  },
-  {
     "title": "",
     "medium": "",
     "dimensions": "",
