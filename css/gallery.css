@@ -291,17 +291,28 @@ a { color: inherit; text-decoration: none; }
   text-align: left;
 }
 
-/* Editorial: die sichtbare About-Bildbreite definiert exakt die Textbreite. */
+/* Editorial pages */
 .editorial-page { padding: calc(var(--header-height) + 38px) 20px 125px; }
+
+/* About: Desktop als echter Splitscreen – Bild links, Text/Vita rechts. */
 .about-content {
-  width: min(100%, 551px, 51.65svh);
+  width: min(100%, 1180px);
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(320px, .92fr) minmax(360px, 1.08fr);
+  gap: clamp(42px, 6vw, 88px);
+  align-items: start;
 }
 .editorial-picture {
   display: block;
   width: 100%;
   height: auto;
-  margin: 0 auto 40px;
+  max-height: calc(100svh - var(--header-height) - 95px);
+  object-fit: contain;
+  object-position: top center;
+  margin: 0;
+  position: sticky;
+  top: calc(var(--header-height) + 28px);
 }
 .editorial-text {
   width: 100%;
@@ -326,6 +337,14 @@ a { color: inherit; text-decoration: none; }
 }
 .vita-year { white-space: nowrap; }
 .contact-content { width: min(100%, 620px); margin: 0 auto; text-align: center; }
+.contact-portrait {
+  display: block;
+  width: clamp(118px, 12vw, 168px);
+  height: auto;
+  max-height: 225px;
+  object-fit: contain;
+  margin: 0 auto 30px;
+}
 .contact-content .editorial-text { margin: 0; text-align: center; }
 .editorial-contact {
   margin-top: 32px;
@@ -347,14 +366,20 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   gap: 5px;
 }
-.copyright {
+.footer-instagram {
   margin: 0;
   text-align: center;
-  pointer-events: none;
   font: 300 10px/1.35 var(--site-font);
   letter-spacing: .35px;
   color: #999;
+  text-decoration: none;
 }
+.footer-instagram:hover, .footer-instagram:focus-visible {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.footer-instagram:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; }
 .footer-links {
   display: flex;
   gap: 14px;
@@ -495,8 +520,17 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   }
 
   .editorial-page { padding: calc(var(--header-height) + 36px) 18px 110px; }
-  .editorial-picture { margin-bottom: 34px; }
-  .about-content { width: min(100%, 551px, 51.65svh); }
+  .about-content {
+    width: min(100%, 551px);
+    display: block;
+  }
+  .editorial-picture {
+    position: static;
+    width: min(100%, 551px, 51.65svh);
+    max-height: none;
+    margin: 0 auto 34px;
+  }
+  .contact-portrait { width: 126px; margin-bottom: 26px; }
   .vita {
     grid-template-columns: 92px minmax(0,1fr);
     column-gap: 12px;
@@ -604,4 +638,310 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   .footer-links { gap: 12px; font-size: 9px; }
   .legal-content { width: min(100%, 92vw); }
   .legal-section + .legal-section { margin-top: 28px; }
+}
+
+/* ================================================================
+   Painting / Ink – Projektansicht 1 / 2 Kolonnen
+   Standard = 1 Kolonne. Die 2-Kolonnen-Ansicht wird nur über den
+   Projekttoggle aktiviert. Keine Bilder werden beschnitten.
+   ================================================================ */
+
+/* Einspaltig: normale Hochformate bleiben kompakt; Querformate bekommen
+   deutlich mehr Breite, aber weiterhin einen großzügigen Seitenrand. */
+.painting-page .artwork-list[data-project-columns="1"],
+.graphic-page .artwork-list[data-project-columns="1"] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-images,
+.graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-images {
+  width: min(100%, 1000px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(18px, 2.5vw, 36px);
+  row-gap: 22px;
+  align-items: start;
+}
+.painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .hero-wrap,
+.graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .hero-wrap {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  width: 100%;
+}
+.painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-toggle,
+.graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-toggle {
+  width: 100%;
+}
+.painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-main,
+.graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-main {
+  width: 100%;
+  max-width: 100%;
+  max-height: min(68svh, 690px);
+}
+.painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-frame-left,
+.graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-frame-left {
+  grid-column: 1;
+  grid-row: 2;
+}
+.painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-frame-right,
+.graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-frame-right {
+  grid-column: 2;
+  grid-row: 2;
+}
+.painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-image,
+.graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-image {
+  max-height: min(36svh, 360px);
+}
+
+/* Mehrere Hauptbilder bilden immer eine gemeinsame, breite Projekteinheit. */
+.painting-page .artwork-list[data-project-columns] .multi-main-artwork .artwork-images,
+.graphic-page .artwork-list[data-project-columns] .multi-main-artwork .artwork-images {
+  display: block;
+  width: min(100%, 1120px);
+}
+.painting-page .artwork-list[data-project-columns] .multi-main-artwork .main-stack,
+.graphic-page .artwork-list[data-project-columns] .multi-main-artwork .main-stack {
+  width: 100%;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+/* Zwei Hauptbilder: zwei gleich große Slots nebeneinander. */
+.painting-page .artwork-list[data-project-columns] .two-main-artwork .main-stack,
+.graphic-page .artwork-list[data-project-columns] .two-main-artwork .main-stack {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(18px, 2.5vw, 36px);
+  align-items: stretch;
+}
+.painting-page .artwork-list[data-project-columns] .two-main-artwork .hero-wrap,
+.graphic-page .artwork-list[data-project-columns] .two-main-artwork .hero-wrap {
+  width: 100%;
+  height: clamp(320px, 42vw, 610px);
+  min-width: 0;
+}
+.painting-page .artwork-list[data-project-columns] .two-main-artwork .artwork-main,
+.graphic-page .artwork-list[data-project-columns] .two-main-artwork .artwork-main {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Sechs Hauptbilder: links das Hochformat über zwei Reihen; rechts fünf
+   Querformate. Oben 3 gleich breite, unten 2 gleich breite Bilder. */
+.painting-page .artwork-list[data-project-columns] .six-main-artwork .artwork-images,
+.graphic-page .artwork-list[data-project-columns] .six-main-artwork .artwork-images {
+  width: min(100%, 1180px);
+}
+.painting-page .artwork-list[data-project-columns] .six-main-artwork .main-stack,
+.graphic-page .artwork-list[data-project-columns] .six-main-artwork .main-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(2, clamp(150px, 15vw, 220px));
+  gap: clamp(10px, 1.2vw, 18px);
+  align-items: stretch;
+}
+.painting-page .six-main-artwork .hero-wrap,
+.graphic-page .six-main-artwork .hero-wrap {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+}
+.painting-page .six-main-artwork .hero-wrap:nth-child(1),
+.graphic-page .six-main-artwork .hero-wrap:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1 / 3;
+}
+.painting-page .six-main-artwork .hero-wrap:nth-child(2),
+.graphic-page .six-main-artwork .hero-wrap:nth-child(2) {
+  grid-column: 2 / span 2;
+  grid-row: 1;
+}
+.painting-page .six-main-artwork .hero-wrap:nth-child(3),
+.graphic-page .six-main-artwork .hero-wrap:nth-child(3) {
+  grid-column: 4 / span 2;
+  grid-row: 1;
+}
+.painting-page .six-main-artwork .hero-wrap:nth-child(4),
+.graphic-page .six-main-artwork .hero-wrap:nth-child(4) {
+  grid-column: 6 / span 2;
+  grid-row: 1;
+}
+.painting-page .six-main-artwork .hero-wrap:nth-child(5),
+.graphic-page .six-main-artwork .hero-wrap:nth-child(5) {
+  grid-column: 2 / span 3;
+  grid-row: 2;
+}
+.painting-page .six-main-artwork .hero-wrap:nth-child(6),
+.graphic-page .six-main-artwork .hero-wrap:nth-child(6) {
+  grid-column: 5 / span 3;
+  grid-row: 2;
+}
+.painting-page .six-main-artwork .artwork-main,
+.graphic-page .six-main-artwork .artwork-main {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.painting-page .six-main-artwork .artwork-description,
+.graphic-page .six-main-artwork .artwork-description {
+  margin-top: 24px;
+  text-align: center;
+}
+
+/* Zwei Kolonnen: natürliche Reihenfolge 1 links, 2 rechts, 3 links, 4 rechts ...
+   (= Zickzack-Lesereihenfolge). Mehrbild-Projekte belegen immer beide Spalten. */
+.painting-page .artwork-list[data-project-columns="2"],
+.graphic-page .artwork-list[data-project-columns="2"] {
+  width: min(100%, calc(var(--page-width) + 80px));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: clamp(38px, 4.8vw, 76px) clamp(24px, 3.4vw, 50px);
+}
+.painting-page .artwork-list[data-project-columns="2"] > .artwork,
+.graphic-page .artwork-list[data-project-columns="2"] > .artwork {
+  width: 100%;
+  min-width: 0;
+}
+.painting-page .artwork-list[data-project-columns="2"] > .artwork:not(.multi-main-artwork),
+.graphic-page .artwork-list[data-project-columns="2"] > .artwork:not(.multi-main-artwork) {
+  aspect-ratio: 1 / 1.06;
+  min-height: 560px;
+  padding: clamp(16px, 1.8vw, 28px);
+  justify-content: space-between;
+}
+.painting-page .artwork-list[data-project-columns="2"] > .multi-main-artwork,
+.graphic-page .artwork-list[data-project-columns="2"] > .multi-main-artwork {
+  grid-column: 1 / -1;
+  padding: clamp(18px, 2vw, 30px) 0;
+}
+
+/* In der 2-Kolonnen-Ansicht bekommt jedes Einzelprojekt dieselbe Bildzone.
+   Hoch- und Querformat werden nur eingepasst, niemals beschnitten. */
+.painting-page .artwork-list[data-project-columns="2"] > .artwork:not(.multi-main-artwork) .artwork-images,
+.graphic-page .artwork-list[data-project-columns="2"] > .artwork:not(.multi-main-artwork) .artwork-images {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+.painting-page .artwork-list[data-project-columns="2"] > .artwork:not(.multi-main-artwork) .hero-wrap,
+.graphic-page .artwork-list[data-project-columns="2"] > .artwork:not(.multi-main-artwork) .hero-wrap {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+.painting-page .artwork-list[data-project-columns="2"] > .artwork:not(.multi-main-artwork) .artwork-toggle,
+.graphic-page .artwork-list[data-project-columns="2"] > .artwork:not(.multi-main-artwork) .artwork-toggle {
+  width: 100%;
+  height: 100%;
+}
+.painting-page .artwork-list[data-project-columns="2"] > .artwork:not(.multi-main-artwork) .artwork-main,
+.graphic-page .artwork-list[data-project-columns="2"] > .artwork:not(.multi-main-artwork) .artwork-main {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.painting-page .artwork-list[data-project-columns="2"] .artwork-description,
+.graphic-page .artwork-list[data-project-columns="2"] .artwork-description {
+  width: 100%;
+  max-width: 620px;
+  margin: 18px auto 0;
+  text-align: center;
+}
+
+/* In der zweispaltigen Projektansicht gibt es bewusst keine Detailbilder. */
+.painting-page .artwork-list[data-project-columns="2"] .detail-frame,
+.painting-page .artwork-list[data-project-columns="2"] .detail-hint,
+.painting-page .artwork-list[data-project-columns="2"] .multi-main-detail-toggle,
+.graphic-page .artwork-list[data-project-columns="2"] .detail-frame,
+.graphic-page .artwork-list[data-project-columns="2"] .detail-hint,
+.graphic-page .artwork-list[data-project-columns="2"] .multi-main-detail-toggle {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  /* Der 1/2-Toggle bleibt auch mobil nutzbar. */
+  .painting-page .artwork-list[data-project-columns="2"],
+  .graphic-page .artwork-list[data-project-columns="2"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 58px 12px;
+  }
+  .painting-page .artwork-list[data-project-columns="2"] > .artwork:not(.multi-main-artwork),
+  .graphic-page .artwork-list[data-project-columns="2"] > .artwork:not(.multi-main-artwork) {
+    aspect-ratio: auto;
+    min-height: 52svh;
+    padding: 6px 2px;
+  }
+  .painting-page .artwork-list[data-project-columns="2"] .artwork-description,
+  .graphic-page .artwork-list[data-project-columns="2"] .artwork-description {
+    max-width: 100%;
+    margin-top: 10px;
+    font-size: 10px;
+    line-height: 1.35;
+  }
+  .painting-page .artwork-list[data-project-columns="2"] .artwork-title,
+  .graphic-page .artwork-list[data-project-columns="2"] .artwork-title {
+    margin-bottom: 8px;
+  }
+
+  /* Mehrbild-Projekte bleiben über die gesamte mobile Breite. */
+  .painting-page .artwork-list[data-project-columns="2"] > .multi-main-artwork,
+  .graphic-page .artwork-list[data-project-columns="2"] > .multi-main-artwork {
+    grid-column: 1 / -1;
+  }
+
+  /* Zwei Hauptbilder bleiben nebeneinander, aber ohne feste Desktop-Höhe. */
+  .painting-page .artwork-list[data-project-columns] .two-main-artwork .hero-wrap,
+  .graphic-page .artwork-list[data-project-columns] .two-main-artwork .hero-wrap {
+    height: min(54vw, 320px);
+  }
+
+  /* Das 6er-Projekt wird mobil als sauberes 2x3-Raster dargestellt. */
+  .painting-page .artwork-list[data-project-columns] .six-main-artwork .main-stack,
+  .graphic-page .artwork-list[data-project-columns] .six-main-artwork .main-stack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+    gap: 10px;
+  }
+  .painting-page .six-main-artwork .hero-wrap:nth-child(n),
+  .graphic-page .six-main-artwork .hero-wrap:nth-child(n) {
+    grid-column: auto;
+    grid-row: auto;
+    height: 36vw;
+  }
+  .painting-page .six-main-artwork .hero-wrap:first-child,
+  .graphic-page .six-main-artwork .hero-wrap:first-child {
+    height: 54vw;
+  }
+
+  /* Querformat-Details bleiben mobil wie bisher per + aufklappbar und stehen unten. */
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-images,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-images {
+    display: flex;
+    width: min(100%, 92vw);
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-main,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-main {
+    width: 100%;
+    max-width: 92vw;
+    max-height: 61svh;
+  }
 }
