@@ -23,5 +23,19 @@ window.ARCHITECTURE_WORKS = [
       "../images/architecture/peter-joseph-lenne-preis-2026/main-20260930235611-04.jpg",
       "../images/architecture/peter-joseph-lenne-preis-2026/main-20260930235611-05.jpg"
     ]
+  },
+  {
+    "title": "Ausstellungsgestaltung zur 19. Architekturbiennale von Venedig \"Intelligens\"",
+    "medium": "Modell 1:50 des Skandinavischen Pavilions",
+    "dimensions": "",
+    "availability": "",
+    "text": "",
+    "images": [
+      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-01.jpg",
+      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-02.jpg",
+      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-03.jpg",
+      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-04.jpg",
+      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-05.jpg"
+    ]
   }
 ];
