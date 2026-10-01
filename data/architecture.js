@@ -17,7 +17,11 @@ window.ARCHITECTURE_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/architecture/peter-joseph-lenne-preis-2026/main-20260930235611-05.jpg"
+      "../images/architecture/peter-joseph-lenne-preis-2026/main-20260930235611-05.jpg",
+      "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-02.jpg",
+      "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-03.jpg",
+      "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-04.jpg",
+      "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-05.jpg"
     ]
   },
   {
