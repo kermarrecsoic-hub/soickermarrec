@@ -97,11 +97,9 @@ window.PAINTING_WORKS = [
     "dimensions": "55 × 46 cm",
     "availability": "",
     "text": "",
-    "image": "../images/painting/parigi1/main.jpg",
-    "details": {
-      "left": "../images/painting/parigi1/detail-left.jpg",
-      "right": "../images/painting/parigi1/detail-right.jpg"
-    }
+    "images": [
+      "../images/painting/parigi1/main.jpg"
+    ]
   },
   {
     "title": "Untitled (Bär), 2024",
