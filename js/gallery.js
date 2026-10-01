@@ -59,6 +59,47 @@
     else img.addEventListener('load', apply, { once: true });
   }
 
+  function detailPathsForWork(work, rawMainPaths) {
+    const details = [];
+    if (Array.isArray(work.details)) {
+      details.push(...work.details.filter(Boolean));
+    } else if (work.details && typeof work.details === 'object') {
+      if (work.details.left) details.push(work.details.left);
+      if (work.details.right) details.push(work.details.right);
+    }
+
+    // Legacy migration for the Holzdruck layout: older Studio versions stored
+    // every wood print as a main image. Keep only the first as the real main
+    // image and expose the remaining images as details without losing paths.
+    const legacyDetailLayout = work.layout === 'six-grid' || work.layout === 'portrait-eight-grid' || /holz/i.test(work.title || '');
+    const mainPaths = [...rawMainPaths];
+    if (legacyDetailLayout && mainPaths.length > 1) {
+      details.unshift(...mainPaths.slice(1));
+      mainPaths.splice(1);
+    }
+
+    return {
+      mainPaths,
+      detailPaths: [...new Set(details.filter(Boolean))],
+    };
+  }
+
+  function detailGallery(paths, title) {
+    const gallery = element('div', 'detail-gallery');
+    paths.forEach((src, index) => {
+      const figure = element('div', 'detail-gallery-item');
+      const img = element('img', 'detail-image');
+      img.src = src;
+      img.alt = `${title || 'Work'} – detail ${index + 1}`;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.draggable = false;
+      figure.appendChild(img);
+      gallery.appendChild(figure);
+    });
+    return gallery;
+  }
+
   function detailFrame(src, side, title) {
     const frame = element('div', `detail-frame detail-frame-${side}`);
     const inner = element('div', 'detail-inner');
@@ -190,23 +231,27 @@
   }
 
   function render(work, workIndex) {
-    const paths = Array.isArray(work.images) && work.images.length
+    const rawMainPaths = Array.isArray(work.images) && work.images.length
       ? work.images.filter(Boolean)
       : (work.image ? [work.image] : []);
+    const normalized = detailPathsForWork(work, rawMainPaths);
+    const paths = normalized.mainPaths;
+    const detailPaths = normalized.detailPaths;
     if (!paths.length) return document.createDocumentFragment();
 
     const series = forceSeries;
     const multiMain = !forceSeries && paths.length > 1;
     const twoMain = multiMain && paths.length === 2;
-    const specialGrid = multiMain && (work.layout === 'six-grid' || work.layout === 'portrait-eight-grid' || paths.length >= 6);
+    const specialGrid = multiMain && paths.length >= 6;
     const sixMain = specialGrid && paths.length === 6;
     const nineMain = specialGrid && paths.length === 9;
-    const hasDetails = !forceSeries && Boolean(work.details &&
-      (work.details.left || work.details.right));
+    const hasDetails = !forceSeries && detailPaths.length > 0;
+    const detailGrid = hasDetails && detailPaths.length > 2;
 
     const classes = ['artwork'];
     if (projectGrid) classes.push('project-grid-artwork');
     if (hasDetails) classes.push('has-details');
+    if (detailGrid) classes.push('has-detail-gallery');
     if (work.demo) classes.push('is-demo');
     if (series) classes.push('series-artwork');
     if (multiMain) classes.push('multi-main-artwork');
@@ -274,8 +319,11 @@
 
     if (hasDetails) {
       images.id = detailIds;
-      for (const side of ['left', 'right']) {
-        if (work.details[side]) images.appendChild(detailFrame(work.details[side], side, work.title));
+      if (detailGrid) {
+        images.appendChild(detailGallery(detailPaths, work.title));
+      } else {
+        if (detailPaths[0]) images.appendChild(detailFrame(detailPaths[0], 'left', work.title));
+        if (detailPaths[1]) images.appendChild(detailFrame(detailPaths[1], 'right', work.title));
       }
     }
 
