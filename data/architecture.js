@@ -12,7 +12,7 @@ window.ARCHITECTURE_WORKS = [
   },
   {
     "title": "Peter-Joseph-Lenné Preis 2026",
-    "medium": "Nachwuchs-Preis für Stadt und Landschaftsgestaltung",
+    "medium": "",
     "dimensions": "",
     "availability": "",
     "text": "",
