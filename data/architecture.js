@@ -26,7 +26,7 @@ window.ARCHITECTURE_WORKS = [
   },
   {
     "title": "Ausstellungsgestaltung zur 19. Architekturbiennale von Venedig \"Intelligens\"",
-    "medium": "Modell 1:50 des Skandinavischen Pavilions",
+    "medium": "",
     "dimensions": "",
     "availability": "",
     "text": "",
