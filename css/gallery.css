@@ -296,7 +296,7 @@ a { color: inherit; text-decoration: none; }
 
 /* About: Desktop als echter Splitscreen – Bild links, Text/Vita rechts. */
 .about-content {
-  width: min(100%, 1180px);
+  width: min(100%, 1220px);
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(320px, .92fr) minmax(360px, 1.08fr);
@@ -734,13 +734,13 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
    Querformate. Oben 3 gleich breite, unten 2 gleich breite Bilder. */
 .painting-page .artwork-list[data-project-columns] .six-main-artwork .artwork-images,
 .graphic-page .artwork-list[data-project-columns] .six-main-artwork .artwork-images {
-  width: min(100%, 1180px);
+  width: min(100%, 1220px);
 }
 .painting-page .artwork-list[data-project-columns] .six-main-artwork .main-stack,
 .graphic-page .artwork-list[data-project-columns] .six-main-artwork .main-stack {
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) repeat(6, minmax(0, 1fr));
-  grid-template-rows: repeat(2, clamp(150px, 15vw, 220px));
+  grid-template-columns: minmax(0, 3fr) repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(2, clamp(175px, 17.5vw, 255px));
   gap: clamp(10px, 1.2vw, 18px);
   align-items: stretch;
 }
