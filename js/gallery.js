@@ -198,7 +198,9 @@
     const series = forceSeries;
     const multiMain = !forceSeries && paths.length > 1;
     const twoMain = multiMain && paths.length === 2;
-    const sixMain = multiMain && (work.layout === 'six-grid' || paths.length === 6);
+    const specialGrid = multiMain && (work.layout === 'six-grid' || work.layout === 'portrait-eight-grid' || paths.length >= 6);
+    const sixMain = specialGrid && paths.length === 6;
+    const nineMain = specialGrid && paths.length === 9;
     const hasDetails = !forceSeries && Boolean(work.details &&
       (work.details.left || work.details.right));
 
@@ -209,7 +211,9 @@
     if (series) classes.push('series-artwork');
     if (multiMain) classes.push('multi-main-artwork');
     if (twoMain) classes.push('two-main-artwork');
+    if (specialGrid) classes.push('special-main-artwork');
     if (sixMain) classes.push('six-main-artwork');
+    if (nineMain) classes.push('nine-main-artwork');
 
     const section = element('section', classes.join(' '));
     const images = element('div', 'artwork-images' +
