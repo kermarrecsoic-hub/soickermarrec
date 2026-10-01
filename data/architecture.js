@@ -50,5 +50,19 @@ window.ARCHITECTURE_WORKS = [
       "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-03.jpg",
       "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-04.jpg"
     ]
+  },
+  {
+    "title": "",
+    "medium": "",
+    "dimensions": "",
+    "availability": "",
+    "text": "",
+    "images": [
+      "../images/architecture/untitled/main-20261001101929-01.jpg",
+      "../images/architecture/untitled/main-20261001101929-02.jpg",
+      "../images/architecture/untitled/main-20261001101929-03.jpg",
+      "../images/architecture/untitled/main-20261001101929-04.jpg",
+      "../images/architecture/untitled/main-20261001101929-05.jpg"
+    ]
   }
 ];
