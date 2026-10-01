@@ -40,7 +40,7 @@ window.ARCHITECTURE_WORKS = [
   },
   {
     "title": "The good the bad and the ulgy",
-    "medium": "Pavilion für Raves",
+    "medium": "",
     "dimensions": "",
     "availability": "",
     "text": "",
