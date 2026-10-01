@@ -13,6 +13,7 @@
   const SITE_IMAGES = [
     { label: 'About – Hauptbild', path: 'images/about.jpg' },
     { label: 'Kontakt – Hauptbild', path: 'images/contact.jpg' },
+    { label: 'Social Preview – Standard (ideal 1200 × 630)', path: 'images/social-preview.jpg' },
   ];
 
   const $ = (sel, root = document) => root.querySelector(sel);
@@ -42,6 +43,7 @@
     picker: null,
     busy: false,
     landingConfig: null,
+    customPages: [],
   };
 
   async function api(name, options = {}) {
@@ -159,6 +161,14 @@
       return;
     }
 
+    if (view === 'pages') {
+      workspaceEyebrow.textContent = 'Website';
+      workspaceTitle.textContent = 'Seiten';
+      headerActions.appendChild(button('Neue Seite', 'primary', () => openPageEditor()));
+      await renderPages();
+      return;
+    }
+
     if (view === 'media') {
       workspaceEyebrow.textContent = 'Dateien';
       workspaceTitle.textContent = 'Mediathek';
@@ -211,6 +221,14 @@
   function workImages(work) {
     if (Array.isArray(work.images) && work.images.length) return work.images.filter(Boolean);
     return work.image ? [work.image] : [];
+  }
+
+  function workDetails(work) {
+    if (Array.isArray(work.details)) return work.details.filter(Boolean);
+    const out = [];
+    if (work.details?.left) out.push(work.details.left);
+    if (work.details?.right) out.push(work.details.right);
+    return out;
   }
 
   function renderProjects() {
@@ -330,11 +348,16 @@
     const config = SECTION_CONFIG[state.section];
     const isNew = index < 0;
     const work = isNew ? { title: '', medium: '', dimensions: '', availability: '', text: '', images: [] } : clone(state.works[index]);
-    const main = workImages(work).map(path => ({ path: toRepoPath(path), preview: publicUrl(path) }));
-    const details = {
-      left: work.details?.left ? { path: toRepoPath(work.details.left), preview: publicUrl(work.details.left) } : null,
-      right: work.details?.right ? { path: toRepoPath(work.details.right), preview: publicUrl(work.details.right) } : null,
-    };
+    let mainPaths = workImages(work);
+    let detailPaths = workDetails(work);
+    // Older Holzdruck entries stored all wood prints as main images. Migrate
+    // them in the editor without deleting a single repository path.
+    if ((work.layout === 'six-grid' || work.layout === 'portrait-eight-grid' || /holz/i.test(work.title || '')) && mainPaths.length > 1) {
+      detailPaths = [...mainPaths.slice(1), ...detailPaths];
+      mainPaths = mainPaths.slice(0, 1);
+    }
+    const main = mainPaths.map(path => ({ path: toRepoPath(path), preview: publicUrl(path) }));
+    const details = [...new Set(detailPaths)].map(path => ({ path: toRepoPath(path), preview: publicUrl(path) }));
     state.editor = { index, isNew, work, main, details, config };
 
     $('#editorTitle').textContent = isNew ? 'Neues Projekt' : (work.title || 'Untitled');
@@ -394,22 +417,49 @@
       });
       strip.appendChild(box);
     });
-    renderDetailPreview('left');
-    renderDetailPreview('right');
+    renderDetailImages();
   }
 
-  function renderDetailPreview(side) {
-    const box = $(`#detail${side[0].toUpperCase() + side.slice(1)}Preview`);
-    box.innerHTML = '';
-    const item = state.editor?.details?.[side];
-    if (!item) {
-      box.textContent = 'Kein Detailbild';
-      return;
-    }
-    const img = document.createElement('img');
-    img.src = item.preview || publicUrl(item.path);
-    img.alt = '';
-    box.appendChild(img);
+  function renderDetailImages() {
+    const editor = state.editor;
+    const strip = $('#detailImageStrip');
+    if (!editor || !strip) return;
+    strip.innerHTML = '';
+    editor.details.forEach((item, index) => {
+      const box = document.createElement('div');
+      box.className = 'image-item';
+      box.draggable = true;
+      box.dataset.index = index;
+      const img = document.createElement('img');
+      img.src = item.preview || publicUrl(item.path);
+      img.alt = '';
+      const remove = button('×', 'image-remove', () => {
+        if (item.preview?.startsWith('blob:')) URL.revokeObjectURL(item.preview);
+        editor.details.splice(index, 1);
+        renderDetailImages();
+      });
+      remove.setAttribute('aria-label', 'Detailbild entfernen');
+      const path = document.createElement('span');
+      path.className = 'image-path';
+      path.textContent = item.file ? item.file.name : item.path;
+      box.append(img, remove, path);
+      box.addEventListener('dragstart', event => {
+        box.classList.add('is-dragging');
+        event.dataTransfer.setData('text/plain', String(index));
+      });
+      box.addEventListener('dragend', () => box.classList.remove('is-dragging'));
+      box.addEventListener('dragover', event => event.preventDefault());
+      box.addEventListener('drop', event => {
+        event.preventDefault();
+        const from = Number(event.dataTransfer.getData('text/plain'));
+        const to = Number(box.dataset.index);
+        if (!Number.isInteger(from) || from === to) return;
+        const [moved] = editor.details.splice(from, 1);
+        editor.details.splice(to, 0, moved);
+        renderDetailImages();
+      });
+      strip.appendChild(box);
+    });
   }
 
   $('#fieldTitle').addEventListener('input', () => {
@@ -426,40 +476,21 @@
     renderEditorImages();
   });
 
-  $$('.detail-file-input').forEach(input => input.addEventListener('change', event => {
-    const side = input.dataset.side;
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const old = state.editor.details[side];
-    if (old?.preview?.startsWith('blob:')) URL.revokeObjectURL(old.preview);
-    state.editor.details[side] = { file, preview: URL.createObjectURL(file) };
-    input.value = '';
-    renderDetailPreview(side);
-  }));
+  $('#detailImageInput').addEventListener('change', event => {
+    const files = [...event.target.files];
+    files.forEach(file => state.editor.details.push({ file, preview: URL.createObjectURL(file) }));
+    event.target.value = '';
+    renderDetailImages();
+  });
 
-  $$('.detail-clear-button').forEach(buttonEl => buttonEl.addEventListener('click', () => {
-    const side = buttonEl.dataset.side;
-    const item = state.editor.details[side];
-    if (item?.preview?.startsWith('blob:')) URL.revokeObjectURL(item.preview);
-    state.editor.details[side] = null;
-    renderDetailPreview(side);
-  }));
-
-  $('#chooseMainFromMedia').addEventListener('click', () => openMediaPicker({ multiple: true, onPick(paths) {
+  $('#chooseDetailsFromMedia').addEventListener('click', () => openMediaPicker({ multiple: true, onPick(paths) {
     paths.forEach(path => {
-      if (!state.editor.main.some(item => item.path === path)) state.editor.main.push({ path, preview: publicUrl(path) });
+      if (!state.editor.details.some(item => item.path === path)) {
+        state.editor.details.push({ path, preview: publicUrl(path) });
+      }
     });
-    renderEditorImages();
+    renderDetailImages();
   }}));
-
-  $$('.detail-media-button').forEach(buttonEl => buttonEl.addEventListener('click', () => {
-    const side = buttonEl.dataset.side;
-    openMediaPicker({ multiple: false, onPick(paths) {
-      const path = paths[0];
-      if (path) state.editor.details[side] = { path, preview: publicUrl(path) };
-      renderDetailPreview(side);
-    }});
-  }));
 
   $('#cancelEditorButton').addEventListener('click', () => editorDialog.close());
 
@@ -624,17 +655,16 @@
         }
       }
 
-      const detailPaths = {};
-      for (const side of ['left', 'right']) {
-        const item = editor.details[side];
-        if (!item) continue;
+      const detailPaths = [];
+      for (let i = 0; i < editor.details.length; i++) {
+        const item = editor.details[i];
         if (item.file) {
           const blob = await optimizeImage(item.file);
-          const path = `${editor.config.root}/${folder}/detail-${side}-${stamp}.jpg`;
+          const path = `${editor.config.root}/${folder}/detail-${stamp}-${String(i + 1).padStart(2, '0')}.jpg`;
           await uploadBlob(path, blob);
-          detailPaths[side] = path;
+          detailPaths.push(path);
         } else if (item.path) {
-          detailPaths[side] = item.path;
+          detailPaths.push(item.path);
         }
       }
 
@@ -648,12 +678,14 @@
         images: mainPaths.map(toDataPath),
       };
       delete updated.image;
-      if (editor.config.kind === 'art' && (detailPaths.left || detailPaths.right)) {
-        updated.details = {};
-        if (detailPaths.left) updated.details.left = toDataPath(detailPaths.left);
-        if (detailPaths.right) updated.details.right = toDataPath(detailPaths.right);
+      if (editor.config.kind === 'art' && detailPaths.length) {
+        updated.details = detailPaths.map(toDataPath);
       } else {
         delete updated.details;
+      }
+      if (updated.images.length === 1 && updated.details?.length &&
+          (updated.layout === 'six-grid' || updated.layout === 'portrait-eight-grid')) {
+        delete updated.layout;
       }
 
       if (editor.isNew) state.works.push(updated);
@@ -686,7 +718,12 @@
     return api('save-data', { method: 'POST', body: JSON.stringify({ section: state.section, works: state.works }) });
   }
 
-  async function optimizeImage(file, maxSide = 2200, quality = 0.9) {
+  async function optimizeImage(file, maxSide = 2800, quality = 0.94) {
+    // Kleine JPEGs bleiben byte-identisch: keine erneute Kompression, keine
+    // Reduktion der Pixelmaße. Nur Dateien, die für den GitHub-Upload zu groß
+    // sind (oder ein anderes Format haben), werden neu berechnet.
+    if (/image\/jpe?g/i.test(file.type) && file.size <= 3_900_000) return file;
+
     const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
     const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
     const width = Math.max(1, Math.round(bitmap.width * scale));
@@ -699,13 +736,12 @@
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(bitmap, 0, 0, width, height);
     bitmap.close();
-    let blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
-    if (!blob) throw new Error('Das Bild konnte nicht verarbeitet werden.');
-    if (blob.size > 3_900_000) {
-      blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.78));
+
+    for (const q of [quality, 0.9, 0.84, 0.78]) {
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', q));
+      if (blob && blob.size <= 3_950_000) return blob;
     }
-    if (!blob || blob.size > 4_000_000) throw new Error(`${file.name} ist auch nach Optimierung zu groß.`);
-    return blob;
+    throw new Error(`${file.name} ist auch nach vorsichtiger Optimierung größer als 4 MB.`);
   }
 
   async function blobToBase64(blob) {
@@ -1031,6 +1067,113 @@
       setStatus(error.message, true);
     }
   }
+
+  async function renderPages() {
+    workspaceContent.innerHTML = '<div class="empty-state">Lade Seiten …</div>';
+    try {
+      const data = await api('pages');
+      state.customPages = Array.isArray(data.pages) ? data.pages : [];
+      workspaceContent.innerHTML = '';
+      if (!state.customPages.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.innerHTML = '<p>Noch keine zusätzlichen Seiten.</p>';
+        empty.appendChild(button('Erste Seite anlegen', 'primary', () => openPageEditor()));
+        workspaceContent.appendChild(empty);
+      } else {
+        const list = document.createElement('div');
+        list.className = 'project-list';
+        state.customPages.forEach(page => {
+          const card = document.createElement('article');
+          card.className = 'project-card custom-page-card';
+          const body = document.createElement('div');
+          body.className = 'project-card-body';
+          const title = document.createElement('div');
+          title.className = 'project-card-title';
+          title.textContent = page.title;
+          const meta = document.createElement('div');
+          meta.className = 'project-card-meta';
+          meta.textContent = `/pages/${page.slug}.html`;
+          const actions = document.createElement('div');
+          actions.className = 'project-card-actions';
+          const open = document.createElement('a');
+          open.className = 'secondary';
+          open.href = `${SITE}pages/${encodeURIComponent(page.slug)}.html`;
+          open.target = '_blank';
+          open.rel = 'noreferrer';
+          open.textContent = 'Öffnen ↗';
+          const edit = button('Bearbeiten', 'secondary', () => openPageEditor(page));
+          actions.append(open, edit);
+          body.append(title, meta, actions);
+          card.appendChild(body);
+          list.appendChild(card);
+        });
+        workspaceContent.appendChild(list);
+      }
+      setStatus(`${state.customPages.length} zusätzliche Seiten · neue Seiten werden als echte HTML-Dateien veröffentlicht.`);
+    } catch (error) {
+      workspaceContent.innerHTML = `<div class="empty-state">${escapeHtml(error.message)}</div>`;
+      setStatus(error.message, true);
+    }
+  }
+
+  function openPageEditor(page = null) {
+    const dialog = $('#pageDialog');
+    const existing = Boolean(page);
+    $('#pageEditorTitle').textContent = existing ? page.title : 'Neue Seite';
+    $('#pageTitle').value = page?.title || '';
+    $('#pageSlug').value = page?.slug || '';
+    $('#pageSlug').readOnly = existing;
+    if (!existing) delete $('#pageSlug').dataset.touched;
+    $('#pageDescription').value = page?.description || '';
+    $('#pageBody').value = page?.body || '';
+    $('#deletePageButton').hidden = !existing;
+    dialog.dataset.originalSlug = page?.slug || '';
+    dialog.showModal();
+  }
+
+  $('#pageTitle').addEventListener('input', () => {
+    const slug = $('#pageSlug');
+    if (!slug.readOnly && !slug.dataset.touched) slug.value = slugify($('#pageTitle').value);
+  });
+  $('#pageSlug').addEventListener('input', event => { event.target.dataset.touched = '1'; });
+  $('#cancelPageButton').addEventListener('click', () => $('#pageDialog').close());
+  $('#savePageButton').addEventListener('click', async () => {
+    const title = $('#pageTitle').value.trim();
+    const slug = slugify($('#pageSlug').value);
+    if (!title || !slug) return alert('Bitte Titel und URL-Slug angeben.');
+    try {
+      $('#savePageButton').disabled = true;
+      setStatus('Seite wird veröffentlicht …');
+      await api('save-page', { method: 'POST', body: JSON.stringify({
+        title, slug, description: $('#pageDescription').value.trim(), body: $('#pageBody').value.trim()
+      }) });
+      $('#pageDialog').close();
+      showToast('Seite veröffentlicht');
+      await renderPages();
+    } catch (error) {
+      alert(`Seite konnte nicht gespeichert werden:
+${error.message}`);
+      setStatus(error.message, true);
+    } finally {
+      $('#savePageButton').disabled = false;
+    }
+  });
+  $('#deletePageButton').addEventListener('click', async () => {
+    const slug = $('#pageDialog').dataset.originalSlug;
+    if (!slug || !confirm(`Seite /pages/${slug}.html wirklich löschen?`)) return;
+    try {
+      $('#deletePageButton').disabled = true;
+      await api('delete-page', { method: 'POST', body: JSON.stringify({ slug }) });
+      $('#pageDialog').close();
+      showToast('Seite gelöscht');
+      await renderPages();
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      $('#deletePageButton').disabled = false;
+    }
+  });
 
   function escapeHtml(value) {
     const div = document.createElement('div');

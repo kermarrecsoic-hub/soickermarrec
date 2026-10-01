@@ -175,3 +175,6 @@ h3 { font-size: 15px; }
 .landing-slot-body h3 { margin: 0 0 5px; font-size: 13px; }
 .landing-slot-body p { margin: 0 0 12px; font-size: 9px; color: var(--muted); overflow-wrap: anywhere; }
 @media (max-width: 760px) { .landing-slot-grid { grid-template-columns: 1fr; } }
+
+.page-editor-note { margin: 20px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.custom-page-card .project-card-actions { justify-content: flex-start; }
