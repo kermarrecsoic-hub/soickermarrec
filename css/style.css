@@ -1,0 +1,265 @@
+@font-face {
+  font-family: "Michroma";
+  src: url("Michroma-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Comfortaa";
+  src: url("Comfortaa-VariableFont_wght.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+/* Soïc Kermarrec – V11 Landing */
+:root {
+  --ink: #414141;
+  --site-font: "Michroma", Arial, sans-serif;
+  --row-height: 26px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; min-height: 100%; background: #fff; color: var(--ink); }
+body {
+  min-height: 100svh;
+  overflow: hidden;
+  font-family: var(--site-font);
+  font-weight: 300;
+  letter-spacing: .45px;
+}
+
+/* Hintergrund: proportional auf volle Breite, oben 90 % Deckkraft; der Weißverlauf ist um je 10 Prozentpunkte nach oben und unten erweitert. */
+.landing-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #fff;
+  pointer-events: none;
+}
+#landing-background-image,
+.landing-background-image-next {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100vw;
+  height: auto;
+  max-width: none;
+  opacity: .90;
+  transition: opacity 900ms ease;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.landing-background-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0%) 0%,
+    rgb(255 255 255 / 0%) 22%,
+    rgb(255 255 255 / 18%) 33%,
+    rgb(255 255 255 / 50%) 50%,
+    rgb(255 255 255 / 78%) 67%,
+    #fff 78%,
+    #fff 100%
+  );
+}
+
+/* Feste Breite + feste Zeilenhöhe: wenn eine Schrift rotiert, bewegt sich kein anderer Link. */
+.navigation {
+  position: fixed;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+  padding: 0;
+  text-align: center;
+  animation: page-intro .8s ease-out both;
+}
+.navigation .site-title {
+  width: 100%;
+  height: var(--row-height);
+  flex: 0 0 var(--row-height);
+  margin: 0 0 12px;
+  padding: 0;
+  font: inherit;
+}
+.navigation a {
+  display: flex;
+  width: 100%;
+  height: var(--row-height);
+  flex: 0 0 var(--row-height);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+  font-family: var(--site-font);
+  font-size: 16px;
+  font-weight: 300;
+  line-height: var(--row-height);
+  letter-spacing: .45px;
+  transition: color .18s linear;
+}
+.navigation a:focus-visible { outline: 1px solid currentColor; outline-offset: 4px; }
+
+/* Der Name rotiert immer. Desktop-Hover pausiert ihn und übergibt die Rotation genau an den aktiven Link. */
+.navigation a.is-cycling,
+.navigation a.is-active { animation: font-cycle 1.2s step-end infinite; }
+@keyframes font-cycle {
+  0%, 33.332% {
+    font-family: "Michroma", Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+  }
+  33.333%, 66.665% {
+    font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
+    font-size: 16px;
+    font-weight: 300;
+  }
+  66.666%, 100% {
+    font-family: "Comfortaa", "Arial Rounded MT Bold", Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+  }
+}
+
+.site-footer {
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  bottom: 12px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.footer-instagram {
+  margin: 0;
+  text-align: center;
+  font: 300 10px/1.35 var(--site-font);
+  letter-spacing: .35px;
+  color: #999;
+  text-decoration: none;
+}
+.footer-instagram:hover, .footer-instagram:focus-visible {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.footer-instagram:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; }
+.footer-links {
+  display: flex;
+  gap: 14px;
+  font: 300 9px/1.35 var(--site-font);
+  letter-spacing: .35px;
+  color: #aaa;
+}
+.footer-links a { color: inherit; text-decoration: none; }
+.footer-links a:hover, .footer-links a:focus-visible, .footer-links a[aria-current="page"] {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.footer-links a:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; }
+@keyframes page-intro {
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 8px)); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@media (max-width: 700px), (hover: none) and (pointer: coarse) {
+  :root { --row-height: 27px; }
+  .navigation { width: min(220px, calc(100vw - 44px)); gap: 7px; }
+  .navigation a { font-size: 16px; }
+  /* Touch hat keinen Hover: nur der Name rotiert permanent. */
+  .navigation a:not(.home-banner) { animation: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navigation { animation: none; }
+  .navigation a.is-cycling,
+  .navigation a.is-active { animation: none; }
+}
+img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
+
+.landing-background-image-next {
+  z-index: 0;
+  opacity: 0;
+}
+.landing-background-image-next.is-visible {
+  opacity: .90;
+}
+#landing-background-image.is-hidden {
+  opacity: 0;
+}
+.landing-background-fade {
+  z-index: 1;
+}
+
+
+/* DE / FR / EN – sichtbar oben links. */
+.language-switch {
+  position: fixed;
+  z-index: 5;
+  top: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 300 10px/1 var(--site-font);
+  letter-spacing: .45px;
+}
+.language-switch button {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 2px 0;
+  background: transparent;
+  color: #777;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  opacity: .58;
+}
+.language-switch button:hover,
+.language-switch button:focus-visible { opacity: 1; }
+.language-switch button.is-active {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.language-switch button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 4px;
+}
+@media (max-width: 700px), (hover: none) and (pointer: coarse) {
+  .language-switch { top: 20px; left: 18px; gap: 9px; font-size: 9px; }
+}
+
+
+/* Impressum / Datenschutz */
+.legal-shell { padding-bottom: 150px; }
+.legal-content { width: min(100%, 720px); margin: 0 auto; }
+.legal-title { margin: 0 0 34px; font: inherit; text-align: center; }
+.legal-section + .legal-section { margin-top: 34px; }
+.legal-section h3 { margin: 0 0 12px; font: inherit; }
+.legal-text p { margin: 0 0 13px; }
+.legal-text p:last-child { margin-bottom: 0; }
+.legal-text a { text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 700px) {
+  .site-footer { bottom: 9px; gap: 4px; }
+  .footer-links { gap: 12px; font-size: 9px; }
+  .legal-content { width: min(100%, 92vw); }
+  .legal-section + .legal-section { margin-top: 28px; }
+}
