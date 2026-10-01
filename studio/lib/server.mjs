@@ -211,6 +211,31 @@ export async function putRepoFile(path, contentBuffer, message) {
   return res.json();
 }
 
+export async function deleteRepoFile(path, message) {
+  const existing = await getRepoFileIfExists(path);
+  if (!existing?.sha) return { deleted: false };
+  const body = {
+    message: message || `Studio: delete ${path}`,
+    sha: existing.sha,
+    branch: REPO.branch,
+  };
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+  const res = await githubFetch(`/repos/${REPO.owner}/${REPO.repo}/contents/${encodedPath}`, {
+    method: 'DELETE',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+export function safePageSlug(value) {
+  const slug = String(value || '').trim().toLowerCase();
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) throw new Error('Ungültiger Seiten-Slug.');
+  const reserved = new Set(['about','architecture','contact','datenschutz','ex26','graphic','impressum','painting','xxx','404']);
+  if (reserved.has(slug)) throw new Error('Dieser Seitenname ist reserviert.');
+  return slug;
+}
+
 export function safeImagePath(value) {
   const path = String(value || '').replace(/^\/+/, '');
   if (!path.startsWith('images/')) throw new Error('Bilder dürfen nur unter images/ gespeichert werden.');
