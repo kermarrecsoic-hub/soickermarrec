@@ -63,7 +63,7 @@ window.GRAPHIC_WORKS = [
     }
   },
   {
-    "title": "Unbenannt (Krokodil)",
+    "title": "Untitled (Krokodil)",
     "medium": "Tinte auf Papier",
     "dimensions": "12 x 24 cm",
     "availability": "",
