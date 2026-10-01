@@ -37,5 +37,18 @@ window.ARCHITECTURE_WORKS = [
       "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-04.jpg",
       "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-05.jpg"
     ]
+  },
+  {
+    "title": "The good the bad and the ulgy",
+    "medium": "Pavilion für Raves",
+    "dimensions": "",
+    "availability": "",
+    "text": "",
+    "images": [
+      "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-01.jpg",
+      "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-02.jpg",
+      "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-03.jpg",
+      "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-04.jpg"
+    ]
   }
 ];
