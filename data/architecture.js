@@ -7,7 +7,7 @@ window.ARCHITECTURE_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/architecture/untitled/main-20260930235426-01.jpg"
+      "../images/architecture/untitled/main-20261001000714-01.jpg"
     ]
   },
   {
