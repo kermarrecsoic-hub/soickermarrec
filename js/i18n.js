@@ -27,6 +27,9 @@
         exaerial: 'Ausstellung Aerial&Art'
       },
       contact: {
+        role: 'Künstler & Architekturstudent',
+        location: 'Leipzig, Deutschland',
+        practice: 'Malerei · Tinte · Fotografie · Architektur',
         intro: 'Alle Anfragen zur Verfügbarkeit von Werken, Projekten und Ausstellungen bitte per E-Mail.',
         email: 'E-Mail'
       },
@@ -95,6 +98,9 @@
         exaerial: 'Exposition Aerial&Art'
       },
       contact: {
+        role: 'Artiste & étudiant en architecture',
+        location: 'Leipzig, Allemagne',
+        practice: 'Peinture · Encre · Photographie · Architecture',
         intro: 'Pour toute demande concernant la disponibilité des œuvres, les projets ou les expositions, merci de me contacter par e-mail.',
         email: 'E-mail'
       },
@@ -163,6 +169,9 @@
         exaerial: 'Exhibition Aerial&Art'
       },
       contact: {
+        role: 'Artist & architecture student',
+        location: 'Leipzig, Germany',
+        practice: 'Painting · Ink · Photography · Architecture',
         intro: 'For enquiries about artwork availability, projects and exhibitions, please get in touch by email.',
         email: 'Email'
       },

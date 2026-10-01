@@ -1,8 +1,16 @@
+@font-face {
+  font-family: "Michroma";
+  src: url("../Michroma-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 /* Soïc Kermarrec – V9.1 / gemeinsame Typografie, Galerie und Editorial */
 :root {
   --ink: #414141;
   --muted: #adadad;
-  --site-font: Baskerville, "Baskerville Old Face", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --site-font: "Michroma", Arial, sans-serif;
   --header-height: 180px;
   --page-width: 1240px;
   --series-gap-x: clamp(30px, 3vw, 52px);
@@ -352,6 +360,8 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.5;
   overflow-wrap: break-word;
 }
+/* Give the right-hand About text more breathing room below the fixed navigation. */
+.about-page .editorial-text { padding-top: clamp(64px, 7vh, 96px); }
 .about-page .editorial-text p {
   margin: 0 0 36px;
   text-align: justify;
@@ -378,6 +388,14 @@ a { color: inherit; text-decoration: none; }
   margin: 0 auto 30px;
 }
 .contact-content .editorial-text { margin: 0; text-align: center; }
+.contact-identity { margin: 0 0 34px; text-align: center; }
+.contact-name { margin: 0 0 10px; font: inherit; font-size: 16px; line-height: 1.4; }
+.contact-role,
+.contact-location,
+.contact-practice { margin: 0; line-height: 1.55; }
+.contact-location { color: #777; }
+.contact-practice { margin-top: 11px; color: #777; font-size: 12px; }
+.contact-content > .editorial-text { margin-top: 0; }
 .editorial-contact {
   margin-top: 32px;
   display: flex;
@@ -565,6 +583,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     width: min(100%, 551px);
     display: block;
   }
+  .about-page .editorial-text { padding-top: 0; }
   .editorial-picture {
     position: static;
     width: min(100%, 551px, 51.65svh);

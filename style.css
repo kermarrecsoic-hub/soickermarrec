@@ -6,10 +6,18 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Comfortaa";
+  src: url("Comfortaa-VariableFont_wght.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+}
+
 /* Soïc Kermarrec – V11 Landing */
 :root {
   --ink: #414141;
-  --site-font: Baskerville, "Baskerville Old Face", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --site-font: "Michroma", Arial, sans-serif;
   --row-height: 26px;
 }
 * { box-sizing: border-box; }
@@ -120,8 +128,8 @@ body {
     font-weight: 300;
   }
   66.666%, 100% {
-    font-family: Michroma, Arial, sans-serif;
-    font-size: 14px;
+    font-family: "Comfortaa", "Arial Rounded MT Bold", Arial, sans-serif;
+    font-size: 15px;
     font-weight: 400;
   }
 }
