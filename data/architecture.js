@@ -1,7 +1,7 @@
 /* Verwaltet über Soïc Studio. Manuelle Änderungen bleiben möglich. */
 window.ARCHITECTURE_WORKS = [
   {
-    "title": "architektur",
+    "title": "Architektur",
     "medium": "",
     "dimensions": "",
     "availability": "",
