@@ -6,7 +6,12 @@ function serialize(section, works) {
     delete copy._folder;
     delete copy._ui;
     if (Array.isArray(copy.images)) copy.images = copy.images.filter(Boolean);
-    if (copy.details && !copy.details.left && !copy.details.right) delete copy.details;
+    if (Array.isArray(copy.details)) {
+      copy.details = copy.details.filter(Boolean);
+      if (!copy.details.length) delete copy.details;
+    } else if (copy.details && !copy.details.left && !copy.details.right) {
+      delete copy.details;
+    }
     return copy;
   });
   return `/* Verwaltet über Soïc Studio. Manuelle Änderungen bleiben möglich. */\nwindow.${section.globalName} = ${JSON.stringify(cleaned, null, 2)};\n`;
