@@ -5,7 +5,7 @@
   const SITE = 'https://soickermarrec.de/';
   const SECTION_CONFIG = {
     painting: { label: 'Malerei', root: 'images/painting', kind: 'art' },
-    graphic: { label: 'Tinte', root: 'images/ink', kind: 'art' },
+    graphic: { label: 'Grafik', root: 'images/ink', kind: 'art' },
     exhibitions: { label: 'Ausstellung', root: 'images/exhibitions', kind: 'series' },
     architecture: { label: 'Arch.0', root: 'images/architecture', kind: 'series' },
     xxx: { label: 'Fotografie', root: 'images/foto1/fotogalerie_sortiert', kind: 'series' },

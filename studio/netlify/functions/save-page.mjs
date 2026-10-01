@@ -44,7 +44,7 @@ function pageHtml(page) {
 </head>
 <body class="gallery-page custom-page">
 <header class="site-header"><nav class="site-nav" aria-label="Portfolio sections">
-<a href="../index.html">Soïc Kermarrec</a><a data-i18n="nav.painting" href="painting.html">Malerei</a><a data-i18n="nav.graphic" href="graphic.html">Tinte</a><a data-i18n="nav.exhibitions" href="ex26.html">Ausstellung</a><a data-i18n="nav.architecture" href="architecture.html">Arch.0</a><a data-i18n="nav.photography" href="xxx.html">Fotografie</a><a data-i18n="nav.about" href="about.html">About</a><a data-i18n="nav.contact" href="contact.html">Kontakt</a>
+<a href="../index.html">Soïc Kermarrec</a><a data-i18n="nav.painting" href="painting.html">Malerei</a><a data-i18n="nav.graphic" href="graphic.html">Grafik</a><a data-i18n="nav.exhibitions" href="ex26.html">Ausstellung</a><a data-i18n="nav.architecture" href="architecture.html">Arch.0</a><a data-i18n="nav.photography" href="xxx.html">Fotografie</a><a data-i18n="nav.about" href="about.html">About</a><a data-i18n="nav.contact" href="contact.html">Kontakt</a>
 </nav></header>
 <main class="editorial-page custom-page-shell"><div class="editorial-text custom-page-content"><h1 class="custom-page-title">${title}</h1>${paragraphs(page.body)}</div></main>
 <footer class="site-footer"><a class="footer-instagram" href="https://www.instagram.com/soicyv/" rel="noopener noreferrer me" target="_blank">Instagram</a><nav class="footer-links" aria-label="Legal links"><a data-i18n="legal.imprint" href="impressum.html">Impressum</a><a data-i18n="legal.privacy" href="datenschutz.html">Datenschutz</a></nav></footer>

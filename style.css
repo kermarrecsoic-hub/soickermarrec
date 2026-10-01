@@ -17,7 +17,7 @@
 /* Soïc Kermarrec – V11 Landing */
 :root {
   --ink: #414141;
-  --site-font: "Michroma", Arial, sans-serif;
+  --site-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --row-height: 26px;
 }
 * { box-sizing: border-box; }
@@ -118,7 +118,7 @@ body {
 .navigation a.is-active { animation: font-cycle 1.2s step-end infinite; }
 @keyframes font-cycle {
   0%, 33.332% {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Michroma", Arial, sans-serif;
     font-size: 16px;
     font-weight: 300;
   }

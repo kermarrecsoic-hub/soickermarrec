@@ -10,7 +10,7 @@
 :root {
   --ink: #414141;
   --muted: #adadad;
-  --site-font: "Michroma", Arial, sans-serif;
+  --site-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --header-height: 180px;
   --page-width: 1240px;
   --series-gap-x: clamp(30px, 3vw, 52px);

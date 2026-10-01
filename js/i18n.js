@@ -8,7 +8,7 @@
     de: {
       nav: {
         painting: 'Malerei',
-        graphic: 'Tinte',
+        graphic: 'Grafik',
         exhibitions: 'Ausstellung',
         architecture: 'Arch.0',
         photography: 'Fotografie',
@@ -29,13 +29,13 @@
       contact: {
         role: 'Künstler & Architekturstudent',
         location: 'Leipzig, Deutschland',
-        practice: 'Malerei · Tinte · Fotografie · Architektur',
+        practice: 'Malerei · Grafik · Fotografie · Architektur',
         intro: 'Alle Anfragen zur Verfügbarkeit von Werken, Projekten und Ausstellungen bitte per E-Mail.',
         email: 'E-Mail'
       },
       page: {
         painting: 'Malerei',
-        graphic: 'Tinte',
+        graphic: 'Grafik',
         exhibitions: 'Ausstellung',
         architecture: 'Architektur',
         photography: 'Fotografie',
@@ -54,11 +54,11 @@
         detail: 'Detail'
       },
       meta: {
-        homeTitle: 'Soïc Kermarrec — Malerei, Tinte, Fotografie & Architektur',
+        homeTitle: 'Soïc Kermarrec — Malerei, Grafik, Fotografie & Architektur',
         homeDescription: 'Portfolio von Soïc Kermarrec, Künstler und Architekturstudent aus Leipzig. Malerei, Tinte, Ausstellungen, Fotografie und Architektur, geprägt durch seine Zeit in Paris.',
         paintingTitle: 'Malerei | Soïc Kermarrec',
         paintingDescription: 'Malerei von Soïc Kermarrec: Acryl, Tinte und Mixed Media. Seine Malereipraxis entwickelte sich während seiner Zeit in Paris.',
-        graphicTitle: 'Tinte | Soïc Kermarrec',
+        graphicTitle: 'Grafik | Soïc Kermarrec',
         graphicDescription: 'Tuschezeichnungen und grafische Arbeiten von Soïc Kermarrec.',
         exhibitionsTitle: 'Ausstellung | Soïc Kermarrec',
         exhibitionsDescription: 'Ausstellungen von Soïc Kermarrec, darunter Aerial&Art (2026), mit Arbeiten zwischen Leipzig und Paris.',
@@ -79,7 +79,7 @@
     fr: {
       nav: {
         painting: 'Peinture',
-        graphic: 'Encre',
+        graphic: 'Graphisme',
         exhibitions: 'Expositions',
         architecture: 'Arch.0',
         photography: 'Photographie',
@@ -100,13 +100,13 @@
       contact: {
         role: 'Artiste & étudiant en architecture',
         location: 'Leipzig, Allemagne',
-        practice: 'Peinture · Encre · Photographie · Architecture',
+        practice: 'Peinture · Graphisme · Photographie · Architecture',
         intro: 'Pour toute demande concernant la disponibilité des œuvres, les projets ou les expositions, merci de me contacter par e-mail.',
         email: 'E-mail'
       },
       page: {
         painting: 'Peinture',
-        graphic: 'Encre',
+        graphic: 'Graphisme',
         exhibitions: 'Expositions',
         architecture: 'Architecture',
         photography: 'Photographie',
@@ -125,11 +125,11 @@
         detail: 'détail'
       },
       meta: {
-        homeTitle: 'Soïc Kermarrec — Peinture, encre, photographie & architecture',
+        homeTitle: 'Soïc Kermarrec — Peinture, graphisme, photographie & architecture',
         homeDescription: 'Portfolio de Soïc Kermarrec, artiste et étudiant en architecture à Leipzig. Peinture, encre, expositions, photographie et architecture, marquées par son séjour à Paris.',
         paintingTitle: 'Peinture | Soïc Kermarrec',
         paintingDescription: 'Peintures de Soïc Kermarrec : acrylique, encre et techniques mixtes. Sa pratique picturale s’est développée pendant son séjour à Paris.',
-        graphicTitle: 'Encre | Soïc Kermarrec',
+        graphicTitle: 'Graphisme | Soïc Kermarrec',
         graphicDescription: 'Dessins à l’encre et œuvres graphiques de Soïc Kermarrec.',
         exhibitionsTitle: 'Expositions | Soïc Kermarrec',
         exhibitionsDescription: 'Expositions de Soïc Kermarrec, dont Aerial&Art (2026), avec des œuvres développées entre Leipzig et Paris.',
@@ -150,7 +150,7 @@
     en: {
       nav: {
         painting: 'Painting',
-        graphic: 'Ink',
+        graphic: 'Graphics',
         exhibitions: 'Exhibitions',
         architecture: 'Arch.0',
         photography: 'Photography',
@@ -171,13 +171,13 @@
       contact: {
         role: 'Artist & architecture student',
         location: 'Leipzig, Germany',
-        practice: 'Painting · Ink · Photography · Architecture',
+        practice: 'Painting · Graphics · Photography · Architecture',
         intro: 'For enquiries about artwork availability, projects and exhibitions, please get in touch by email.',
         email: 'Email'
       },
       page: {
         painting: 'Painting',
-        graphic: 'Ink',
+        graphic: 'Graphics',
         exhibitions: 'Exhibitions',
         architecture: 'Architecture',
         photography: 'Photography',
@@ -196,11 +196,11 @@
         detail: 'detail'
       },
       meta: {
-        homeTitle: 'Soïc Kermarrec — Painting, ink, photography & architecture',
+        homeTitle: 'Soïc Kermarrec — Painting, graphics, photography & architecture',
         homeDescription: 'Portfolio of Soïc Kermarrec, an artist and architecture student in Leipzig. Painting, ink, exhibitions, photography and architecture shaped by his time in Paris.',
         paintingTitle: 'Painting | Soïc Kermarrec',
         paintingDescription: 'Paintings by Soïc Kermarrec: acrylic, ink and mixed media. His painting practice developed during his time in Paris.',
-        graphicTitle: 'Ink | Soïc Kermarrec',
+        graphicTitle: 'Graphics | Soïc Kermarrec',
         graphicDescription: 'Ink drawings and graphic works by Soïc Kermarrec.',
         exhibitionsTitle: 'Exhibitions | Soïc Kermarrec',
         exhibitionsDescription: 'Exhibitions by Soïc Kermarrec, including Aerial&Art (2026), with work developed between Leipzig and Paris.',
