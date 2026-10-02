@@ -512,6 +512,11 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     align-self: center;
     margin-top: 12px;
     grid-template-rows: none;
+    /* Mobile fix: Desktop blend state must not keep 1–2 detail images invisible. */
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: none;
   }
   .detail-frame .detail-image { max-width: 100%; max-height: 45svh; }
   .artwork.has-details.details-visible .detail-frame { display: block; }
