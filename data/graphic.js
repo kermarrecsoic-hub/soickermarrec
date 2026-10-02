@@ -1,6 +1,21 @@
 /* Verwaltet über Soïc Studio. Manuelle Änderungen bleiben möglich. */
 window.GRAPHIC_WORKS = [
   {
+    "title": "Kunstdrucke",
+    "medium": "auf Anfrage",
+    "dimensions": "",
+    "availability": "",
+    "text": "",
+    "images": [
+      "../images/ink/kunstdrucke/main-20261002213547-01.jpg"
+    ],
+    "shareId": "kunstdrucke",
+    "details": [
+      "../images/ink/kunstdrucke/detail-20261002213547-01.jpg",
+      "../images/ink/kunstdrucke/detail-20261002213547-02.jpg"
+    ]
+  },
+  {
     "title": "Untitled (Wand), 2025",
     "medium": "ink, water and white pencil on paper",
     "dimensions": "30 x 42 cm",
@@ -70,21 +85,6 @@ window.GRAPHIC_WORKS = [
     "text": "",
     "images": [
       "../images/ink/random/main1.jpg"
-    ]
-  },
-  {
-    "title": "Kunstdrucke",
-    "medium": "auf Anfrage",
-    "dimensions": "",
-    "availability": "",
-    "text": "",
-    "images": [
-      "../images/ink/kunstdrucke/main-20261002213547-01.jpg"
-    ],
-    "shareId": "kunstdrucke",
-    "details": [
-      "../images/ink/kunstdrucke/detail-20261002213547-01.jpg",
-      "../images/ink/kunstdrucke/detail-20261002213547-02.jpg"
     ]
   }
 ];
