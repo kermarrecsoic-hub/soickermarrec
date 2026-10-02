@@ -115,5 +115,17 @@ window.PAINTING_WORKS = [
       "left": "../images/painting/baer/detail-left.jpg",
       "right": "../images/painting/baer/detail-right.jpg"
     }
+  },
+  {
+    "title": "Kunstdrucke",
+    "medium": "",
+    "dimensions": "",
+    "availability": "",
+    "text": "",
+    "images": [
+      "../images/painting/kunstdrucke/main-20261002212557-01.jpg",
+      "../images/painting/kunstdrucke/main-20261002212557-02.jpg"
+    ],
+    "shareId": "kunstdrucke"
   }
 ];
