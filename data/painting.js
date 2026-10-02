@@ -1,6 +1,18 @@
 /* Verwaltet über Soïc Studio. Manuelle Änderungen bleiben möglich. */
 window.PAINTING_WORKS = [
   {
+    "title": "Kunstdrucke",
+    "medium": "",
+    "dimensions": "",
+    "availability": "",
+    "text": "",
+    "images": [
+      "../images/painting/kunstdrucke/main-20261002212557-01.jpg",
+      "../images/painting/kunstdrucke/main-20261002212557-02.jpg"
+    ],
+    "shareId": "kunstdrucke"
+  },
+  {
     "title": "Dante, 2026",
     "medium": "acrylic, ink, kyougi on canvas",
     "dimensions": "65 × 50 cm",
@@ -115,17 +127,5 @@ window.PAINTING_WORKS = [
       "left": "../images/painting/baer/detail-left.jpg",
       "right": "../images/painting/baer/detail-right.jpg"
     }
-  },
-  {
-    "title": "Kunstdrucke",
-    "medium": "",
-    "dimensions": "",
-    "availability": "",
-    "text": "",
-    "images": [
-      "../images/painting/kunstdrucke/main-20261002212557-01.jpg",
-      "../images/painting/kunstdrucke/main-20261002212557-02.jpg"
-    ],
-    "shareId": "kunstdrucke"
   }
 ];
