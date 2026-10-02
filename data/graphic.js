@@ -71,5 +71,20 @@ window.GRAPHIC_WORKS = [
     "images": [
       "../images/ink/random/main1.jpg"
     ]
+  },
+  {
+    "title": "Kunstdrucke",
+    "medium": "auf Anfrage",
+    "dimensions": "",
+    "availability": "",
+    "text": "",
+    "images": [
+      "../images/ink/kunstdrucke/main-20261002213547-01.jpg"
+    ],
+    "shareId": "kunstdrucke",
+    "details": [
+      "../images/ink/kunstdrucke/detail-20261002213547-01.jpg",
+      "../images/ink/kunstdrucke/detail-20261002213547-02.jpg"
+    ]
   }
 ];
