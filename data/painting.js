@@ -11,7 +11,8 @@ window.PAINTING_WORKS = [
     ],
     "shareId": "kunstdrucke",
     "details": [
-      "../images/painting/kunstdrucke/detail-20261002213210-01.jpg"
+      "../images/painting/kunstdrucke/detail-20261002213210-01.jpg",
+      "../images/painting/kunstdrucke/detail-20261002213434-02.jpg"
     ]
   },
   {
