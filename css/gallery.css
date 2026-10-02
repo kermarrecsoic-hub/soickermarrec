@@ -1135,3 +1135,35 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   .custom-page-shell, .not-found-shell { padding-left: 18px; padding-right: 18px; }
   .custom-page-title, .not-found-title { margin-bottom: 30px; }
 }
+
+/* Einzelne Werke teilen: bewusst unauffällig unter den Werkangaben. */
+.painting-page .artwork[id^="werk-"],
+.graphic-page .artwork[id^="werk-"] {
+  scroll-margin-top: calc(var(--header-height) + 24px);
+}
+.work-share-button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  margin: 15px 0 0;
+  background: transparent;
+  color: var(--muted);
+  font: 300 11px/1.4 var(--site-font);
+  letter-spacing: .4px;
+  cursor: pointer;
+}
+.work-share-button:hover,
+.work-share-button:focus-visible {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.work-share-button:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
+}
+.painting-page .artwork-list[data-project-columns="2"] .work-share-button,
+.graphic-page .artwork-list[data-project-columns="2"] .work-share-button {
+  margin-top: 10px;
+  font-size: 10px;
+}

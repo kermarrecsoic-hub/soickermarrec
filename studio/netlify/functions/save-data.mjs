@@ -1,4 +1,5 @@
-import { SECTIONS, json, putRepoFile, requireAuth, requireSameOrigin } from '../../lib/server.mjs';
+import { SECTIONS, deleteRepoFile, json, putRepoFile, requireAuth, requireSameOrigin } from '../../lib/server.mjs';
+import { renderSharePage, shareIdForWork, sharePagePath } from '../../lib/share-pages.mjs';
 
 function serialize(section, works) {
   const cleaned = works.map(work => {
@@ -30,6 +31,26 @@ export default async (req) => {
     if (!section || !Array.isArray(body.works)) return json({ ok: false, error: 'Ungültige Daten.' }, 400);
     const source = serialize(section, body.works);
     await putRepoFile(section.dataPath, Buffer.from(source, 'utf8'), `Studio: ${section.label} aktualisiert`);
+
+    // Nur Malerei/Grafik brauchen werkbezogene Social-Preview-Seiten.
+    // Beim normalen Sortieren wird nichts neu erzeugt; beim Bearbeiten/Anlegen
+    // aktualisieren wir nur die betroffene Seite, damit ein Studio-Speichern schnell bleibt.
+    if (section.kind === 'art' && body.shareWorkId) {
+      const wanted = String(body.shareWorkId);
+      const index = body.works.findIndex((work, i) => shareIdForWork(body.section, work, i) === wanted);
+      if (index >= 0) {
+        const work = body.works[index];
+        const pagePath = sharePagePath(body.section, work, index);
+        const html = renderSharePage(body.section, work, index);
+        await putRepoFile(pagePath, Buffer.from(html, 'utf8'), `Studio: Share-Seite ${wanted} aktualisiert`);
+      }
+    }
+
+    if (section.kind === 'art' && body.deleteShareId) {
+      const id = String(body.deleteShareId).replace(/[^a-z0-9-]/g, '');
+      if (id) await deleteRepoFile(`share/${body.section}/${id}.html`, `Studio: Share-Seite ${id} entfernt`);
+    }
+
     return json({ ok: true });
   } catch (error) {
     return json({ ok: false, error: error.message }, 500);

@@ -20,6 +20,9 @@
     document.body.classList.contains('painting-page') ||
     document.body.classList.contains('graphic-page')
   );
+  const shareSection = document.body.classList.contains('painting-page')
+    ? 'painting'
+    : (document.body.classList.contains('graphic-page') ? 'graphic' : '');
 
   let uid = 0;
   let currentColumns = null;
@@ -230,6 +233,97 @@
     button.tabIndex = mobile.matches ? 0 : -1;
   }
 
+  function slugifyShare(value = '') {
+    return String(value)
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/ß/g, 'ss')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60);
+  }
+
+  function workShareId(work, workIndex, paths = []) {
+    const explicit = slugifyShare(work.shareId || '');
+    if (explicit) return explicit;
+
+    const first = String(paths[0] || work.image || '').replace(/^\.\.\//, '').replace(/^\/+/, '');
+    const root = shareSection === 'painting' ? 'images/painting/' : 'images/ink/';
+    if (shareSection && first.startsWith(root)) {
+      const rest = first.slice(root.length);
+      const folder = rest.includes('/') ? rest.split('/')[0] : rest.replace(/\.[^.]+$/, '');
+      const fromFolder = slugifyShare(folder);
+      if (fromFolder) return fromFolder;
+    }
+    return slugifyShare(work.title || '') || `werk-${workIndex + 1}`;
+  }
+
+  function sharePageUrl(id) {
+    return new URL(`/share/${shareSection}/${encodeURIComponent(id)}.html`, window.location.origin).href;
+  }
+
+  function fileNameForShare(title, mime = 'image/jpeg') {
+    const ext = mime.includes('png') ? 'png' : (mime.includes('webp') ? 'webp' : 'jpg');
+    return `${slugifyShare(title || 'soic-kermarrec') || 'soic-kermarrec'}.${ext}`;
+  }
+
+  async function shareWork(work, id, mainPath) {
+    const title = work.title || tr('gallery.work', 'Werk');
+    const url = sharePageUrl(id);
+    const text = `${title} — Soïc Kermarrec`;
+
+    // Auf unterstützten Mobilgeräten wird zusätzlich das echte Hauptbild an
+    // den nativen Teilen-Dialog übergeben. WhatsApp kann so Bild + Link erhalten.
+    if (navigator.share) {
+      try {
+        let file = null;
+        if (mainPath && navigator.canShare) {
+          try {
+            const response = await fetch(mainPath, { cache: 'force-cache' });
+            if (response.ok) {
+              const blob = await response.blob();
+              const candidate = new File([blob], fileNameForShare(title, blob.type), { type: blob.type || 'image/jpeg' });
+              if (navigator.canShare({ files: [candidate] })) file = candidate;
+            }
+          } catch {}
+        }
+
+        const data = { title: text, text, url };
+        if (file) data.files = [file];
+        await navigator.share(data);
+        return;
+      } catch (error) {
+        if (error?.name === 'AbortError') return;
+      }
+    }
+
+    // Desktop/Fallback: direkt WhatsApp/WhatsApp Web mit werkbezogener URL.
+    // Die Share-Seite besitzt eigene Open-Graph-Tags mit dem Hauptbild.
+    const message = `${text}\n${url}`;
+    window.location.href = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  }
+
+  function addShareControl(description, work, workIndex, paths, section) {
+    if (!shareSection || !paths.length) return;
+    const id = workShareId(work, workIndex, paths);
+    section.id = `werk-${id}`;
+    section.dataset.shareId = id;
+
+    const button = element('button', 'work-share-button', tr('gallery.share', 'teilen'));
+    button.type = 'button';
+    button.setAttribute('aria-label', `${tr('gallery.shareViaWhatsApp', 'Werk über WhatsApp teilen')}: ${work.title || tr('gallery.work', 'Werk')}`);
+    button.addEventListener('click', () => shareWork(work, id, paths[0]));
+    description.appendChild(button);
+  }
+
+  function scrollToSharedWork() {
+    const hash = decodeURIComponent(window.location.hash || '');
+    if (!hash.startsWith('#werk-')) return;
+    const targetWork = document.getElementById(hash.slice(1));
+    if (!targetWork) return;
+    requestAnimationFrame(() => targetWork.scrollIntoView({ block: 'start', behavior: 'auto' }));
+  }
+
   function render(work, workIndex) {
     const rawMainPaths = Array.isArray(work.images) && work.images.length
       ? work.images.filter(Boolean)
@@ -336,12 +430,15 @@
     if (work.dimensions) description.appendChild(element('p', 'dimensions', work.dimensions));
     if (work.availability) description.appendChild(element('p', 'availability', work.availability));
     if (work.text) description.appendChild(element('p', 'free-text', work.text));
+    addShareControl(description, work, workIndex, paths, section);
     section.appendChild(description);
 
     return section;
   }
 
   works.forEach((work, index) => target.appendChild(render(work, index)));
+  scrollToSharedWork();
+  window.addEventListener('hashchange', scrollToSharedWork);
 
   if (forceSeries) {
     makeViewToggle();

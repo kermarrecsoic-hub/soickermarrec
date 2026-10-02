@@ -100,7 +100,7 @@ body {
   font-family: var(--site-font);
   font-size: 16px;
   font-weight: 300;
-  line-height: var(--row-height);
+  line-height: 1;
   letter-spacing: .45px;
   transition: color .18s linear;
 }
@@ -124,7 +124,7 @@ body {
   }
   66.666%, 100% {
     font-family: "Michroma", Arial, sans-serif;
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 400;
     letter-spacing: .45px;
   }

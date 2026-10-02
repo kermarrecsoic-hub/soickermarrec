@@ -51,7 +51,9 @@
         hideDetails: 'Details ausblenden',
         work: 'Werk',
         image: 'Bild',
-        detail: 'Detail'
+        detail: 'Detail',
+        share: 'teilen',
+        shareViaWhatsApp: 'Werk über WhatsApp teilen'
       },
       meta: {
         homeTitle: 'Soïc Kermarrec — Malerei, Grafik, Fotografie & Architektur',
@@ -122,7 +124,9 @@
         hideDetails: 'Masquer les détails',
         work: 'Œuvre',
         image: 'image',
-        detail: 'détail'
+        detail: 'détail',
+        share: 'partager',
+        shareViaWhatsApp: 'Partager l’œuvre via WhatsApp'
       },
       meta: {
         homeTitle: 'Soïc Kermarrec — Peinture, graphisme, photographie & architecture',
@@ -193,7 +197,9 @@
         hideDetails: 'Hide details',
         work: 'Work',
         image: 'image',
-        detail: 'detail'
+        detail: 'detail',
+        share: 'share',
+        shareViaWhatsApp: 'Share work via WhatsApp'
       },
       meta: {
         homeTitle: 'Soïc Kermarrec — Painting, graphics, photography & architecture',

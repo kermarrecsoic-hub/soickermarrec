@@ -344,6 +344,13 @@
     return slugify(work.title || 'untitled');
   }
 
+  function workShareId(work, index, config = SECTION_CONFIG[state.section]) {
+    if (work?.shareId) return slugify(work.shareId);
+    const folder = deriveFolder(work || {}, config);
+    if (folder && folder !== 'untitled') return slugify(folder);
+    return slugify(work?.title || `werk-${Math.max(0, index) + 1}`);
+  }
+
   function openProjectEditor(index) {
     const config = SECTION_CONFIG[state.section];
     const isNew = index < 0;
@@ -498,10 +505,11 @@
     const editor = state.editor;
     if (!editor || editor.isNew) return;
     if (!confirm(`„${editor.work.title || 'Untitled'}“ wirklich von der Seite entfernen? Die Bilddateien bleiben in der Mediathek.`)) return;
+    const deleteShareId = editor.config.kind === 'art' ? workShareId(editor.work, editor.index, editor.config) : '';
     state.works.splice(editor.index, 1);
     try {
       setBusy(true);
-      await saveWorks();
+      await saveWorks({ deleteShareId });
       editorDialog.close();
       renderProjects();
       showToast('Projekt entfernt');
@@ -668,15 +676,20 @@
         }
       }
 
+      const titleValue = $('#fieldTitle').value.trim();
+      const stableShareId = editor.config.kind === 'art'
+        ? (editor.work.shareId || (!editor.isNew ? workShareId(editor.work, editor.index, editor.config) : slugify(folder || titleValue || `werk-${Date.now()}`)))
+        : '';
       const updated = {
         ...editor.work,
-        title: $('#fieldTitle').value.trim(),
+        title: titleValue,
         medium: $('#fieldMedium').value.trim(),
         dimensions: $('#fieldDimensions').value.trim(),
         availability: $('#fieldAvailability').value.trim(),
         text: $('#fieldText').value.trim(),
         images: mainPaths.map(toDataPath),
       };
+      if (stableShareId) updated.shareId = stableShareId;
       delete updated.image;
       if (editor.config.kind === 'art' && detailPaths.length) {
         updated.details = detailPaths.map(toDataPath);
@@ -691,8 +704,8 @@
       if (editor.isNew) state.works.push(updated);
       else state.works[editor.index] = updated;
 
-      setStatus('Projektdatei wird veröffentlicht …');
-      await saveWorks();
+      setStatus('Projektdatei und Teilen-Vorschau werden veröffentlicht …');
+      await saveWorks({ shareWorkId: stableShareId });
       state.mediaLoaded = false;
       editorDialog.close();
       renderProjects();
@@ -714,8 +727,11 @@
     });
   }
 
-  async function saveWorks() {
-    return api('save-data', { method: 'POST', body: JSON.stringify({ section: state.section, works: state.works }) });
+  async function saveWorks({ shareWorkId = '', deleteShareId = '' } = {}) {
+    return api('save-data', {
+      method: 'POST',
+      body: JSON.stringify({ section: state.section, works: state.works, shareWorkId, deleteShareId })
+    });
   }
 
   async function optimizeImage(file, maxSide = 2800, quality = 0.94) {

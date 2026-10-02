@@ -15,7 +15,7 @@ export const SECTIONS = {
     kind: 'art',
   },
   graphic: {
-    label: 'Ink',
+    label: 'Grafik',
     dataPath: 'data/graphic.js',
     globalName: 'GRAPHIC_WORKS',
     imageRoot: 'images/ink',
