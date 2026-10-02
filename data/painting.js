@@ -7,10 +7,12 @@ window.PAINTING_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/painting/kunstdrucke/main-20261002212557-01.jpg",
-      "../images/painting/kunstdrucke/main-20261002212557-02.jpg"
+      "../images/painting/kunstdrucke/main-20261002213210-01.jpg"
     ],
-    "shareId": "kunstdrucke"
+    "shareId": "kunstdrucke",
+    "details": [
+      "../images/painting/kunstdrucke/detail-20261002213210-01.jpg"
+    ]
   },
   {
     "title": "Dante, 2026",
