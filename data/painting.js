@@ -2,7 +2,7 @@
 window.PAINTING_WORKS = [
   {
     "title": "Kunstdrucke",
-    "medium": "",
+    "medium": "auf Anfrage",
     "dimensions": "",
     "availability": "",
     "text": "",
