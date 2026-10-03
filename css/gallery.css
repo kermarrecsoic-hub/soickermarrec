@@ -1453,3 +1453,182 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     opacity: 1 !important;
   }
 }
+
+
+/* ================================================================
+   2026-10-03 – UI refinement
+   ================================================================ */
+
+/* Teilen bleibt klickbar, aber ohne Hand-Cursor. */
+.work-share-button,
+.work-share-button:hover,
+.work-share-button:focus-visible {
+  cursor: default !important;
+}
+
+/* Hauptbilder zoomen beim Hover nicht mehr. Detailbilder dürfen weiterhin
+   minimal reagieren. */
+@media (hover: hover) and (pointer: fine) and (min-width: 701px) {
+  .hero-wrap:hover > .artwork-toggle .artwork-main,
+  .hero-wrap:hover > .artwork-main {
+    transform: none !important;
+  }
+
+  /* Werkangaben sind im Ruhezustand etwas zurückhaltender und werden nur
+     beim Hover über das Hauptbild dunkler. */
+  .artwork-description {
+    color: #747474;
+    transition: color .20s ease;
+  }
+  .artwork:has(.hero-wrap:hover) > .artwork-description {
+    color: var(--ink);
+  }
+}
+
+/* Beschreibungen generell ein paar Pixel weiter nach unten. */
+.painting-page .artwork-description,
+.graphic-page .artwork-description,
+.painting-page .artwork-list[data-project-columns="2"] .artwork-description,
+.graphic-page .artwork-list[data-project-columns="2"] .artwork-description,
+.painting-page .six-main-artwork .artwork-description,
+.graphic-page .six-main-artwork .artwork-description,
+.painting-page .nine-main-artwork .artwork-description,
+.graphic-page .nine-main-artwork .artwork-description {
+  margin-top: calc(10px + var(--row-align-offset, 0px)) !important;
+}
+
+/* Querformat mit Details:
+   - solange Details unsichtbar sind, belegen sie keinen Platz;
+   - die Beschreibung sitzt direkt unter dem Hauptbild;
+   - sobald Details erscheinen, entsteht die Detailzeile und die Beschreibung
+     rutscht automatisch darunter.
+   Die Beschreibungsbreite kommt weiterhin exakt aus gallery.js vom Hauptbild. */
+@media (hover: hover) and (min-width: 701px) {
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-frame,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-frame {
+    display: none;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:hover .detail-frame,
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:focus-within .detail-frame,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:hover .detail-frame,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:focus-within .detail-frame {
+    display: grid;
+  }
+}
+
+/* Die Holzdruck-Detailgruppe insgesamt ca. 20 % kleiner. */
+.painting-page .wood-detail-artwork .detail-gallery,
+.graphic-page .wood-detail-artwork .detail-gallery {
+  width: 80% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Projektbeschreibungen auf den Serienseiten ebenfalls mittig. */
+.artwork-description.is-series-description {
+  text-align: center !important;
+  margin-top: 36px;
+}
+
+/* About Desktop: rechte Textspalte weiter nach links und zugleich etwas
+   schmaler, damit sie nicht unter den festen Navigator läuft. */
+@media (min-width: 901px) {
+  .about-page .editorial-text {
+    width: calc(100% - 36px);
+    transform: translateX(-36px);
+  }
+}
+
+/* Subpage-Navigator: dieselbe Schriftfolge wie auf der Landingpage,
+   dauerhaft und mit festen Zeilenhöhen, damit nichts springt. */
+.site-nav {
+  --nav-font-size: 14px;
+  --nav-row-height: 20px;
+}
+.site-nav a {
+  height: var(--nav-row-height);
+  min-height: var(--nav-row-height);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  line-height: 1;
+  animation: subpage-font-cycle 1.2s step-end infinite;
+}
+.site-nav a:first-child {
+  color: #999;
+}
+.site-nav a[aria-current="page"] {
+  color: #666;
+}
+
+@keyframes subpage-font-cycle {
+  0%, 33.332% {
+    font-family: var(--site-font);
+    font-size: var(--nav-font-size);
+    font-weight: 300;
+    letter-spacing: .45px;
+  }
+  33.333%, 66.665% {
+    font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
+    font-size: var(--nav-font-size);
+    font-weight: 300;
+    letter-spacing: .45px;
+  }
+  66.666%, 100% {
+    font-family: "Michroma", Arial, sans-serif;
+    font-size: calc(var(--nav-font-size) - 3px);
+    font-weight: 400;
+    letter-spacing: .45px;
+  }
+}
+
+@media (max-width: 700px) {
+  /* Mobile Detailbilder niemals durch alte Materialize-/Hover-Regeln
+     transparent lassen. */
+  .detail-frame .detail-image,
+  .detail-gallery .detail-image,
+  .artwork.has-details.details-visible .detail-image {
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+    animation: none !important;
+  }
+
+  /* Beschreibungen etwas tiefer; in 2 Spalten wird zusätzlich der von JS
+     berechnete Reihen-Ausgleich berücksichtigt. */
+  .painting-page .artwork-description,
+  .graphic-page .artwork-description {
+    margin-top: calc(9px + var(--row-align-offset, 0px)) !important;
+  }
+  .painting-page .artwork-list[data-project-columns="2"] .artwork-description,
+  .graphic-page .artwork-list[data-project-columns="2"] .artwork-description {
+    width: 100% !important;
+    margin-top: calc(14px + var(--row-align-offset, 0px)) !important;
+  }
+
+  .artwork-description.is-series-description {
+    margin-top: 28px;
+    text-align: center !important;
+  }
+
+  .about-page .editorial-text {
+    width: 100%;
+    transform: none;
+  }
+
+  .site-nav {
+    --nav-font-size: 11px;
+    --nav-row-height: 16px;
+  }
+}
+
+/* Bewegungsreduktion: auch die permanente Navigator-Rotation abschalten. */
+@media (prefers-reduced-motion: reduce) {
+  .site-nav a {
+    animation: none !important;
+  }
+}

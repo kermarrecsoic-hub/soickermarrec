@@ -173,7 +173,6 @@
       button.setAttribute('aria-pressed', String(active));
     });
     syncAllProjectDescriptions();
-  setupScrollReveal();
   }
 
   function animateLayoutChange(applyLayout) {
@@ -386,6 +385,13 @@
     const description = section.querySelector('.artwork-description');
     if (!description) return;
 
+    description.style.maxWidth = '100%';
+
+    if (currentProjectColumns === 2) {
+      description.style.width = '100%';
+      return;
+    }
+
     let reference = null;
     if (section.classList.contains('multi-main-artwork')) {
       reference = section.querySelector('.main-stack');
@@ -397,13 +403,53 @@
     const rect = reference.getBoundingClientRect();
     if (!rect.width) return;
     description.style.width = `${Math.round(rect.width)}px`;
-    description.style.maxWidth = '100%';
+  }
+
+  function alignMobileProjectDescriptionRows() {
+    if (!projectGrid) return;
+
+    const sections = [...target.querySelectorAll(':scope > .artwork')];
+    sections.forEach(section => section.style.removeProperty('--row-align-offset'));
+
+    if (!mobile.matches || currentProjectColumns !== 2) return;
+
+    const alignPair = pair => {
+      if (pair.length < 2) return;
+      const positions = pair.map(section => {
+        const description = section.querySelector('.artwork-description');
+        if (!description) return 0;
+        const sectionRect = section.getBoundingClientRect();
+        const descriptionRect = description.getBoundingClientRect();
+        return descriptionRect.top - sectionRect.top;
+      });
+      const targetTop = Math.max(...positions);
+      pair.forEach((section, index) => {
+        const offset = Math.max(0, targetTop - positions[index]);
+        section.style.setProperty('--row-align-offset', `${Math.round(offset)}px`);
+      });
+    };
+
+    let pair = [];
+    sections.forEach(section => {
+      if (section.classList.contains('multi-main-artwork')) {
+        alignPair(pair);
+        pair = [];
+        return;
+      }
+      pair.push(section);
+      if (pair.length === 2) {
+        alignPair(pair);
+        pair = [];
+      }
+    });
+    alignPair(pair);
   }
 
   function syncAllProjectDescriptions() {
     if (!projectGrid) return;
     requestAnimationFrame(() => {
       target.querySelectorAll('.artwork').forEach(syncProjectDescription);
+      requestAnimationFrame(alignMobileProjectDescriptionRows);
     });
   }
 
@@ -433,12 +479,18 @@
     const hasDetails = !forceSeries && detailPaths.length > 0;
     const detailGrid = hasDetails && detailPaths.length > 2;
     const detailsBottomGrid = hasDetails && detailPaths.length >= 4;
+    const woodDetailArtwork = !forceSeries && (
+      work.layout === 'six-grid' ||
+      work.layout === 'portrait-eight-grid' ||
+      /holz/i.test(work.title || '')
+    );
 
     const classes = ['artwork'];
     if (projectGrid) classes.push('project-grid-artwork');
     if (hasDetails) classes.push('has-details');
     if (detailGrid) classes.push('has-detail-gallery');
     if (detailsBottomGrid) classes.push('details-bottom-grid');
+    if (woodDetailArtwork) classes.push('wood-detail-artwork');
     if (work.demo) classes.push('is-demo');
     if (series) classes.push('series-artwork');
     if (multiMain) classes.push('multi-main-artwork');
@@ -549,6 +601,8 @@
     makeProjectViewToggle();
     setProjectColumns(1);
   }
+
+  setupScrollReveal();
 
   let descriptionResizeTimer = null;
   window.addEventListener('resize', () => {
