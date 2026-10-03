@@ -105,6 +105,10 @@
       img.loading = 'lazy';
       img.decoding = 'async';
       img.draggable = false;
+      img.classList.add('detail-openable');
+      img.tabIndex = 0;
+      img.setAttribute('role', 'button');
+      img.setAttribute('aria-label', `${title || 'Work'} – Detail vergrößern`);
       figure.appendChild(img);
       gallery.appendChild(figure);
     });
@@ -120,9 +124,100 @@
     img.loading = 'lazy';
     img.decoding = 'async';
     img.draggable = false;
+    img.classList.add('detail-openable');
+    img.tabIndex = 0;
+    img.setAttribute('role', 'button');
+    img.setAttribute('aria-label', `${title || 'Work'} – Detail vergrößern`);
     inner.appendChild(img);
     frame.appendChild(inner);
     return frame;
+  }
+
+  let detailLightbox = null;
+  let detailLightboxImage = null;
+  let lastDetailTrigger = null;
+
+  function ensureDetailLightbox() {
+    if (detailLightbox) return;
+
+    detailLightbox = element('div', 'detail-lightbox');
+    detailLightbox.setAttribute('aria-hidden', 'true');
+
+    const stage = element('div', 'detail-lightbox-stage');
+    stage.setAttribute('role', 'dialog');
+    stage.setAttribute('aria-modal', 'true');
+    stage.setAttribute('aria-label', 'Detailansicht');
+
+    const close = element('button', 'detail-lightbox-close', '×');
+    close.type = 'button';
+    close.setAttribute('aria-label', 'Detailansicht schließen');
+
+    detailLightboxImage = element('img', 'detail-lightbox-image');
+    detailLightboxImage.alt = '';
+
+    stage.append(detailLightboxImage, close);
+    detailLightbox.appendChild(stage);
+    document.body.appendChild(detailLightbox);
+
+    const closeLightbox = () => {
+      if (!detailLightbox.classList.contains('is-open')) return;
+      detailLightbox.classList.remove('is-open');
+      detailLightbox.setAttribute('aria-hidden', 'true');
+      document.documentElement.classList.remove('detail-lightbox-open');
+      const previousTrigger = lastDetailTrigger;
+      lastDetailTrigger = null;
+
+      window.setTimeout(() => {
+        if (!detailLightbox.classList.contains('is-open')) {
+          detailLightboxImage.removeAttribute('src');
+        }
+      }, 260);
+
+      if (previousTrigger) {
+        previousTrigger.focus({ preventScroll: true });
+      }
+    };
+
+    close.addEventListener('click', closeLightbox);
+    detailLightbox.addEventListener('click', event => {
+      if (event.target === detailLightbox) closeLightbox();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeLightbox();
+    });
+  }
+
+  function openDetailLightbox(img) {
+    if (!img?.src) return;
+    ensureDetailLightbox();
+
+    lastDetailTrigger = img;
+    detailLightboxImage.src = img.currentSrc || img.src;
+    detailLightboxImage.alt = img.alt || 'Detail';
+
+    detailLightbox.classList.add('is-open');
+    detailLightbox.setAttribute('aria-hidden', 'false');
+    document.documentElement.classList.add('detail-lightbox-open');
+
+    requestAnimationFrame(() => {
+      detailLightbox.querySelector('.detail-lightbox-close')?.focus({ preventScroll: true });
+    });
+  }
+
+  function setupDetailLightboxTriggers() {
+    target.querySelectorAll('.detail-openable').forEach(img => {
+      img.addEventListener('click', event => {
+        event.stopPropagation();
+        openDetailLightbox(img);
+      });
+
+      img.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openDetailLightbox(img);
+        }
+      });
+    });
   }
 
   function orderedSeriesItems(images) {
@@ -589,6 +684,7 @@
   }
 
   works.forEach((work, index) => target.appendChild(render(work, index)));
+  setupDetailLightboxTriggers();
   scrollToSharedWork();
   window.addEventListener('hashchange', scrollToSharedWork);
 

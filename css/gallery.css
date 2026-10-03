@@ -1632,3 +1632,252 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     animation: none !important;
   }
 }
+
+
+/* ================================================================
+   2026-10-03 – Detail-Lightbox + sanfte Querformat-Details
+   + Navigator-Rotation nur auf Soïc / Desktop-Hover
+   ================================================================ */
+
+/* Detail-Hover macht – genau wie Hauptbild-Hover – die Werkbeschreibung dunkler. */
+@media (hover: hover) and (pointer: fine) and (min-width: 701px) {
+  .artwork:has(.detail-image:hover) > .artwork-description {
+    color: var(--ink) !important;
+  }
+}
+
+/* ------------------------------------------------
+   Querformat: Beschreibung gleitet weich nach unten,
+   sobald die Details eingeblendet werden.
+   ------------------------------------------------ */
+@media (hover: hover) and (pointer: fine) and (min-width: 701px) {
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-images,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-images {
+    row-gap: 0 !important;
+    transition: row-gap .36s cubic-bezier(.2,.72,.2,1);
+  }
+
+  /* 1–2 Detailbilder */
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-frame,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-frame {
+    display: grid !important;
+    max-height: 0;
+    min-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: visible;
+    transform: translateY(-7px);
+    transition:
+      max-height .38s cubic-bezier(.2,.72,.2,1),
+      opacity .24s ease,
+      transform .38s cubic-bezier(.2,.72,.2,1);
+  }
+
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:hover .detail-frame,
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:focus-within .detail-frame,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:hover .detail-frame,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:focus-within .detail-frame {
+    max-height: 390px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* 3+ / Raster-Details – ebenfalls ohne abruptes display:none. */
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-gallery,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-gallery {
+    display: grid !important;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    margin-top: 0 !important;
+    transform: translateY(-7px);
+    transition:
+      max-height .46s cubic-bezier(.2,.72,.2,1),
+      opacity .26s ease,
+      transform .38s cubic-bezier(.2,.72,.2,1),
+      margin-top .38s cubic-bezier(.2,.72,.2,1);
+  }
+
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:hover .detail-gallery,
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:focus-within .detail-gallery,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:hover .detail-gallery,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:focus-within .detail-gallery {
+    max-height: 1800px;
+    opacity: 1;
+    margin-top: 18px !important;
+    transform: translateY(0);
+  }
+
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:hover .artwork-images,
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:focus-within .artwork-images,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:hover .artwork-images,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main:focus-within .artwork-images {
+    row-gap: 22px !important;
+  }
+
+  /* Die Beschreibung selbst bekommt zusätzlich eine kleine, weiche Bewegung. */
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main > .artwork-description,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main > .artwork-description {
+    transition:
+      color .20s ease,
+      transform .36s cubic-bezier(.2,.72,.2,1);
+  }
+}
+
+/* ------------------------------------------------
+   Detail-Lightbox
+   ------------------------------------------------ */
+.detail-openable {
+  cursor: zoom-in;
+}
+
+.detail-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 4vw, 54px);
+  background: rgba(250, 250, 250, .10);
+  -webkit-backdrop-filter: blur(18px) saturate(.82);
+  backdrop-filter: blur(18px) saturate(.82);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity .24s ease,
+    visibility .24s ease;
+}
+
+.detail-lightbox.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.detail-lightbox-stage {
+  position: relative;
+  width: min(94vw, 1500px);
+  height: min(92svh, 1050px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(10px) scale(.982);
+  opacity: 0;
+  transition:
+    transform .28s cubic-bezier(.2,.72,.2,1),
+    opacity .22s ease;
+}
+
+.detail-lightbox.is-open .detail-lightbox-stage {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.detail-lightbox-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  box-shadow: 0 3px 22px rgba(0, 0, 0, .08);
+}
+
+.detail-lightbox-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #555;
+  font: 300 24px/1 var(--site-font);
+  cursor: default;
+  opacity: .55;
+  transition: opacity .16s ease;
+}
+
+.detail-lightbox-close:hover,
+.detail-lightbox-close:focus-visible {
+  opacity: 1;
+}
+
+html.detail-lightbox-open,
+html.detail-lightbox-open body {
+  overflow: hidden;
+}
+
+/* ------------------------------------------------
+   Navigator – Desktop UND Mobile:
+   Soïc Kermarrec rotiert permanent.
+   Alle anderen Links bleiben ruhig.
+   Nur auf Geräten mit Hover rotiert der jeweils gehoverte Link.
+   ------------------------------------------------ */
+.site-nav a {
+  animation: none !important;
+}
+
+.site-nav a:first-child {
+  animation: subpage-font-cycle 1.2s step-end infinite !important;
+  color: #999 !important;
+}
+
+/* Aktive Unterseite bleibt etwas zurückhaltend, aber ohne Dauerrotation. */
+.site-nav a[aria-current="page"]:not(:first-child) {
+  color: #666;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .site-nav a:not(:first-child):hover,
+  .site-nav a:not(:first-child):focus-visible {
+    animation: subpage-font-cycle 1.2s step-end infinite !important;
+  }
+}
+
+/* Mobile: keine künstliche Hover-Rotation der übrigen Links.
+   Nur der Name rotiert dauerhaft. */
+@media (hover: none), (pointer: coarse) {
+  .site-nav a:not(:first-child) {
+    animation: none !important;
+  }
+}
+
+/* Mobile Detailbilder bleiben garantiert sichtbar, sobald sie eingeblendet sind. */
+@media (max-width: 700px) {
+  .detail-frame .detail-image,
+  .detail-gallery .detail-image,
+  .artwork.has-details.details-visible .detail-image,
+  .artwork.has-detail-gallery.details-visible .detail-image {
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+  }
+
+  .detail-lightbox {
+    padding: 14px;
+    -webkit-backdrop-filter: blur(14px) saturate(.86);
+    backdrop-filter: blur(14px) saturate(.86);
+  }
+
+  .detail-lightbox-stage {
+    width: 96vw;
+    height: 90svh;
+  }
+}
+
+/* Motion-Preference auch für die neuen Animationen respektieren. */
+@media (prefers-reduced-motion: reduce) {
+  .detail-lightbox,
+  .detail-lightbox-stage,
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-frame,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-frame,
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-gallery,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .detail-gallery,
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-images,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-landscape-main .artwork-images {
+    transition: none !important;
+  }
+}
