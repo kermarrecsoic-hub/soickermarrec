@@ -89,6 +89,7 @@
 
   function detailGallery(paths, title) {
     const gallery = element('div', 'detail-gallery');
+    gallery.dataset.detailCount = String(paths.length);
     paths.forEach((src, index) => {
       const figure = element('div', 'detail-gallery-item');
       const img = element('img', 'detail-image');
@@ -170,6 +171,15 @@
     return mobile.matches ? 1 : 2;
   }
 
+  function viewDots(count) {
+    const stack = element('span', 'view-dot-stack');
+    stack.setAttribute('aria-hidden', 'true');
+    for (let index = 0; index < count; index += 1) {
+      stack.appendChild(element('span', 'view-dot'));
+    }
+    return stack;
+  }
+
   function makeViewToggle() {
     if (!forceSeries) return;
     const header = document.querySelector('.site-header');
@@ -180,9 +190,10 @@
     controls.setAttribute('aria-label', tr('gallery.imagesPerRow', 'Images per row'));
 
     [4, 2, 1].forEach(columns => {
-      const button = element('button', '', String(columns));
+      const button = element('button');
       button.type = 'button';
       button.dataset.columns = String(columns);
+      button.appendChild(viewDots(columns));
       button.setAttribute('aria-label', columns === 1
         ? tr('gallery.oneColumn', '1 column')
         : `${columns} ${tr('gallery.columns', 'columns')}`);
@@ -204,9 +215,10 @@
     controls.setAttribute('aria-label', tr('gallery.projectsPerRow', 'Projects per row'));
 
     [1, 2].forEach(columns => {
-      const button = element('button', '', String(columns));
+      const button = element('button');
       button.type = 'button';
       button.dataset.columns = String(columns);
+      button.appendChild(viewDots(columns));
       button.setAttribute('aria-label', columns === 1
         ? tr('gallery.oneColumn', '1 column')
         : `2 ${tr('gallery.columns', 'columns')}`);
