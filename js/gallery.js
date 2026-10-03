@@ -48,13 +48,21 @@
   function classifyOrientation(img, hero, section, primary = false) {
     const apply = () => {
       if (!img.naturalWidth || !img.naturalHeight) return;
-      const landscape = img.naturalWidth > img.naturalHeight;
+      const ratio = img.naturalWidth / img.naturalHeight;
+      const landscape = ratio > 1;
+      // Nahezu quadratische Bilder sollen sich wie Hochformate verhalten:
+      // Details bleiben seitlich. Erst deutlich breite Querformate (ab 1.18:1)
+      // bekommen ihre Details unter dem Hauptbild.
+      const wideLandscape = ratio >= 1.18;
+
       hero.classList.toggle('is-landscape', landscape);
       hero.classList.toggle('is-portrait', !landscape);
 
       if (primary) {
-        section.classList.toggle('is-landscape-main', landscape);
-        section.classList.toggle('is-portrait-main', !landscape);
+        section.classList.toggle('is-landscape-main', wideLandscape);
+        section.classList.toggle('is-portrait-main', !wideLandscape);
+        section.classList.toggle('is-squareish-main', !wideLandscape && ratio >= 0.88 && ratio < 1.18);
+        requestAnimationFrame(() => syncProjectDescription(section));
       }
     };
 
@@ -89,7 +97,6 @@
 
   function detailGallery(paths, title) {
     const gallery = element('div', 'detail-gallery');
-    gallery.dataset.detailCount = String(paths.length);
     paths.forEach((src, index) => {
       const figure = element('div', 'detail-gallery-item');
       const img = element('img', 'detail-image');
@@ -165,19 +172,11 @@
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
+    syncAllProjectDescriptions();
   }
 
   function initialColumns() {
     return mobile.matches ? 1 : 2;
-  }
-
-  function viewDots(count) {
-    const stack = element('span', 'view-dot-stack');
-    stack.setAttribute('aria-hidden', 'true');
-    for (let index = 0; index < count; index += 1) {
-      stack.appendChild(element('span', 'view-dot'));
-    }
-    return stack;
   }
 
   function makeViewToggle() {
@@ -189,11 +188,10 @@
     controls.setAttribute('role', 'group');
     controls.setAttribute('aria-label', tr('gallery.imagesPerRow', 'Images per row'));
 
-    [4, 2, 1].forEach(columns => {
-      const button = element('button');
+    [1, 2, 4].forEach(columns => {
+      const button = element('button', '', String(columns));
       button.type = 'button';
       button.dataset.columns = String(columns);
-      button.appendChild(viewDots(columns));
       button.setAttribute('aria-label', columns === 1
         ? tr('gallery.oneColumn', '1 column')
         : `${columns} ${tr('gallery.columns', 'columns')}`);
@@ -215,10 +213,9 @@
     controls.setAttribute('aria-label', tr('gallery.projectsPerRow', 'Projects per row'));
 
     [1, 2].forEach(columns => {
-      const button = element('button');
+      const button = element('button', '', String(columns));
       button.type = 'button';
       button.dataset.columns = String(columns);
-      button.appendChild(viewDots(columns));
       button.setAttribute('aria-label', columns === 1
         ? tr('gallery.oneColumn', '1 column')
         : `2 ${tr('gallery.columns', 'columns')}`);
@@ -321,11 +318,37 @@
     section.id = `werk-${id}`;
     section.dataset.shareId = id;
 
-    const button = element('button', 'work-share-button', tr('gallery.share', 'teilen'));
+    const button = element('button', 'work-share-button', '•');
     button.type = 'button';
     button.setAttribute('aria-label', `${tr('gallery.shareViaWhatsApp', 'Werk über WhatsApp teilen')}: ${work.title || tr('gallery.work', 'Werk')}`);
     button.addEventListener('click', () => shareWork(work, id, paths[0]));
     description.appendChild(button);
+  }
+
+  function syncProjectDescription(section) {
+    if (!projectGrid || !section) return;
+    const description = section.querySelector('.artwork-description');
+    if (!description) return;
+
+    let reference = null;
+    if (section.classList.contains('multi-main-artwork')) {
+      reference = section.querySelector('.main-stack');
+    } else {
+      reference = section.querySelector('.hero-wrap .artwork-main');
+    }
+    if (!reference) return;
+
+    const rect = reference.getBoundingClientRect();
+    if (!rect.width) return;
+    description.style.width = `${Math.round(rect.width)}px`;
+    description.style.maxWidth = '100%';
+  }
+
+  function syncAllProjectDescriptions() {
+    if (!projectGrid) return;
+    requestAnimationFrame(() => {
+      target.querySelectorAll('.artwork').forEach(syncProjectDescription);
+    });
   }
 
   function scrollToSharedWork() {
@@ -445,6 +468,13 @@
     addShareControl(description, work, workIndex, paths, section);
     section.appendChild(description);
 
+    if (projectGrid) {
+      section.querySelectorAll('.artwork-main').forEach(img => {
+        if (img.complete) requestAnimationFrame(() => syncProjectDescription(section));
+        else img.addEventListener('load', () => syncProjectDescription(section), { once: true });
+      });
+    }
+
     return section;
   }
 
@@ -461,6 +491,12 @@
     makeProjectViewToggle();
     setProjectColumns(1);
   }
+
+  let descriptionResizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(descriptionResizeTimer);
+    descriptionResizeTimer = setTimeout(syncAllProjectDescriptions, 80);
+  });
 
   mobile.addEventListener('change', () => {
     target.querySelectorAll('.artwork-toggle').forEach(button => {
