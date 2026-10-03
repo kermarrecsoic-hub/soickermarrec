@@ -189,7 +189,7 @@
     controls.setAttribute('aria-label', tr('gallery.imagesPerRow', 'Images per row'));
 
     [1, 2, 4].forEach(columns => {
-      const button = element('button', '', String(columns));
+      const button = element('button', '', '•'.repeat(columns));
       button.type = 'button';
       button.dataset.columns = String(columns);
       button.setAttribute('aria-label', columns === 1
@@ -213,7 +213,7 @@
     controls.setAttribute('aria-label', tr('gallery.projectsPerRow', 'Projects per row'));
 
     [1, 2].forEach(columns => {
-      const button = element('button', '', String(columns));
+      const button = element('button', '', '•'.repeat(columns));
       button.type = 'button';
       button.dataset.columns = String(columns);
       button.setAttribute('aria-label', columns === 1
@@ -376,11 +376,13 @@
     const nineMain = specialGrid && paths.length === 9;
     const hasDetails = !forceSeries && detailPaths.length > 0;
     const detailGrid = hasDetails && detailPaths.length > 2;
+    const detailsBottomGrid = hasDetails && detailPaths.length >= 4;
 
     const classes = ['artwork'];
     if (projectGrid) classes.push('project-grid-artwork');
     if (hasDetails) classes.push('has-details');
     if (detailGrid) classes.push('has-detail-gallery');
+    if (detailsBottomGrid) classes.push('details-bottom-grid');
     if (work.demo) classes.push('is-demo');
     if (series) classes.push('series-artwork');
     if (multiMain) classes.push('multi-main-artwork');
