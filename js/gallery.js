@@ -207,6 +207,7 @@
   function setupDetailLightboxTriggers() {
     target.querySelectorAll('.detail-openable').forEach(img => {
       img.addEventListener('click', event => {
+        event.preventDefault();
         event.stopPropagation();
         openDetailLightbox(img);
       });
