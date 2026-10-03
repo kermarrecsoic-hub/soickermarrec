@@ -1315,3 +1315,141 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
     line-height: 16px;
   }
 }
+
+
+/* ================================================================
+   2026-10-03 – ruhige Interaktionen Desktop + Mobile
+   Keine Vollansicht / kein Lightbox-Verhalten.
+   ================================================================ */
+
+/* Punkt-Umschalter: inaktiv bewusst grau, aktiv klar schwarz. */
+.series-view-toggle button {
+  opacity: .34;
+  transform: scale(1);
+  transform-origin: center;
+  transition: color .18s ease, opacity .18s ease, transform .18s ease;
+}
+.series-view-toggle button.is-active {
+  opacity: 1;
+}
+.series-view-toggle button:hover,
+.series-view-toggle button:focus-visible {
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+/* Teilen-Punkt bleibt minimal, erhält aber eine eindeutige Rückmeldung. */
+.work-share-button {
+  opacity: .42;
+  transform: scale(1);
+  transform-origin: center;
+  transition: color .18s ease, opacity .18s ease, transform .18s ease;
+}
+.work-share-button:hover,
+.work-share-button:focus-visible {
+  opacity: 1;
+  transform: scale(1.28);
+}
+
+/* Desktop: Bilder reagieren nur sehr leicht – kein Zoom-/Lightbox-Hinweis. */
+@media (hover: hover) and (pointer: fine) and (min-width: 701px) {
+  .hero-wrap .artwork-main,
+  .detail-gallery-item .detail-image,
+  .detail-frame .detail-image {
+    transition: transform .30s cubic-bezier(.2,.75,.25,1), opacity .24s ease, filter .24s ease;
+    transform-origin: center;
+  }
+
+  .hero-wrap:hover > .artwork-toggle .artwork-main,
+  .hero-wrap:hover > .artwork-main {
+    transform: scale(1.008);
+  }
+
+  .detail-gallery-item:hover .detail-image,
+  .detail-frame:hover .detail-image {
+    transform: scale(1.012);
+    filter: brightness(1.025);
+  }
+
+  .site-nav a,
+  .language-switch button,
+  .footer-links a,
+  .footer-instagram,
+  .studio-entry a,
+  .editorial-contact a {
+    transition: color .18s ease, opacity .18s ease;
+  }
+}
+
+/* Projekte/Werke erscheinen beim ersten Hineinscrollen ruhig im Bild.
+   Gilt auf Desktop UND Mobile. */
+.artwork.scroll-reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity .55s cubic-bezier(.2,.7,.2,1),
+    transform .55s cubic-bezier(.2,.7,.2,1);
+  will-change: opacity, transform;
+}
+.artwork.scroll-reveal.is-in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Beim Wechsel 1/2 bzw. 1/2/4 werden die Projekte nach dem Layoutwechsel
+   kurz neu eingeblendet, statt hart umzuspringen. */
+.artwork-list.is-layout-switching > .artwork {
+  opacity: 0 !important;
+  transform: translateY(6px) !important;
+  transition-duration: .16s !important;
+}
+.artwork-list.is-layout-entering > .artwork {
+  transition:
+    opacity .34s cubic-bezier(.2,.7,.2,1),
+    transform .34s cubic-bezier(.2,.7,.2,1);
+}
+
+/* Mobile: dieselbe Hierarchie der Punkte, aber ohne Hover-Abhängigkeit. */
+@media (max-width: 700px) {
+  .series-view-toggle button {
+    opacity: .28;
+  }
+  .series-view-toggle button.is-active {
+    opacity: 1;
+  }
+  .series-view-toggle button:active {
+    opacity: 1;
+    transform: scale(1.16);
+  }
+
+  .work-share-button {
+    opacity: .40;
+  }
+  .work-share-button:active {
+    opacity: 1;
+    transform: scale(1.22);
+  }
+
+  .artwork.scroll-reveal {
+    transform: translateY(10px);
+    transition-duration: .46s;
+  }
+}
+
+/* Bewegungsreduktion respektieren. */
+@media (prefers-reduced-motion: reduce) {
+  .series-view-toggle button,
+  .work-share-button,
+  .hero-wrap .artwork-main,
+  .detail-gallery-item .detail-image,
+  .detail-frame .detail-image,
+  .artwork.scroll-reveal,
+  .artwork-list.is-layout-switching > .artwork,
+  .artwork-list.is-layout-entering > .artwork {
+    transition: none !important;
+    transform: none !important;
+  }
+  .artwork.scroll-reveal {
+    opacity: 1 !important;
+  }
+}

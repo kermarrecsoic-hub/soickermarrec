@@ -173,6 +173,56 @@
       button.setAttribute('aria-pressed', String(active));
     });
     syncAllProjectDescriptions();
+  setupScrollReveal();
+  }
+
+  function animateLayoutChange(applyLayout) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      applyLayout();
+      return;
+    }
+
+    target.classList.add('is-layout-switching');
+    window.setTimeout(() => {
+      applyLayout();
+      target.classList.remove('is-layout-switching');
+      target.classList.add('is-layout-entering');
+      requestAnimationFrame(() => {
+        // Force one painted frame with the new layout before restoring visibility.
+        requestAnimationFrame(() => {
+          target.classList.remove('is-layout-entering');
+        });
+      });
+    }, 120);
+  }
+
+  function setupScrollReveal() {
+    const artworks = [...target.querySelectorAll(':scope > .artwork')];
+    if (!artworks.length) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        !('IntersectionObserver' in window)) {
+      artworks.forEach(section => section.classList.add('is-in-view'));
+      return;
+    }
+
+    artworks.forEach(section => section.classList.add('scroll-reveal'));
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-in-view');
+        observer.unobserve(entry.target);
+      });
+    }, {
+      threshold: 0.08,
+      rootMargin: '0px 0px -7% 0px'
+    });
+
+    artworks.forEach((section, index) => {
+      // Das erste bereits sichtbare Projekt soll beim Laden ebenfalls weich erscheinen.
+      observer.observe(section);
+    });
   }
 
   function initialColumns() {
@@ -196,7 +246,10 @@
         ? tr('gallery.oneColumn', '1 column')
         : `${columns} ${tr('gallery.columns', 'columns')}`);
       button.setAttribute('aria-pressed', 'false');
-      button.addEventListener('click', () => setColumns(columns));
+      button.addEventListener('click', () => {
+        if (columns === currentColumns) return;
+        animateLayoutChange(() => setColumns(columns));
+      });
       controls.appendChild(button);
     });
 
@@ -220,7 +273,10 @@
         ? tr('gallery.oneColumn', '1 column')
         : `2 ${tr('gallery.columns', 'columns')}`);
       button.setAttribute('aria-pressed', 'false');
-      button.addEventListener('click', () => setProjectColumns(columns));
+      button.addEventListener('click', () => {
+        if (columns === currentProjectColumns) return;
+        animateLayoutChange(() => setProjectColumns(columns));
+      });
       controls.appendChild(button);
     });
 
