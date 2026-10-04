@@ -1962,3 +1962,14 @@ html.detail-lightbox-open body {
     object-fit: contain !important;
   }
 }
+
+
+/* ================================================================
+   2026-10-04 – Mobile Pinch für Spaltenansicht
+   Ein Finger scrollt normal; zwei Finger steuern die Galerieansicht.
+   ================================================================ */
+@media (max-width: 700px) {
+  #artworks {
+    touch-action: pan-y;
+  }
+}

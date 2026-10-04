@@ -51,9 +51,7 @@
         hideDetails: 'Details ausblenden',
         work: 'Werk',
         image: 'Bild',
-        detail: 'Detail',
-        share: 'teilen',
-        shareViaWhatsApp: 'Werk über WhatsApp teilen'
+        detail: 'Detail'
       },
       meta: {
         homeTitle: 'Soïc Kermarrec — Malerei, Grafik, Fotografie & Architektur',
@@ -124,9 +122,7 @@
         hideDetails: 'Masquer les détails',
         work: 'Œuvre',
         image: 'image',
-        detail: 'détail',
-        share: 'partager',
-        shareViaWhatsApp: 'Partager l’œuvre via WhatsApp'
+        detail: 'détail'
       },
       meta: {
         homeTitle: 'Soïc Kermarrec — Peinture, graphisme, photographie & architecture',
@@ -197,9 +193,7 @@
         hideDetails: 'Hide details',
         work: 'Work',
         image: 'image',
-        detail: 'detail',
-        share: 'share',
-        shareViaWhatsApp: 'Share work via WhatsApp'
+        detail: 'detail'
       },
       meta: {
         homeTitle: 'Soïc Kermarrec — Painting, graphics, photography & architecture',
@@ -384,6 +378,52 @@
   applyStaticText(lang);
   makeSwitch(lang);
   propagateLanguage(lang);
+
+  function setupImageProtection() {
+    const protectImage = img => {
+      if (!(img instanceof HTMLImageElement)) return;
+      img.draggable = false;
+      img.setAttribute('draggable', 'false');
+    };
+
+    document.querySelectorAll('img').forEach(protectImage);
+
+    document.addEventListener('contextmenu', event => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const image = target.closest('img, picture');
+      const protectedBackground = target.closest(
+        '.landing-background, .background-layer, .bg-layer, [data-background-image]'
+      );
+
+      if (image || protectedBackground) {
+        event.preventDefault();
+      }
+    }, { capture: true });
+
+    document.addEventListener('dragstart', event => {
+      const target = event.target;
+      if (target instanceof Element && target.closest('img, picture')) {
+        event.preventDefault();
+      }
+    }, { capture: true });
+
+    // Auch nachträglich von Galerie/Studio-Skripten eingefügte Bilder schützen.
+    const observer = new MutationObserver(records => {
+      records.forEach(record => {
+        record.addedNodes.forEach(node => {
+          if (!(node instanceof Element)) return;
+          if (node.matches('img')) protectImage(node);
+          node.querySelectorAll?.('img').forEach(protectImage);
+        });
+      });
+    });
+
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
+  setupImageProtection();
 
   window.SoicI18n = {
     language: lang,

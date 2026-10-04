@@ -100,7 +100,7 @@ body {
   font-family: var(--site-font);
   font-size: 16px;
   font-weight: 300;
-  line-height: 1;
+  line-height: var(--row-height);
   letter-spacing: .45px;
   transition: color .18s linear;
 }
@@ -124,7 +124,7 @@ body {
   }
   66.666%, 100% {
     font-family: "Michroma", Arial, sans-serif;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 400;
     letter-spacing: .45px;
   }
@@ -258,4 +258,17 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   .footer-links { gap: 12px; font-size: 9px; }
   .legal-content { width: min(100%, 92vw); }
   .legal-section + .legal-section { margin-top: 28px; }
+}
+
+
+/* ================================================================
+   2026-10-04 – Bildschutz / Abschreckung
+   Verhindert Kontextmenü, Drag & iOS-Touch-Callout soweit browserseitig möglich.
+   ================================================================ */
+img,
+picture {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
 }

@@ -27,6 +27,7 @@
   let uid = 0;
   let currentColumns = null;
   let currentProjectColumns = 1;
+  let suppressTapUntil = 0;
 
   function element(tag, className, text) {
     const node = document.createElement(tag);
@@ -207,6 +208,11 @@
   function setupDetailLightboxTriggers() {
     target.querySelectorAll('.detail-openable').forEach(img => {
       img.addEventListener('click', event => {
+        if (Date.now() < suppressTapUntil) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
         event.preventDefault();
         event.stopPropagation();
         openDetailLightbox(img);
@@ -318,6 +324,96 @@
       // Das erste bereits sichtbare Projekt soll beim Laden ebenfalls weich erscheinen.
       observer.observe(section);
     });
+  }
+
+
+  function touchDistance(touches) {
+    if (!touches || touches.length < 2) return 0;
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
+  }
+
+  function availableGestureColumns() {
+    if (forceSeries) return [1, 2, 4];
+    if (projectGrid) return [1, 2];
+    return [];
+  }
+
+  function activeGestureColumns() {
+    return forceSeries ? currentColumns : currentProjectColumns;
+  }
+
+  function applyGestureColumns(columns) {
+    if (forceSeries) {
+      animateLayoutChange(() => setColumns(columns));
+    } else if (projectGrid) {
+      animateLayoutChange(() => setProjectColumns(columns));
+    }
+  }
+
+  function setupMobilePinchColumns() {
+    const modes = availableGestureColumns();
+    if (!modes.length) return;
+
+    let startDistance = 0;
+    let pinchHandled = false;
+    const threshold = 46;
+
+    const reset = () => {
+      startDistance = 0;
+      pinchHandled = false;
+    };
+
+    target.addEventListener('touchstart', event => {
+      if (!mobile.matches || event.touches.length !== 2) return;
+      startDistance = touchDistance(event.touches);
+      pinchHandled = false;
+    }, { passive: true });
+
+    target.addEventListener('touchmove', event => {
+      if (!mobile.matches || event.touches.length !== 2 || !startDistance) return;
+
+      // Innerhalb der Galerie gehört ein Zwei-Finger-Pinch der Spaltensteuerung,
+      // nicht dem Browser-Zoom. Ein-Finger-Scrollen bleibt unangetastet.
+      event.preventDefault();
+
+      if (pinchHandled) return;
+
+      const distance = touchDistance(event.touches);
+      const delta = distance - startDistance;
+      if (Math.abs(delta) < threshold) return;
+
+      const current = activeGestureColumns();
+      const index = Math.max(0, modes.indexOf(current));
+
+      // Finger zusammen = herauszoomen = mehr Spalten.
+      // Finger auseinander = hineinzoomen = weniger Spalten.
+      const nextIndex = delta < 0
+        ? Math.min(modes.length - 1, index + 1)
+        : Math.max(0, index - 1);
+
+      if (nextIndex !== index) {
+        pinchHandled = true;
+        suppressTapUntil = Date.now() + 500;
+        applyGestureColumns(modes[nextIndex]);
+      }
+    }, { passive: false });
+
+    target.addEventListener('touchend', event => {
+      if (event.touches.length < 2) reset();
+    }, { passive: true });
+
+    target.addEventListener('touchcancel', reset, { passive: true });
+
+    // iOS Safari feuert zusätzlich Gesture Events. Diese nur innerhalb
+    // der Galerie abfangen, damit der Rest der Website normal zoombar bleibt.
+    target.addEventListener('gesturestart', event => {
+      if (mobile.matches) event.preventDefault();
+    }, { passive: false });
+    target.addEventListener('gesturechange', event => {
+      if (mobile.matches) event.preventDefault();
+    }, { passive: false });
   }
 
   function initialColumns() {
@@ -699,6 +795,7 @@
     setProjectColumns(1);
   }
 
+  setupMobilePinchColumns();
   setupScrollReveal();
 
   let descriptionResizeTimer = null;
