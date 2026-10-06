@@ -99,13 +99,16 @@ window.PAINTING_WORKS = [
     "medium": "acrylic, ink, paper fragments on canvas",
     "dimensions": "65 × 50 cm",
     "availability": "",
-    "text": "",
-    "image": "../images/painting/Koepfe/main.webp",
-    "details": {
-      "left": "../images/painting/Koepfe/detail-left.webp",
-      "right": "../images/painting/Koepfe/detail-right.webp"
-    },
-    "navColor": "#33556a"
+    "text": "deeply informed by the aesthetics of past digital worlds, this piece brings together a view into an alternate, maybe frightening, supernatural reality.",
+    "details": [
+      "../images/painting/Koepfe/detail-left.webp",
+      "../images/painting/Koepfe/detail-right.webp"
+    ],
+    "navColor": "#315368",
+    "images": [
+      "../images/painting/Koepfe/main.webp"
+    ],
+    "shareId": "koepfe"
   },
   {
     "title": "Untitled (Bär), 2024",
