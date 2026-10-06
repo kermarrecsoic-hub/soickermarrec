@@ -102,6 +102,11 @@ window.PAINTING_WORKS = [
     "text": "",
     "images": [
       "../images/painting/parigi1/main.jpg"
+    ],
+    "shareId": "parigi1",
+    "details": [
+      "../images/painting/parigi1/detail-left.jpg",
+      "../images/painting/parigi1/detail-right.jpg"
     ]
   },
   {
