@@ -135,5 +135,16 @@ window.PAINTING_WORKS = [
       "../images/painting/kunstdrucke/detail-20261002213210-01.jpg",
       "../images/painting/kunstdrucke/detail-20261002213434-02.jpg"
     ]
+  },
+  {
+    "title": "Untitled (etheral space), series of three",
+    "medium": "ink on white paint",
+    "dimensions": "16 x 24 cm",
+    "availability": "",
+    "text": "",
+    "images": [
+      "../images/painting/untitled-etheral-space-series-of-three/main-20261006094334-01.jpg"
+    ],
+    "shareId": "untitled-etheral-space-series-of-three"
   }
 ];
