@@ -59,6 +59,17 @@ window.PAINTING_WORKS = [
     }
   },
   {
+    "title": "Untitled (etheral space), series of three",
+    "medium": "ink on white paint",
+    "dimensions": "16 x 24 cm",
+    "availability": "",
+    "text": "",
+    "images": [
+      "../images/painting/untitled-etheral-space-series-of-three/main-20261006094334-01.jpg"
+    ],
+    "shareId": "untitled-etheral-space-series-of-three"
+  },
+  {
     "title": "Untitled (Kapelle), 2026",
     "medium": "acrylic, ink, on canvas",
     "dimensions": "61 × 46 cm",
@@ -120,17 +131,6 @@ window.PAINTING_WORKS = [
       "left": "../images/painting/baer/detail-left.jpg",
       "right": "../images/painting/baer/detail-right.jpg"
     }
-  },
-  {
-    "title": "Untitled (etheral space), series of three",
-    "medium": "ink on white paint",
-    "dimensions": "16 x 24 cm",
-    "availability": "",
-    "text": "",
-    "images": [
-      "../images/painting/untitled-etheral-space-series-of-three/main-20261006094334-01.jpg"
-    ],
-    "shareId": "untitled-etheral-space-series-of-three"
   },
   {
     "title": "Kunstdrucke",
