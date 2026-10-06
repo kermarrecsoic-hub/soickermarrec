@@ -47,6 +47,7 @@ window.XXX_WORKS = [
       "../images/foto1/fotogalerie_sortiert/37.webp",
       "../images/foto1/fotogalerie_sortiert/38.webp",
       "../images/foto1/fotogalerie_sortiert/39.webp"
-    ]
+    ],
+    "navColor": "#595857"
   }
 ];

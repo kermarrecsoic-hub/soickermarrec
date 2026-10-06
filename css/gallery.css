@@ -2063,17 +2063,31 @@ html.detail-lightbox-open body {
   max-height: min(72svh, 760px);
 }
 
-/* Architektur: das erste, einzelne Projektbild ist die große zentrierte
-   Vorschau der Seite – unabhängig vom gewählten 1/2/4-Serienmodus. */
-.architecture-page .artwork:first-child .artwork-images.is-series.is-single {
-  width: min(86vw, 900px);
-  margin-left: auto;
-  margin-right: auto;
-}
-.architecture-page .artwork:first-child .artwork-images.is-series.is-single .artwork-main {
+/* Architektur: das erste Einzelbild ist eine feste Seitenvorschau.
+   "Fest" bedeutet hier: seine Größe und Zentrierung ändern sich NICHT mit
+   dem 1/2/4-Spalten-Umschalter der restlichen Architekturprojekte. */
+.architecture-page .architecture-preview-artwork {
   width: 100%;
-  height: auto;
-  max-width: 100%;
+  max-width: none;
+}
+.architecture-page .architecture-preview-artwork .artwork-images.is-series.is-single {
+  width: min(86vw, 650px) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  --series-columns: 1 !important;
+}
+.architecture-page .architecture-preview-artwork .artwork-images.is-series.is-single .series-column {
+  width: 100% !important;
+  grid-column: 1 !important;
+}
+.architecture-page .architecture-preview-artwork .artwork-images.is-series.is-single .artwork-main {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  margin: 0 auto;
 }
 
 @media (max-width: 700px) {
@@ -2096,7 +2110,7 @@ html.detail-lightbox-open body {
   .graphic-page .artwork.layout-diptych .detail-gallery-item {
     display: block !important;
   }
-  .architecture-page .artwork:first-child .artwork-images.is-series.is-single {
-    width: min(92vw, 720px);
+  .architecture-page .architecture-preview-artwork .artwork-images.is-series.is-single {
+    width: min(88vw, 650px) !important;
   }
 }

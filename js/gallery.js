@@ -240,18 +240,24 @@
     const items = orderedSeriesItems(images);
     if (!items.length) return;
 
-    images.querySelectorAll(':scope > .series-column').forEach(column => column.remove());
-    images.dataset.columns = String(columns);
-    images.style.setProperty('--series-columns', String(columns));
+    // Das erste Architekturprojekt ist die feste Seitenvorschau. Es bleibt
+    // immer eine einzelne, mittig gesetzte Spalte – unabhängig davon, ob die
+    // restliche Serienansicht auf 1 / 2 / 4 Spalten umgestellt wird.
+    const fixedArchitecturePreview = Boolean(images.closest('.architecture-preview-artwork'));
+    const effectiveColumns = fixedArchitecturePreview ? 1 : columns;
 
-    const wrappers = Array.from({ length: columns }, (_, index) => {
+    images.querySelectorAll(':scope > .series-column').forEach(column => column.remove());
+    images.dataset.columns = String(effectiveColumns);
+    images.style.setProperty('--series-columns', String(effectiveColumns));
+
+    const wrappers = Array.from({ length: effectiveColumns }, (_, index) => {
       const column = element('div', 'series-column');
       column.dataset.column = String(index + 1);
       images.appendChild(column);
       return column;
     });
 
-    items.forEach((item, index) => wrappers[index % columns].appendChild(item));
+    items.forEach((item, index) => wrappers[index % effectiveColumns].appendChild(item));
   }
 
   function setColumns(columns) {
@@ -683,6 +689,9 @@
     const diptychLayout = !forceSeries && work.layout === 'diptych';
     const portraitLayout = !forceSeries && work.layout === 'portrait';
     const landscapeLayout = !forceSeries && work.layout === 'landscape';
+    const architecturePreview = forceSeries &&
+      document.body.classList.contains('architecture-page') &&
+      workIndex === 0 && paths.length === 1;
 
     const classes = ['artwork'];
     if (projectGrid) classes.push('project-grid-artwork');
@@ -693,6 +702,7 @@
     if (diptychLayout) classes.push('layout-diptych');
     if (portraitLayout) classes.push('layout-portrait');
     if (landscapeLayout) classes.push('layout-landscape');
+    if (architecturePreview) classes.push('architecture-preview-artwork');
     if (work.demo) classes.push('is-demo');
     if (series) classes.push('series-artwork');
     if (multiMain) classes.push('multi-main-artwork');
@@ -704,6 +714,7 @@
     const section = element('section', classes.join(' '));
     section.dataset.colorSource = paths[0];
     section.dataset.layout = work.layout || '';
+    if (work.navColor) section.dataset.projectColor = work.navColor;
     const images = element('div', 'artwork-images' +
       (series ? ' is-series' : '') +
       (multiMain ? ' is-multi-main' : '') +
@@ -848,45 +859,78 @@
     const sections = [...target.querySelectorAll(':scope > .artwork')];
     if (!activeNav || !sections.length) return;
 
+    // Für aktuelle Projekte steht die Farbe bereits in der Datendatei. Dadurch
+    // funktioniert der Wechsel zuverlässig auch dann, wenn Canvas-Farbanalyse
+    // im Browser (z. B. durch Cache/CORS/file://) nicht möglich ist. Alte
+    // Projekte ohne gespeicherte Farbe bekommen weiterhin einen Browser-Fallback.
     sections.forEach(section => {
+      if (section.dataset.projectColor) return;
       const img = section.querySelector('.artwork-main');
       if (!img) return;
       averageImageColor(img).then(rgb => {
         if (!rgb) return;
-        section.dataset.projectColor = rgb.join(',');
-        update();
+        section.dataset.projectColor = `rgb(${rgb.join(',')})`;
+        requestUpdate();
       });
     });
 
     let scheduled = false;
+    let currentSection = null;
+
+    const applyColor = section => {
+      if (!section) return;
+      const color = section.dataset.projectColor;
+      if (!color) return;
+      // Inline + !important verhindert, dass ältere Navigator-Regeln oder
+      // Hover-Zustände die projektbezogene Farbe wieder überschreiben.
+      activeNav.style.setProperty('color', color, 'important');
+      activeNav.style.setProperty('--active-project-color', color);
+      activeNav.dataset.colorProject = section.id || String(sections.indexOf(section));
+    };
+
     const update = () => {
       scheduled = false;
       const vh = window.innerHeight || document.documentElement.clientHeight;
+      const viewportCenter = vh / 2;
       let best = null;
       let bestVisible = -1;
       let bestDistance = Infinity;
-      const center = vh / 2;
+
       sections.forEach(section => {
         const rect = section.getBoundingClientRect();
-        const visible = Math.max(0, Math.min(rect.bottom, vh) - Math.max(rect.top, 0));
-        const sectionCenter = (Math.max(rect.top, 0) + Math.min(rect.bottom, vh)) / 2;
-        const distance = Math.abs(sectionCenter - center);
-        if (visible > bestVisible + 1 || (Math.abs(visible - bestVisible) <= 1 && distance < bestDistance)) {
+        const visibleTop = Math.max(rect.top, 0);
+        const visibleBottom = Math.min(rect.bottom, vh);
+        const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+        const sectionCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(sectionCenter - viewportCenter);
+
+        // Entscheidend ist ausschließlich die vertikale Sichtbarkeit. Bei
+        // Gleichstand gewinnt das Projekt, dessen Mittelpunkt näher an der
+        // Bildschirmmitte liegt.
+        if (visibleHeight > bestVisible + 1 ||
+            (Math.abs(visibleHeight - bestVisible) <= 1 && distance < bestDistance)) {
           best = section;
-          bestVisible = visible;
+          bestVisible = visibleHeight;
           bestDistance = distance;
         }
       });
-      const color = best?.dataset.projectColor;
-      if (color) activeNav.style.setProperty('--active-project-color', `rgb(${color})`);
+
+      if (!best) return;
+      if (best !== currentSection || best.dataset.projectColor) {
+        currentSection = best;
+        applyColor(best);
+      }
     };
-    const requestUpdate = () => {
+
+    function requestUpdate() {
       if (scheduled) return;
       scheduled = true;
       requestAnimationFrame(update);
-    };
+    }
+
     window.addEventListener('scroll', requestUpdate, { passive: true });
     window.addEventListener('resize', requestUpdate, { passive: true });
+    window.addEventListener('load', requestUpdate, { once: true });
     requestUpdate();
   }
 

@@ -540,6 +540,99 @@
   }
 
 
+  async function analysisBlobForItem(item) {
+    if (item.file) return item.file;
+    if (item.path) {
+      const response = await fetch(`${API}image-proxy?path=${encodeURIComponent(toRepoPath(item.path))}`, {
+        credentials: 'same-origin',
+        cache: 'no-store',
+      });
+      if (!response.ok) throw new Error(`Bild konnte nicht analysiert werden: ${item.path}`);
+      return response.blob();
+    }
+    return null;
+  }
+
+  function navColorContrastAgainstWhite(rgb) {
+    const channel = value => {
+      const c = value / 255;
+      return c <= .04045 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4);
+    };
+    const luminance = .2126 * channel(rgb[0]) + .7152 * channel(rgb[1]) + .0722 * channel(rgb[2]);
+    return 1.05 / (luminance + .05);
+  }
+
+  function readableNavColor(rgb, minContrast = 4.5) {
+    const source = rgb.map(value => Math.max(0, Math.min(255, value)));
+    if (navColorContrastAgainstWhite(source) >= minContrast) return source.map(Math.round);
+    let low = 0, high = 1, best = [65, 65, 65];
+    for (let i = 0; i < 24; i++) {
+      const factor = (low + high) / 2;
+      const candidate = source.map(value => value * factor);
+      if (navColorContrastAgainstWhite(candidate) >= minContrast) {
+        best = candidate.map(Math.round);
+        low = factor;
+      } else {
+        high = factor;
+      }
+    }
+    return best;
+  }
+
+  async function representativeColorForItem(item) {
+    const blob = await analysisBlobForItem(item);
+    if (!blob) return null;
+    const bitmap = await createImageBitmap(blob, { imageOrientation: 'from-image' });
+    const maxSide = 128;
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+
+    const data = ctx.getImageData(0, 0, width, height).data;
+    let r = 0, g = 0, b = 0, weight = 0;
+    let fallbackR = 0, fallbackG = 0, fallbackB = 0, fallbackN = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      const pr = data[i], pg = data[i + 1], pb = data[i + 2];
+      fallbackR += pr; fallbackG += pg; fallbackB += pb; fallbackN++;
+      const max = Math.max(pr, pg, pb);
+      const min = Math.min(pr, pg, pb);
+      const chroma = (max - min) / 255;
+      const luminance = (.2126 * pr + .7152 * pg + .0722 * pb) / 255;
+      // Fast weiße neutrale Bildränder werden nicht als "Projektfarbe" gewertet.
+      // Helle, tatsächlich farbige Pixel bleiben dagegen erhalten.
+      if (luminance > .94 && chroma < .09) continue;
+      const w = .35 + 1.25 * chroma + .35 * (1 - luminance);
+      r += pr * w; g += pg * w; b += pb * w; weight += w;
+    }
+    if (weight) return [r / weight, g / weight, b / weight];
+    return fallbackN ? [fallbackR / fallbackN, fallbackG / fallbackN, fallbackB / fallbackN] : null;
+  }
+
+  async function projectNavColorForItems(items) {
+    const usable = (items || []).filter(item => item?.file || item?.path);
+    if (!usable.length) return '';
+    // Sehr große Fotoreihen werden gleichmäßig abgetastet, damit ein Studio-Save
+    // nicht dutzende Originaldateien nur für die Navigatorfarbe laden muss.
+    const sample = usable.length <= 12
+      ? usable
+      : Array.from({ length: 12 }, (_, i) => usable[Math.round(i * (usable.length - 1) / 11)]);
+    const colors = [];
+    for (const item of sample) {
+      const color = await representativeColorForItem(item);
+      if (color) colors.push(color);
+    }
+    if (!colors.length) return '';
+    const average = [0, 1, 2].map(channel => colors.reduce((sum, color) => sum + color[channel], 0) / colors.length);
+    const [r, g, b] = readableNavColor(average);
+    return `#${[r, g, b].map(value => value.toString(16).padStart(2, '0')).join('')}`;
+  }
+
   async function saturationScoreForItem(item) {
     let blob;
     if (item.file) {
@@ -679,6 +772,13 @@
       }
 
       const titleValue = $('#fieldTitle').value.trim();
+      let computedNavColor = editor.work.navColor || '';
+      try {
+        setStatus('Projektfarbe für den Navigator wird berechnet …');
+        computedNavColor = await projectNavColorForItems(editor.main) || computedNavColor;
+      } catch (error) {
+        console.warn('Navigatorfarbe konnte nicht neu berechnet werden:', error);
+      }
       const stableShareId = editor.config.kind === 'art'
         ? (editor.work.shareId || (!editor.isNew ? workShareId(editor.work, editor.index, editor.config) : slugify(folder || titleValue || `werk-${Date.now()}`)))
         : '';
@@ -691,6 +791,8 @@
         text: $('#fieldText').value.trim(),
         images: mainPaths.map(toDataPath),
       };
+      if (computedNavColor) updated.navColor = computedNavColor;
+      else delete updated.navColor;
       if (editor.config.kind === 'art' && $('#fieldLayout').value) updated.layout = $('#fieldLayout').value;
       else delete updated.layout;
       if (stableShareId) updated.shareId = stableShareId;

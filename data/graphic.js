@@ -1,6 +1,5 @@
 /* Verwaltet über Soïc Studio. Manuelle Änderungen bleiben möglich. */
 window.GRAPHIC_WORKS = [
-  
   {
     "title": "Untitled (Wand), 2025",
     "medium": "ink, water and white pencil on paper",
@@ -11,7 +10,8 @@ window.GRAPHIC_WORKS = [
     "details": {
       "left": "../images/ink/wand/detail-left.webp",
       "right": "../images/ink/wand/detail-right.webp"
-    }
+    },
+    "navColor": "#777777"
   },
   {
     "title": "Untitled (portal), 2025",
@@ -25,7 +25,8 @@ window.GRAPHIC_WORKS = [
     },
     "images": [
       "../images/ink/portal/main-20260930110235-01.webp"
-    ]
+    ],
+    "navColor": "#817474"
   },
   {
     "title": "Untitled (Angst&Zorn), 2024",
@@ -37,7 +38,8 @@ window.GRAPHIC_WORKS = [
     "details": {
       "left": "../images/ink/angst/detail-left.webp",
       "right": "../images/ink/angst/detail-right.webp"
-    }
+    },
+    "navColor": "#6b6668"
   },
   {
     "title": "Untitled (Himmel), 2024",
@@ -49,7 +51,8 @@ window.GRAPHIC_WORKS = [
     "details": {
       "left": "../images/ink/himmel/detail-left.webp",
       "right": "../images/ink/himmel/detail-right.webp"
-    }
+    },
+    "navColor": "#7b7372"
   },
   {
     "title": "Akira, 2025",
@@ -61,7 +64,8 @@ window.GRAPHIC_WORKS = [
     "details": {
       "left": "../images/ink/akira/detail-left.webp",
       "right": "../images/ink/akira/detail-right.webp"
-    }
+    },
+    "navColor": "#7b7672"
   },
   {
     "title": "Untitled (Krokodil)",
@@ -71,6 +75,7 @@ window.GRAPHIC_WORKS = [
     "text": "",
     "images": [
       "../images/ink/random/main1.webp"
-    ]
+    ],
+    "navColor": "#777678"
   }
 ];
