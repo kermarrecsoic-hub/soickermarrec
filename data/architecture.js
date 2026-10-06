@@ -24,7 +24,8 @@ window.ARCHITECTURE_WORKS = [
       "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-05.webp",
       "../images/architecture/peter-joseph-lenne-preis-2026/main-20260930235611-05.webp"
     ],
-    "navColor": "#7c7574"
+    "navColor": "#7f7572",
+    "visible": false
   },
   {
     "title": "Ausstellungsgestaltung zur 19. Architekturbiennale von Venedig \"Intelligens\"",
