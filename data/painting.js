@@ -33,18 +33,6 @@ window.PAINTING_WORKS = [
     ]
   },
   {
-    "title": "Rome, 2026",
-    "medium": "acrylic, ink, paper fragments on canvas",
-    "dimensions": "46 × 61 cm",
-    "availability": "",
-    "text": "",
-    "image": "../images/painting/rome/main.jpg",
-    "details": {
-      "left": "../images/painting/rome/detail-left.jpg",
-      "right": "../images/painting/rome/detail-right.jpg"
-    }
-  },
-  {
     "title": "Untitled (Gipfel), 2026",
     "medium": "acrylic, white wall paint, ink, kyougi on canvas",
     "dimensions": "80 × 60 cm",
@@ -57,6 +45,18 @@ window.PAINTING_WORKS = [
     "images": [
       "../images/painting/gipfel/main.jpg"
     ]
+  },
+  {
+    "title": "Rome, 2026",
+    "medium": "acrylic, ink, paper fragments on canvas",
+    "dimensions": "46 × 61 cm",
+    "availability": "",
+    "text": "",
+    "image": "../images/painting/rome/main.jpg",
+    "details": {
+      "left": "../images/painting/rome/detail-left.jpg",
+      "right": "../images/painting/rome/detail-right.jpg"
+    }
   },
   {
     "title": "Untitled (Kapelle), 2026",
