@@ -2,7 +2,7 @@
 window.EXHIBITIONS_WORKS = [
   {
     "title": "Ausstellung Aerial&Art, 2026, Solo exhibition",
-    "medium": "",
+    "medium": "Aerial circus, Leipzig",
     "dimensions": "",
     "availability": "",
     "text": "",
@@ -22,7 +22,7 @@ window.EXHIBITIONS_WORKS = [
   },
   {
     "title": "Ausstellung E1ns+E1ns+E1ns, 2026, group exhibition (S.Kermarrec, H. Wiesel, L. Nowak)",
-    "medium": "ehem. FSA",
+    "medium": "ehem. FSA, Leipzig",
     "dimensions": "",
     "availability": "",
     "text": "",
