@@ -15,6 +15,24 @@ window.PAINTING_WORKS = [
     ]
   },
   {
+    "title": "Untitled (8 Holzplatten), 2026",
+    "medium": "phototransfer medium, ink, pencil on wood",
+    "dimensions": "12 x 21 x 3 cm",
+    "availability": "",
+    "text": "",
+    "images": [
+      "../images/painting/holzdruck/main.jpg",
+      "../images/painting/holzdruck/main-20261001105322-02.jpg",
+      "../images/painting/holzdruck/main-20261001105322-03.jpg",
+      "../images/painting/holzdruck/main-20261001105322-04.jpg",
+      "../images/painting/holzdruck/main-20261001105322-05.jpg",
+      "../images/painting/holzdruck/main-20261001105322-06.jpg",
+      "../images/painting/holzdruck/main-20261001105322-07.jpg",
+      "../images/painting/holzdruck/main-20261001105322-08.jpg",
+      "../images/painting/holzdruck/main-20261001105322-09.jpg"
+    ]
+  },
+  {
     "title": "Köpfe, 2026",
     "medium": "acrylic, ink, paper fragments on canvas",
     "dimensions": "65 × 50 cm",
@@ -37,24 +55,6 @@ window.PAINTING_WORKS = [
       "left": "../images/painting/rome/detail-left.jpg",
       "right": "../images/painting/rome/detail-right.jpg"
     }
-  },
-  {
-    "title": "Untitled (8 Holzplatten), 2026",
-    "medium": "phototransfer medium, ink, pencil on wood",
-    "dimensions": "12 x 21 x 3 cm",
-    "availability": "",
-    "text": "",
-    "images": [
-      "../images/painting/holzdruck/main.jpg",
-      "../images/painting/holzdruck/main-20261001105322-02.jpg",
-      "../images/painting/holzdruck/main-20261001105322-03.jpg",
-      "../images/painting/holzdruck/main-20261001105322-04.jpg",
-      "../images/painting/holzdruck/main-20261001105322-05.jpg",
-      "../images/painting/holzdruck/main-20261001105322-06.jpg",
-      "../images/painting/holzdruck/main-20261001105322-07.jpg",
-      "../images/painting/holzdruck/main-20261001105322-08.jpg",
-      "../images/painting/holzdruck/main-20261001105322-09.jpg"
-    ]
   },
   {
     "title": "Untitled (Kapelle), 2026",
