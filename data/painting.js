@@ -76,9 +76,7 @@ window.PAINTING_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/painting/prozession-diptychon/main-20261006094623-01.jpg",
-      "../images/painting/prozession-diptychon/main-20261006094623-02.jpg",
-      "../images/painting/prozession-diptychon/main-20261006094623-03.jpg"
+      "../images/painting/prozession-diptychon/main-20261006094623-01.jpg"
     ],
     "shareId": "prozession-diptychon",
     "details": [
