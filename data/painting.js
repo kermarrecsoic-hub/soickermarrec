@@ -99,6 +99,18 @@ window.PAINTING_WORKS = [
     }
   },
   {
+    "title": "Untitled (Bär), 2024",
+    "medium": "acrylic, ink on paper",
+    "dimensions": "30 × 41 cm",
+    "availability": "",
+    "text": "",
+    "image": "../images/painting/baer/main.jpg",
+    "details": {
+      "left": "../images/painting/baer/detail-left.jpg",
+      "right": "../images/painting/baer/detail-right.jpg"
+    }
+  },
+  {
     "title": "parigiparigiparigi2, 2026",
     "medium": "acrylic, ink, on canvas",
     "dimensions": "60 × 80 cm",
@@ -136,18 +148,6 @@ window.PAINTING_WORKS = [
       "../images/painting/parigi1/detail-left.jpg",
       "../images/painting/parigi1/detail-right.jpg"
     ]
-  },
-  {
-    "title": "Untitled (Bär), 2024",
-    "medium": "acrylic, ink on paper",
-    "dimensions": "30 × 41 cm",
-    "availability": "",
-    "text": "",
-    "image": "../images/painting/baer/main.jpg",
-    "details": {
-      "left": "../images/painting/baer/detail-left.jpg",
-      "right": "../images/painting/baer/detail-right.jpg"
-    }
   },
   {
     "title": "Kunstdrucke",
