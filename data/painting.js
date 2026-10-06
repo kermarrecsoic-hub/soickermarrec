@@ -33,18 +33,6 @@ window.PAINTING_WORKS = [
     ]
   },
   {
-    "title": "Köpfe, 2026",
-    "medium": "acrylic, ink, paper fragments on canvas",
-    "dimensions": "65 × 50 cm",
-    "availability": "",
-    "text": "",
-    "image": "../images/painting/Koepfe/main.jpg",
-    "details": {
-      "left": "../images/painting/Koepfe/detail-left.jpg",
-      "right": "../images/painting/Koepfe/detail-right.jpg"
-    }
-  },
-  {
     "title": "Rome, 2026",
     "medium": "acrylic, ink, paper fragments on canvas",
     "dimensions": "46 × 61 cm",
@@ -80,6 +68,18 @@ window.PAINTING_WORKS = [
     "details": {
       "left": "../images/painting/kapelle/detail-left.jpg",
       "right": "../images/painting/kapelle/detail-right.jpg"
+    }
+  },
+  {
+    "title": "Köpfe, 2026",
+    "medium": "acrylic, ink, paper fragments on canvas",
+    "dimensions": "65 × 50 cm",
+    "availability": "",
+    "text": "",
+    "image": "../images/painting/Koepfe/main.jpg",
+    "details": {
+      "left": "../images/painting/Koepfe/detail-left.jpg",
+      "right": "../images/painting/Koepfe/detail-right.jpg"
     }
   },
   {
