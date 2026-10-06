@@ -87,18 +87,6 @@ window.PAINTING_WORKS = [
     ]
   },
   {
-    "title": "Untitled (Kapelle), 2026",
-    "medium": "acrylic, ink, on canvas",
-    "dimensions": "61 × 46 cm",
-    "availability": "",
-    "text": "",
-    "image": "../images/painting/kapelle/main.jpg",
-    "details": {
-      "left": "../images/painting/kapelle/detail-left.jpg",
-      "right": "../images/painting/kapelle/detail-right.jpg"
-    }
-  },
-  {
     "title": "Köpfe, 2026",
     "medium": "acrylic, ink, paper fragments on canvas",
     "dimensions": "65 × 50 cm",
@@ -108,6 +96,18 @@ window.PAINTING_WORKS = [
     "details": {
       "left": "../images/painting/Koepfe/detail-left.jpg",
       "right": "../images/painting/Koepfe/detail-right.jpg"
+    }
+  },
+  {
+    "title": "Untitled (Kapelle), 2026",
+    "medium": "acrylic, ink, on canvas",
+    "dimensions": "61 × 46 cm",
+    "availability": "",
+    "text": "",
+    "image": "../images/painting/kapelle/main.jpg",
+    "details": {
+      "left": "../images/painting/kapelle/detail-left.jpg",
+      "right": "../images/painting/kapelle/detail-right.jpg"
     }
   },
   {
