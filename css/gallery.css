@@ -2114,3 +2114,217 @@ html.detail-lightbox-open body {
     width: min(88vw, 650px) !important;
   }
 }
+
+
+/* ================================================================
+   2026-10-06d – Navigatorfarbe am Namen, statische Detailtexte,
+   mobile +1 px und Diptychon-Finalisierung
+   ================================================================ */
+
+/* Die projektbezogene Farbe sitzt ausschließlich auf dem rotierenden Namen.
+   Ohne Scroll-Farbe hat er exakt die normale Website-Schriftfarbe. */
+.site-nav a:first-child {
+  color: var(--scroll-project-color, var(--ink)) !important;
+  transition: color .38s ease;
+}
+.site-nav a[aria-current="page"]:not(:first-child) {
+  color: var(--muted);
+  transition: color .18s ease;
+}
+
+/* Wie auf der Landingpage: sobald ein anderer Navigator-Link rotiert,
+   pausiert die Rotation von Soïc Kermarrec. */
+@media (hover: hover) and (pointer: fine) {
+  .site-nav:has(a:not(:first-child):hover) a:first-child,
+  .site-nav:has(a:not(:first-child):focus-visible) a:first-child {
+    animation: none !important;
+  }
+  .site-nav a:not(:first-child):hover,
+  .site-nav a:not(:first-child):focus-visible {
+    animation: subpage-font-cycle 1.2s step-end infinite !important;
+  }
+}
+
+/* Text und Details sind ein gemeinsamer Ausklappbereich. Der Text steht immer
+   zuerst und verändert seine Position nicht, wenn die Detailbilder erscheinen. */
+.artwork-detail-panel {
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: max-height .42s cubic-bezier(.2,.72,.2,1), opacity .22s ease, visibility .22s ease;
+}
+.artwork-detail-panel .artwork-description {
+  order: 1;
+  margin: 14px auto 0 !important;
+  transform: none !important;
+}
+.artwork-detail-panel .detail-gallery {
+  order: 2;
+  position: static !important;
+  inset: auto !important;
+  display: grid !important;
+  width: min(100%, 1040px) !important;
+  height: auto !important;
+  max-height: none !important;
+  margin: 22px auto 0 !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(14px, 2vw, 28px) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+.artwork-detail-panel .detail-gallery-item {
+  grid-column: auto !important;
+  grid-row: auto !important;
+  width: 100%;
+  height: auto !important;
+}
+.artwork-detail-panel .detail-gallery .detail-image {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: none !important;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 701px) {
+  .artwork.has-details:hover > .artwork-detail-panel,
+  .artwork.has-details:focus-within > .artwork-detail-panel {
+    max-height: 5000px;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* Diptychon bleibt auf Desktop vollständig offen. */
+  .artwork.layout-diptych > .artwork-detail-panel {
+    max-height: none;
+    overflow: visible;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+}
+
+/* Mehrere: große Detailmenge kompakter, aber weiterhin unter dem Text. */
+.painting-page .artwork.layout-multiple .artwork-detail-panel .detail-gallery,
+.graphic-page .artwork.layout-multiple .artwork-detail-panel .detail-gallery {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  width: 100% !important;
+}
+
+/* Diptychon: 2×2 über die gesamte nutzbare Bildschirmbreite. */
+.painting-page .artwork.layout-diptych .artwork-detail-panel,
+.graphic-page .artwork.layout-diptych .artwork-detail-panel {
+  width: 100%;
+  max-width: none;
+}
+.painting-page .artwork.layout-diptych .artwork-detail-panel .detail-gallery,
+.graphic-page .artwork.layout-diptych .artwork-detail-panel .detail-gallery {
+  width: 100% !important;
+  max-width: none !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(18px, 2.4vw, 34px) !important;
+}
+.painting-page .artwork.layout-diptych .artwork-description,
+.graphic-page .artwork.layout-diptych .artwork-description {
+  width: min(100%, 760px) !important;
+}
+
+/* Die alten, innerhalb des Bildrasters liegenden Detailcontainer werden vom
+   neuen Renderer nicht mehr erzeugt; falls gecachte DOM-Reste existieren,
+   dürfen sie das neue Layout nicht beeinflussen. */
+.artwork-images > .detail-gallery,
+.artwork-images > .detail-frame {
+  display: none !important;
+}
+
+/* About / Vita: echte Unterkategorie für Ausstellungen. */
+.vita-subtitle {
+  margin: 52px 0 26px;
+  font: inherit;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  /* Exakt eine Pixelstufe größer als der bisherige Mobile-Stand. */
+  body.gallery-page { font-size: 13px; }
+  .site-nav {
+    --nav-font-size: 12px;
+    --nav-row-height: 17px;
+    font-size: 12px;
+    line-height: 17px;
+  }
+  .current-section { font-size: 12px; line-height: 17px; }
+  .series-view-toggle { font-size: 11px; line-height: 15px; }
+  .language-switch { font-size: 10px; }
+  .detail-hint { font-size: 21px; line-height: 25px; }
+  .footer-instagram { font-size: 11px; }
+  .footer-links { font-size: 10px; }
+  .work-share-button { font-size: 12px; line-height: 17px; }
+  .painting-page .artwork-list[data-project-columns="2"] .artwork-description,
+  .graphic-page .artwork-list[data-project-columns="2"] .artwork-description {
+    font-size: 11px;
+  }
+
+  /* Mobile ist jedes Detailprojekt wirklich aufklappbar. Beschreibung zuerst,
+     danach die Details. */
+  .artwork-detail-panel {
+    display: none;
+    max-height: none;
+    overflow: visible;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: none;
+  }
+  .artwork.has-details.details-visible > .artwork-detail-panel {
+    display: flex;
+  }
+  .artwork-detail-panel .artwork-description {
+    margin-top: 12px !important;
+  }
+  .artwork-detail-panel .detail-gallery {
+    display: grid !important;
+    width: min(100%, 92vw) !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    margin-top: 16px !important;
+  }
+
+  /* Mehrere bleibt mobil kompakt zweispaltig; Diptychon ausdrücklich
+     untereinander, wie gewünscht. */
+  .painting-page .artwork.layout-multiple .artwork-detail-panel .detail-gallery,
+  .graphic-page .artwork.layout-multiple .artwork-detail-panel .detail-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    width: 100% !important;
+  }
+  .painting-page .artwork.layout-diptych .artwork-detail-panel .detail-gallery,
+  .graphic-page .artwork.layout-diptych .artwork-detail-panel .detail-gallery {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+  }
+
+  .painting-page .artwork.layout-diptych .artwork-toggle,
+  .graphic-page .artwork.layout-diptych .artwork-toggle {
+    width: 100%;
+  }
+
+  .vita-subtitle { margin: 42px 0 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .artwork-detail-panel,
+  .site-nav a:first-child { transition: none !important; }
+}
+
+@media (max-width: 700px) {
+  .contact-name { font-size: 17px; }
+  .contact-practice { font-size: 13px; }
+}

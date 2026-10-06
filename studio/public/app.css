@@ -190,3 +190,24 @@ h3 { font-size: 15px; }
   padding: 9px 11px;
   font: inherit;
 }
+
+
+/* Projekt-Sichtbarkeit */
+.checkbox-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  color: var(--ink);
+}
+.checkbox-row input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--ink);
+}
+.checkbox-row > span { color: var(--ink); font-size: 13px; }
+.project-card.is-hidden-project .project-thumb img { opacity: .28; filter: grayscale(.55); }
+.project-card.is-hidden-project .project-card-title { color: var(--muted); }

@@ -41,8 +41,12 @@ export default async (req) => {
       if (index >= 0) {
         const work = body.works[index];
         const pagePath = sharePagePath(body.section, work, index);
-        const html = renderSharePage(body.section, work, index);
-        await putRepoFile(pagePath, Buffer.from(html, 'utf8'), `Studio: Share-Seite ${wanted} aktualisiert`);
+        if (work.visible === false) {
+          await deleteRepoFile(pagePath, `Studio: versteckte Share-Seite ${wanted} entfernt`);
+        } else {
+          const html = renderSharePage(body.section, work, index);
+          await putRepoFile(pagePath, Buffer.from(html, 'utf8'), `Studio: Share-Seite ${wanted} aktualisiert`);
+        }
       }
     }
 

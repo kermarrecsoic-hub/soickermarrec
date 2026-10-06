@@ -250,7 +250,7 @@
 
   function projectCard(work, index) {
     const card = document.createElement('article');
-    card.className = 'project-card';
+    card.className = `project-card${work.visible === false ? ' is-hidden-project' : ''}`;
     card.draggable = true;
     card.dataset.index = index;
     const images = workImages(work);
@@ -280,7 +280,8 @@
     title.textContent = work.title || 'Untitled';
     const meta = document.createElement('div');
     meta.className = 'project-card-meta';
-    meta.textContent = [work.medium, work.dimensions].filter(Boolean).join(' · ') || '—';
+    const baseMeta = [work.medium, work.dimensions].filter(Boolean).join(' · ') || '—';
+    meta.textContent = work.visible === false ? `${baseMeta} · unsichtbar` : baseMeta;
     const actions = document.createElement('div');
     actions.className = 'project-card-actions';
     const handle = document.createElement('span');
@@ -373,6 +374,7 @@
     $('#fieldDimensions').value = work.dimensions || '';
     $('#fieldAvailability').value = work.availability || '';
     $('#fieldText').value = work.text || '';
+    $('#fieldVisible').checked = work.visible !== false;
     $('#fieldLayout').value = work.layout || '';
     $('#layoutField').hidden = config.kind !== 'art';
     $('#fieldFolder').value = deriveFolder(work, config);
@@ -793,6 +795,8 @@
       };
       if (computedNavColor) updated.navColor = computedNavColor;
       else delete updated.navColor;
+      if ($('#fieldVisible').checked) delete updated.visible;
+      else updated.visible = false;
       if (editor.config.kind === 'art' && $('#fieldLayout').value) updated.layout = $('#fieldLayout').value;
       else delete updated.layout;
       if (stableShareId) updated.shareId = stableShareId;

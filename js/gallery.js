@@ -7,7 +7,9 @@
 
   const rawWorks = window[document.body.dataset.works || 'PAINTING_WORKS'] || [];
   const i18n = window.SoicI18n || null;
-  const works = rawWorks.map(work => i18n?.localizeWork ? i18n.localizeWork(work) : work);
+  const works = rawWorks
+    .filter(work => work && work.visible !== false)
+    .map(work => i18n?.localizeWork ? i18n.localizeWork(work) : work);
   const tr = (key, fallback) => {
     if (!i18n?.t) return fallback;
     const value = i18n.t(key);
@@ -715,6 +717,7 @@
     section.dataset.colorSource = paths[0];
     section.dataset.layout = work.layout || '';
     if (work.navColor) section.dataset.projectColor = work.navColor;
+
     const images = element('div', 'artwork-images' +
       (series ? ' is-series' : '') +
       (multiMain ? ' is-multi-main' : '') +
@@ -756,7 +759,10 @@
         const main = artworkImage(path, alt, workIndex === 0 && index === 0);
         classifyOrientation(main, hero, section, index === 0);
 
-        if (hasDetails && index === 0 && !diptychLayout) {
+        // Jedes Einzelbild mit Details ist mobil aufklappbar – auch das
+        // Diptychon. Auf Desktop bleibt der Button neutral; dort übernimmt
+        // Hover/Focus die Detailansicht.
+        if (hasDetails && index === 0) {
           const button = element('button', 'artwork-toggle');
           const hint = element('span', 'detail-hint', '+');
           hint.setAttribute('aria-hidden', 'true');
@@ -771,16 +777,6 @@
       });
     }
 
-    if (hasDetails) {
-      images.id = detailIds;
-      if (detailGrid) {
-        images.appendChild(detailGallery(detailPaths, work.title));
-      } else {
-        if (detailPaths[0]) images.appendChild(detailFrame(detailPaths[0], 'left', work.title));
-        if (detailPaths[1]) images.appendChild(detailFrame(detailPaths[1], 'right', work.title));
-      }
-    }
-
     section.appendChild(images);
 
     const description = element('div', 'artwork-description' +
@@ -791,7 +787,19 @@
     if (work.availability) description.appendChild(element('p', 'availability', work.availability));
     if (work.text) description.appendChild(element('p', 'free-text', work.text));
     addShareControl(description, work, workIndex, paths, section);
-    section.appendChild(description);
+
+    // Bei Werken mit Details bilden Text + Details einen eigenen Bereich.
+    // Dadurch bleibt der Text beim Öffnen immer an derselben Position direkt
+    // unter dem Hauptbild; die Details erscheinen erst darunter.
+    if (hasDetails) {
+      const panel = element('div', 'artwork-detail-panel');
+      panel.id = detailIds;
+      panel.appendChild(description);
+      panel.appendChild(detailGallery(detailPaths, work.title));
+      section.appendChild(panel);
+    } else {
+      section.appendChild(description);
+    }
 
     if (projectGrid) {
       section.querySelectorAll('.artwork-main').forEach(img => {
@@ -802,7 +810,6 @@
 
     return section;
   }
-
 
   function srgbChannel(value) {
     const c = value / 255;
@@ -855,41 +862,94 @@
   }
 
   function setupProjectNavColor() {
-    const activeNav = document.querySelector('.site-nav a[aria-current="page"]');
+    const nameNav = document.querySelector('.site-nav a:first-child');
     const sections = [...target.querySelectorAll(':scope > .artwork')];
-    if (!activeNav || !sections.length) return;
+    if (!nameNav || !sections.length) return;
 
-    // Für aktuelle Projekte steht die Farbe bereits in der Datendatei. Dadurch
-    // funktioniert der Wechsel zuverlässig auch dann, wenn Canvas-Farbanalyse
-    // im Browser (z. B. durch Cache/CORS/file://) nicht möglich ist. Alte
-    // Projekte ohne gespeicherte Farbe bekommen weiterhin einen Browser-Fallback.
-    sections.forEach(section => {
-      if (section.dataset.projectColor) return;
-      const img = section.querySelector('.artwork-main');
-      if (!img) return;
-      averageImageColor(img).then(rgb => {
-        if (!rgb) return;
-        section.dataset.projectColor = `rgb(${rgb.join(',')})`;
-        requestUpdate();
-      });
-    });
-
+    const photographyPage = document.body.classList.contains('xxx-page');
+    const allImages = [...target.querySelectorAll('.artwork-main')];
     let scheduled = false;
-    let currentSection = null;
+    let currentKey = '';
 
-    const applyColor = section => {
-      if (!section) return;
-      const color = section.dataset.projectColor;
-      if (!color) return;
-      // Inline + !important verhindert, dass ältere Navigator-Regeln oder
-      // Hover-Zustände die projektbezogene Farbe wieder überschreiben.
-      activeNav.style.setProperty('color', color, 'important');
-      activeNav.style.setProperty('--active-project-color', color);
-      activeNav.dataset.colorProject = section.id || String(sections.indexOf(section));
+    const cssColor = rgb => `rgb(${rgb.map(v => Math.round(v)).join(',')})`;
+
+    // Fotografie besteht momentan aus einer langen Serie innerhalb eines
+    // Projekts. Dort wird deshalb die Farbe der aktuell sichtbaren Bildreihe
+    // verwendet, damit sich die Farbe beim Scrollen tatsächlich verändert.
+    if (photographyPage) {
+      allImages.forEach(img => {
+        averageImageColor(img).then(rgb => {
+          if (!rgb) return;
+          img._soicNavRgb = rgb;
+          requestUpdate();
+        });
+      });
+    } else {
+      // Für normale Projektseiten ist die im Studio gespeicherte Projektfarbe
+      // der zuverlässige Primärwert. Nur bei alten Projekten ohne Farbe wird
+      // sie einmal aus dem ersten Hauptbild berechnet.
+      sections.forEach(section => {
+        if (section.dataset.projectColor) return;
+        const img = section.querySelector('.artwork-main');
+        if (!img) return;
+        averageImageColor(img).then(rgb => {
+          if (!rgb) return;
+          section.dataset.projectColor = cssColor(rgb);
+          requestUpdate();
+        });
+      });
+    }
+
+    const setNameColor = (color, key) => {
+      if (!color) color = 'var(--ink)';
+      if (key === currentKey && nameNav.style.getPropertyValue('--scroll-project-color') === color) return;
+      currentKey = key;
+      nameNav.style.setProperty('--scroll-project-color', color);
     };
 
-    const update = () => {
-      scheduled = false;
+    const visibleHeight = rect => Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+
+    const updatePhotography = () => {
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const viewportCenter = vh / 2;
+      let bestVisible = -1;
+      let bestDistance = Infinity;
+      let candidates = [];
+
+      allImages.forEach(img => {
+        const rect = img.getBoundingClientRect();
+        const visible = visibleHeight(rect);
+        if (visible <= 0) return;
+        const distance = Math.abs((rect.top + rect.bottom) / 2 - viewportCenter);
+
+        if (visible > bestVisible + 2) {
+          bestVisible = visible;
+          bestDistance = distance;
+          candidates = [img];
+        } else if (Math.abs(visible - bestVisible) <= 2) {
+          // Bilder derselben sichtbaren Reihe werden gemeinsam gemittelt.
+          if (distance < bestDistance + Math.max(18, rect.height * .08)) {
+            bestDistance = Math.min(bestDistance, distance);
+            candidates.push(img);
+          }
+        }
+      });
+
+      if (!candidates.length) return;
+      const colors = candidates.map(img => img._soicNavRgb).filter(Boolean);
+      if (colors.length) {
+        const avg = [0, 1, 2].map(channel => colors.reduce((sum, rgb) => sum + rgb[channel], 0) / colors.length);
+        const readable = ensureReadableOnWhite(avg);
+        const key = candidates.map(img => img.currentSrc || img.src).join('|');
+        setNameColor(cssColor(readable), key);
+        return;
+      }
+
+      const fallbackSection = candidates[0].closest('.artwork');
+      setNameColor(fallbackSection?.dataset.projectColor || 'var(--ink)', `photo-fallback-${candidates[0].src}`);
+    };
+
+    const updateProjects = () => {
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const viewportCenter = vh / 2;
       let best = null;
@@ -898,28 +958,24 @@
 
       sections.forEach(section => {
         const rect = section.getBoundingClientRect();
-        const visibleTop = Math.max(rect.top, 0);
-        const visibleBottom = Math.min(rect.bottom, vh);
-        const visibleHeight = Math.max(0, visibleBottom - visibleTop);
-        const sectionCenter = rect.top + rect.height / 2;
-        const distance = Math.abs(sectionCenter - viewportCenter);
-
-        // Entscheidend ist ausschließlich die vertikale Sichtbarkeit. Bei
-        // Gleichstand gewinnt das Projekt, dessen Mittelpunkt näher an der
-        // Bildschirmmitte liegt.
-        if (visibleHeight > bestVisible + 1 ||
-            (Math.abs(visibleHeight - bestVisible) <= 1 && distance < bestDistance)) {
+        const visible = visibleHeight(rect);
+        const distance = Math.abs((rect.top + rect.bottom) / 2 - viewportCenter);
+        if (visible > bestVisible + 1 ||
+            (Math.abs(visible - bestVisible) <= 1 && distance < bestDistance)) {
           best = section;
-          bestVisible = visibleHeight;
+          bestVisible = visible;
           bestDistance = distance;
         }
       });
 
       if (!best) return;
-      if (best !== currentSection || best.dataset.projectColor) {
-        currentSection = best;
-        applyColor(best);
-      }
+      setNameColor(best.dataset.projectColor || 'var(--ink)', best.id || String(sections.indexOf(best)));
+    };
+
+    const update = () => {
+      scheduled = false;
+      if (photographyPage) updatePhotography();
+      else updateProjects();
     };
 
     function requestUpdate() {
