@@ -7,7 +7,7 @@ window.ARCHITECTURE_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/architecture/untitled/main-20261001000714-01.jpg"
+      "../images/architecture/untitled/main-20261001000714-01.webp"
     ]
   },
   {
@@ -17,11 +17,11 @@ window.ARCHITECTURE_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-02.jpg",
-      "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-03.jpg",
-      "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-04.jpg",
-      "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-05.jpg",
-      "../images/architecture/peter-joseph-lenne-preis-2026/main-20260930235611-05.jpg"
+      "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-02.webp",
+      "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-03.webp",
+      "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-04.webp",
+      "../images/architecture/peter-joseph-lenne-preis-2026/main-20261001102850-05.webp",
+      "../images/architecture/peter-joseph-lenne-preis-2026/main-20260930235611-05.webp"
     ]
   },
   {
@@ -31,11 +31,11 @@ window.ARCHITECTURE_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-01.jpg",
-      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-02.jpg",
-      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-03.jpg",
-      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-04.jpg",
-      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-05.jpg"
+      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-01.webp",
+      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-02.webp",
+      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-03.webp",
+      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-04.webp",
+      "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-05.webp"
     ]
   },
   {
@@ -45,10 +45,10 @@ window.ARCHITECTURE_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-01.jpg",
-      "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-02.jpg",
-      "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-03.jpg",
-      "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-04.jpg"
+      "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-01.webp",
+      "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-02.webp",
+      "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-03.webp",
+      "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-04.webp"
     ]
   },
   {
@@ -58,11 +58,11 @@ window.ARCHITECTURE_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/architecture/untitled/main-20261001101929-01.jpg",
-      "../images/architecture/untitled/main-20261001101929-02.jpg",
-      "../images/architecture/untitled/main-20261001101929-03.jpg",
-      "../images/architecture/untitled/main-20261001101929-04.jpg",
-      "../images/architecture/untitled/main-20261001101929-05.jpg"
+      "../images/architecture/untitled/main-20261001101929-01.webp",
+      "../images/architecture/untitled/main-20261001101929-02.webp",
+      "../images/architecture/untitled/main-20261001101929-03.webp",
+      "../images/architecture/untitled/main-20261001101929-04.webp",
+      "../images/architecture/untitled/main-20261001101929-05.webp"
     ]
   }
 ];

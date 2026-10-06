@@ -1973,3 +1973,130 @@ html.detail-lightbox-open body {
     touch-action: pan-y;
   }
 }
+
+/* ================================================================
+   2026-10-06 – explizite Projektlayouts + projektbezogene Nav-Farbe
+   ================================================================ */
+.site-nav a[aria-current="page"] {
+  color: var(--active-project-color, #666);
+  transition: color .38s ease;
+}
+
+/* Diptychon: ein sehr breites Hauptbild mit großzügigem Seitenrand,
+   darunter vier Details als 2 × 2 Raster. Details sind hier Teil des
+   Layouts und deshalb dauerhaft sichtbar. */
+.painting-page .artwork.layout-diptych,
+.graphic-page .artwork.layout-diptych {
+  width: 100%;
+  max-width: none;
+}
+.painting-page .artwork.layout-diptych .artwork-images,
+.graphic-page .artwork.layout-diptych .artwork-images {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr;
+  gap: clamp(24px, 3vw, 46px);
+  align-items: start;
+}
+.painting-page .artwork.layout-diptych .hero-wrap,
+.graphic-page .artwork.layout-diptych .hero-wrap {
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%;
+}
+.painting-page .artwork.layout-diptych .artwork-main,
+.graphic-page .artwork.layout-diptych .artwork-main {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: none;
+  object-fit: contain;
+}
+.painting-page .artwork.layout-diptych .detail-gallery,
+.graphic-page .artwork.layout-diptych .detail-gallery {
+  position: static !important;
+  display: grid !important;
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  width: min(100%, 1180px) !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(16px, 2vw, 28px) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+.painting-page .artwork.layout-diptych .detail-gallery-item,
+.graphic-page .artwork.layout-diptych .detail-gallery-item {
+  grid-column: auto !important;
+  grid-row: auto !important;
+  width: 100%;
+  height: auto !important;
+}
+.painting-page .artwork.layout-diptych .detail-gallery .detail-image,
+.graphic-page .artwork.layout-diptych .detail-gallery .detail-image {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: none !important;
+}
+.painting-page .artwork.layout-diptych .artwork-description,
+.graphic-page .artwork.layout-diptych .artwork-description {
+  margin-top: 14px !important;
+}
+
+/* Explizite Hoch-/Querformatwahl aus dem Studio. */
+.painting-page .artwork.layout-portrait .artwork-images,
+.graphic-page .artwork.layout-portrait .artwork-images {
+  grid-template-columns: minmax(0,1fr) minmax(0,440px) minmax(0,1fr);
+}
+.painting-page .artwork.layout-landscape .artwork-images,
+.graphic-page .artwork.layout-landscape .artwork-images {
+  grid-template-columns: 1fr minmax(0, min(74vw, 920px)) 1fr;
+}
+.painting-page .artwork.layout-landscape .artwork-main,
+.graphic-page .artwork.layout-landscape .artwork-main {
+  width: 100%;
+  max-width: 100%;
+  max-height: min(72svh, 760px);
+}
+
+/* Architektur: das erste, einzelne Projektbild ist die große zentrierte
+   Vorschau der Seite – unabhängig vom gewählten 1/2/4-Serienmodus. */
+.architecture-page .artwork:first-child .artwork-images.is-series.is-single {
+  width: min(86vw, 900px);
+  margin-left: auto;
+  margin-right: auto;
+}
+.architecture-page .artwork:first-child .artwork-images.is-series.is-single .artwork-main {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+@media (max-width: 700px) {
+  .painting-page .artwork.layout-diptych,
+  .graphic-page .artwork.layout-diptych {
+    width: min(100%, 92vw);
+  }
+  .painting-page .artwork.layout-diptych .artwork-images,
+  .graphic-page .artwork.layout-diptych .artwork-images {
+    gap: 18px;
+  }
+  .painting-page .artwork.layout-diptych .detail-gallery,
+  .graphic-page .artwork.layout-diptych .detail-gallery {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+  .painting-page .artwork.layout-diptych .detail-gallery-item,
+  .graphic-page .artwork.layout-diptych .detail-gallery-item {
+    display: block !important;
+  }
+  .architecture-page .artwork:first-child .artwork-images.is-series.is-single {
+    width: min(92vw, 720px);
+  }
+}

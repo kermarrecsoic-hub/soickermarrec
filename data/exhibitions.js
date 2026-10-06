@@ -7,18 +7,18 @@ window.EXHIBITIONS_WORKS = [
     availability: "",
     text: "",
     // Erstes Bild = vorhandene Landingpage-Vorschau; bitte später eigenes Projektfoto einsetzen.
-    images: ["../images/exhibitions/aa/01.jpg", 
-             "../images/exhibitions/aa/02.jpg",
-             "../images/exhibitions/aa/03.jpg",
-             "../images/exhibitions/aa/04.jpg",
-             "../images/exhibitions/aa/05.jpg",
-             "../images/exhibitions/aa/06.jpg",
-             "../images/exhibitions/aa/07.jpg",
-             "../images/exhibitions/aa/08.jpg",
-             "../images/exhibitions/aa/09.jpg",
-             "../images/exhibitions/aa/10.jpg",],
+    images: ["../images/exhibitions/aa/01.webp", 
+             "../images/exhibitions/aa/02.webp",
+             "../images/exhibitions/aa/03.webp",
+             "../images/exhibitions/aa/04.webp",
+             "../images/exhibitions/aa/05.webp",
+             "../images/exhibitions/aa/06.webp",
+             "../images/exhibitions/aa/07.webp",
+             "../images/exhibitions/aa/08.webp",
+             "../images/exhibitions/aa/09.webp",
+             "../images/exhibitions/aa/10.webp",],
   // Für eine Fotoserie weitere Bildpfade in images ergänzen, z. B.:
-  // images: ["../images/architecture/serie/01.jpg", "../images/architecture/serie/02.jpg"],
+  // images: ["../images/architecture/serie/01.webp", "../images/architecture/serie/02.webp"],
   // Alle Bilder stehen gleichwertig vor dem Titel und der vollbreiten Beschreibung.
   },
     {
@@ -28,14 +28,14 @@ window.EXHIBITIONS_WORKS = [
     availability: "",
     text: "",
     // Erstes Bild = vorhandene Landingpage-Vorschau; bitte später eigenes Projektfoto einsetzen.
-    images: ["../images/exhibitions/111/01.jpg", 
-             "../images/exhibitions/111/02.jpg",
-             "../images/exhibitions/111/03.jpg",
-             "../images/exhibitions/111/04.jpg",
-             "../images/exhibitions/111/05.jpg",
-             "../images/exhibitions/111/06.jpg",],
+    images: ["../images/exhibitions/111/01.webp", 
+             "../images/exhibitions/111/02.webp",
+             "../images/exhibitions/111/03.webp",
+             "../images/exhibitions/111/04.webp",
+             "../images/exhibitions/111/05.webp",
+             "../images/exhibitions/111/06.webp",],
   // Für eine Fotoserie weitere Bildpfade in images ergänzen, z. B.:
-  // images: ["../images/architecture/serie/01.jpg", "../images/architecture/serie/02.jpg"],
+  // images: ["../images/architecture/serie/01.webp", "../images/architecture/serie/02.webp"],
   // Alle Bilder stehen gleichwertig vor dem Titel und der vollbreiten Beschreibung.
   },
 ];

@@ -54,7 +54,10 @@
       // Nahezu quadratische Bilder sollen sich wie Hochformate verhalten:
       // Details bleiben seitlich. Erst deutlich breite Querformate (ab 1.18:1)
       // bekommen ihre Details unter dem Hauptbild.
-      const wideLandscape = ratio >= 1.18;
+      const forcedLayout = section.dataset.layout || '';
+      const wideLandscape = forcedLayout === 'landscape' || forcedLayout === 'diptych'
+        ? true
+        : (forcedLayout === 'portrait' ? false : ratio >= 1.18);
 
       hero.classList.toggle('is-landscape', landscape);
       hero.classList.toggle('is-portrait', !landscape);
@@ -83,7 +86,7 @@
     // Legacy migration for the Holzdruck layout: older Studio versions stored
     // every wood print as a main image. Keep only the first as the real main
     // image and expose the remaining images as details without losing paths.
-    const legacyDetailLayout = work.layout === 'six-grid' || work.layout === 'portrait-eight-grid' || /holz/i.test(work.title || '');
+    const legacyDetailLayout = work.layout === 'multiple' || work.layout === 'six-grid' || work.layout === 'portrait-eight-grid' || /holz/i.test(work.title || '');
     const mainPaths = [...rawMainPaths];
     if (legacyDetailLayout && mainPaths.length > 1) {
       details.unshift(...mainPaths.slice(1));
@@ -672,17 +675,24 @@
     const detailGrid = hasDetails && detailPaths.length > 2;
     const detailsBottomGrid = hasDetails && detailPaths.length >= 4;
     const woodDetailArtwork = !forceSeries && (
+      work.layout === 'multiple' ||
       work.layout === 'six-grid' ||
       work.layout === 'portrait-eight-grid' ||
       /holz/i.test(work.title || '')
     );
+    const diptychLayout = !forceSeries && work.layout === 'diptych';
+    const portraitLayout = !forceSeries && work.layout === 'portrait';
+    const landscapeLayout = !forceSeries && work.layout === 'landscape';
 
     const classes = ['artwork'];
     if (projectGrid) classes.push('project-grid-artwork');
     if (hasDetails) classes.push('has-details');
     if (detailGrid) classes.push('has-detail-gallery');
     if (detailsBottomGrid) classes.push('details-bottom-grid');
-    if (woodDetailArtwork) classes.push('wood-detail-artwork');
+    if (woodDetailArtwork) classes.push('wood-detail-artwork', 'layout-multiple');
+    if (diptychLayout) classes.push('layout-diptych');
+    if (portraitLayout) classes.push('layout-portrait');
+    if (landscapeLayout) classes.push('layout-landscape');
     if (work.demo) classes.push('is-demo');
     if (series) classes.push('series-artwork');
     if (multiMain) classes.push('multi-main-artwork');
@@ -692,6 +702,8 @@
     if (nineMain) classes.push('nine-main-artwork');
 
     const section = element('section', classes.join(' '));
+    section.dataset.colorSource = paths[0];
+    section.dataset.layout = work.layout || '';
     const images = element('div', 'artwork-images' +
       (series ? ' is-series' : '') +
       (multiMain ? ' is-multi-main' : '') +
@@ -733,7 +745,7 @@
         const main = artworkImage(path, alt, workIndex === 0 && index === 0);
         classifyOrientation(main, hero, section, index === 0);
 
-        if (hasDetails && index === 0) {
+        if (hasDetails && index === 0 && !diptychLayout) {
           const button = element('button', 'artwork-toggle');
           const hint = element('span', 'detail-hint', '+');
           hint.setAttribute('aria-hidden', 'true');
@@ -780,7 +792,106 @@
     return section;
   }
 
+
+  function srgbChannel(value) {
+    const c = value / 255;
+    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  }
+
+  function contrastAgainstWhite(rgb) {
+    const luminance = 0.2126 * srgbChannel(rgb[0]) + 0.7152 * srgbChannel(rgb[1]) + 0.0722 * srgbChannel(rgb[2]);
+    return 1.05 / (luminance + 0.05);
+  }
+
+  function ensureReadableOnWhite(rgb, minContrast = 4.5) {
+    let out = rgb.map(v => Math.max(0, Math.min(255, Math.round(v))));
+    if (contrastAgainstWhite(out) >= minContrast) return out;
+    for (let factor = 0.94; factor >= 0.18; factor -= 0.04) {
+      const candidate = out.map(v => Math.round(v * factor));
+      if (contrastAgainstWhite(candidate) >= minContrast) return candidate;
+    }
+    return [65, 65, 65];
+  }
+
+  async function averageImageColor(img) {
+    try {
+      if (!img.complete) await new Promise(resolve => img.addEventListener('load', resolve, { once: true }));
+      if (!img.naturalWidth || !img.naturalHeight) return null;
+      const size = 48;
+      const ratio = Math.min(size / img.naturalWidth, size / img.naturalHeight, 1);
+      const w = Math.max(1, Math.round(img.naturalWidth * ratio));
+      const h = Math.max(1, Math.round(img.naturalHeight * ratio));
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(img, 0, 0, w, h);
+      const pixels = ctx.getImageData(0, 0, w, h).data;
+      let r = 0, g = 0, b = 0, weight = 0;
+      for (let i = 0; i < pixels.length; i += 4) {
+        const a = pixels[i + 3] / 255;
+        if (a < 0.1) continue;
+        r += pixels[i] * a;
+        g += pixels[i + 1] * a;
+        b += pixels[i + 2] * a;
+        weight += a;
+      }
+      if (!weight) return null;
+      return ensureReadableOnWhite([r / weight, g / weight, b / weight]);
+    } catch {
+      return null;
+    }
+  }
+
+  function setupProjectNavColor() {
+    const activeNav = document.querySelector('.site-nav a[aria-current="page"]');
+    const sections = [...target.querySelectorAll(':scope > .artwork')];
+    if (!activeNav || !sections.length) return;
+
+    sections.forEach(section => {
+      const img = section.querySelector('.artwork-main');
+      if (!img) return;
+      averageImageColor(img).then(rgb => {
+        if (!rgb) return;
+        section.dataset.projectColor = rgb.join(',');
+        update();
+      });
+    });
+
+    let scheduled = false;
+    const update = () => {
+      scheduled = false;
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      let best = null;
+      let bestVisible = -1;
+      let bestDistance = Infinity;
+      const center = vh / 2;
+      sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        const visible = Math.max(0, Math.min(rect.bottom, vh) - Math.max(rect.top, 0));
+        const sectionCenter = (Math.max(rect.top, 0) + Math.min(rect.bottom, vh)) / 2;
+        const distance = Math.abs(sectionCenter - center);
+        if (visible > bestVisible + 1 || (Math.abs(visible - bestVisible) <= 1 && distance < bestDistance)) {
+          best = section;
+          bestVisible = visible;
+          bestDistance = distance;
+        }
+      });
+      const color = best?.dataset.projectColor;
+      if (color) activeNav.style.setProperty('--active-project-color', `rgb(${color})`);
+    };
+    const requestUpdate = () => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(update);
+    };
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate, { passive: true });
+    requestUpdate();
+  }
+
   works.forEach((work, index) => target.appendChild(render(work, index)));
+  setupProjectNavColor();
   setupDetailLightboxTriggers();
   scrollToSharedWork();
   window.addEventListener('hashchange', scrollToSharedWork);

@@ -7,29 +7,30 @@ window.PAINTING_WORKS = [
     "availability": "",
     "text": "",
     "details": {
-      "left": "../images/painting/dante/detail-left.jpg",
-      "right": "../images/painting/dante/detail-right.jpg"
+      "left": "../images/painting/dante/detail-left.webp",
+      "right": "../images/painting/dante/detail-right.webp"
     },
     "images": [
-      "../images/painting/dante/main.jpg"
+      "../images/painting/dante/main.webp"
     ]
   },
   {
     "title": "Untitled (8 Holzplatten), 2026",
+    "layout": "multiple",
     "medium": "phototransfer medium, ink, pencil on wood",
     "dimensions": "12 x 21 x 3 cm",
     "availability": "",
     "text": "",
     "images": [
-      "../images/painting/holzdruck/main.jpg",
-      "../images/painting/holzdruck/main-20261001105322-02.jpg",
-      "../images/painting/holzdruck/main-20261001105322-03.jpg",
-      "../images/painting/holzdruck/main-20261001105322-04.jpg",
-      "../images/painting/holzdruck/main-20261001105322-05.jpg",
-      "../images/painting/holzdruck/main-20261001105322-06.jpg",
-      "../images/painting/holzdruck/main-20261001105322-07.jpg",
-      "../images/painting/holzdruck/main-20261001105322-08.jpg",
-      "../images/painting/holzdruck/main-20261001105322-09.jpg"
+      "../images/painting/holzdruck/main.webp",
+      "../images/painting/holzdruck/main-20261001105322-02.webp",
+      "../images/painting/holzdruck/main-20261001105322-03.webp",
+      "../images/painting/holzdruck/main-20261001105322-04.webp",
+      "../images/painting/holzdruck/main-20261001105322-05.webp",
+      "../images/painting/holzdruck/main-20261001105322-06.webp",
+      "../images/painting/holzdruck/main-20261001105322-07.webp",
+      "../images/painting/holzdruck/main-20261001105322-08.webp",
+      "../images/painting/holzdruck/main-20261001105322-09.webp"
     ]
   },
   {
@@ -39,11 +40,11 @@ window.PAINTING_WORKS = [
     "availability": "",
     "text": "",
     "details": {
-      "left": "../images/painting/gipfel/detail-left.jpg",
-      "right": "../images/painting/gipfel/detail-right.jpg"
+      "left": "../images/painting/gipfel/detail-left.webp",
+      "right": "../images/painting/gipfel/detail-right.webp"
     },
     "images": [
-      "../images/painting/gipfel/main.jpg"
+      "../images/painting/gipfel/main.webp"
     ]
   },
   {
@@ -52,10 +53,10 @@ window.PAINTING_WORKS = [
     "dimensions": "46 × 61 cm",
     "availability": "",
     "text": "",
-    "image": "../images/painting/rome/main.jpg",
+    "image": "../images/painting/rome/main.webp",
     "details": {
-      "left": "../images/painting/rome/detail-left.jpg",
-      "right": "../images/painting/rome/detail-right.jpg"
+      "left": "../images/painting/rome/detail-left.webp",
+      "right": "../images/painting/rome/detail-right.webp"
     }
   },
   {
@@ -65,25 +66,26 @@ window.PAINTING_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/painting/untitled-etheral-space-series-of-three/main-20261006094334-01.jpg"
+      "../images/painting/untitled-etheral-space-series-of-three/main-20261006094334-01.webp"
     ],
     "shareId": "untitled-etheral-space-series-of-three"
   },
   {
     "title": "Prozession, diptychon",
+    "layout": "diptych",
     "medium": "ink, acrylic on canvas",
     "dimensions": "100 x 60 cm",
     "availability": "",
     "text": "",
     "images": [
-      "../images/painting/prozession-diptychon/main-20261006094623-01.jpg"
+      "../images/painting/prozession-diptychon/main-20261006094623-01.webp"
     ],
     "shareId": "prozession-diptychon",
     "details": [
-      "../images/painting/prozession-diptychon/detail-20261006094623-01.jpg",
-      "../images/painting/prozession-diptychon/detail-20261006094623-02.jpg",
-      "../images/painting/prozession-diptychon/main-20261006094623-02.jpg",
-      "../images/painting/prozession-diptychon/main-20261006094623-03.jpg"
+      "../images/painting/prozession-diptychon/detail-20261006094623-01.webp",
+      "../images/painting/prozession-diptychon/detail-20261006094623-02.webp",
+      "../images/painting/prozession-diptychon/main-20261006094623-02.webp",
+      "../images/painting/prozession-diptychon/main-20261006094623-03.webp"
     ]
   },
   {
@@ -92,10 +94,10 @@ window.PAINTING_WORKS = [
     "dimensions": "65 × 50 cm",
     "availability": "",
     "text": "",
-    "image": "../images/painting/Koepfe/main.jpg",
+    "image": "../images/painting/Koepfe/main.webp",
     "details": {
-      "left": "../images/painting/Koepfe/detail-left.jpg",
-      "right": "../images/painting/Koepfe/detail-right.jpg"
+      "left": "../images/painting/Koepfe/detail-left.webp",
+      "right": "../images/painting/Koepfe/detail-right.webp"
     }
   },
   {
@@ -104,10 +106,10 @@ window.PAINTING_WORKS = [
     "dimensions": "30 × 41 cm",
     "availability": "",
     "text": "",
-    "image": "../images/painting/baer/main.jpg",
+    "image": "../images/painting/baer/main.webp",
     "details": {
-      "left": "../images/painting/baer/detail-left.jpg",
-      "right": "../images/painting/baer/detail-right.jpg"
+      "left": "../images/painting/baer/detail-left.webp",
+      "right": "../images/painting/baer/detail-right.webp"
     }
   },
   {
@@ -116,10 +118,10 @@ window.PAINTING_WORKS = [
     "dimensions": "60 × 80 cm",
     "availability": "",
     "text": "",
-    "image": "../images/painting/parigi2/main.jpg",
+    "image": "../images/painting/parigi2/main.webp",
     "details": {
-      "left": "../images/painting/parigi2/detail-left.jpg",
-      "right": "../images/painting/parigi2/detail-right.jpg"
+      "left": "../images/painting/parigi2/detail-left.webp",
+      "right": "../images/painting/parigi2/detail-right.webp"
     }
   },
   {
@@ -128,10 +130,10 @@ window.PAINTING_WORKS = [
     "dimensions": "61 × 46 cm",
     "availability": "",
     "text": "",
-    "image": "../images/painting/kapelle/main.jpg",
+    "image": "../images/painting/kapelle/main.webp",
     "details": {
-      "left": "../images/painting/kapelle/detail-left.jpg",
-      "right": "../images/painting/kapelle/detail-right.jpg"
+      "left": "../images/painting/kapelle/detail-left.webp",
+      "right": "../images/painting/kapelle/detail-right.webp"
     }
   },
   {
@@ -141,12 +143,12 @@ window.PAINTING_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/painting/parigi1/main.jpg"
+      "../images/painting/parigi1/main.webp"
     ],
     "shareId": "parigi1",
     "details": [
-      "../images/painting/parigi1/detail-left.jpg",
-      "../images/painting/parigi1/detail-right.jpg"
+      "../images/painting/parigi1/detail-left.webp",
+      "../images/painting/parigi1/detail-right.webp"
     ]
   },
   {
@@ -156,12 +158,12 @@ window.PAINTING_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/painting/kunstdrucke/main-20261002213210-01.jpg"
+      "../images/painting/kunstdrucke/main-20261002213210-01.webp"
     ],
     "shareId": "kunstdrucke",
     "details": [
-      "../images/painting/kunstdrucke/detail-20261002213210-01.jpg",
-      "../images/painting/kunstdrucke/detail-20261002213434-02.jpg"
+      "../images/painting/kunstdrucke/detail-20261002213210-01.webp",
+      "../images/painting/kunstdrucke/detail-20261002213434-02.webp"
     ]
   }
 ];

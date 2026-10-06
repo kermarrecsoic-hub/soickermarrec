@@ -11,8 +11,8 @@
     xxx: { label: 'Fotografie', root: 'images/foto1/fotogalerie_sortiert', kind: 'series' },
   };
   const SITE_IMAGES = [
-    { label: 'About – Hauptbild', path: 'images/about.jpg' },
-    { label: 'Kontakt – Hauptbild', path: 'images/contact.jpg' },
+    { label: 'About – Hauptbild', path: 'images/about.webp' },
+    { label: 'Kontakt – Hauptbild', path: 'images/contact.webp' },
     { label: 'Social Preview – Standard (ideal 1200 × 630)', path: 'images/social-preview.jpg' },
   ];
 
@@ -359,7 +359,7 @@
     let detailPaths = workDetails(work);
     // Older Holzdruck entries stored all wood prints as main images. Migrate
     // them in the editor without deleting a single repository path.
-    if ((work.layout === 'six-grid' || work.layout === 'portrait-eight-grid' || /holz/i.test(work.title || '')) && mainPaths.length > 1) {
+    if ((work.layout === 'multiple' || work.layout === 'six-grid' || work.layout === 'portrait-eight-grid' || /holz/i.test(work.title || '')) && mainPaths.length > 1) {
       detailPaths = [...mainPaths.slice(1), ...detailPaths];
       mainPaths = mainPaths.slice(0, 1);
     }
@@ -373,6 +373,8 @@
     $('#fieldDimensions').value = work.dimensions || '';
     $('#fieldAvailability').value = work.availability || '';
     $('#fieldText').value = work.text || '';
+    $('#fieldLayout').value = work.layout || '';
+    $('#layoutField').hidden = config.kind !== 'art';
     $('#fieldFolder').value = deriveFolder(work, config);
     $('#folderPrefix').textContent = `${config.root}/`;
     const folderField = document.querySelector('.folder-field');
@@ -654,8 +656,8 @@
         if (item.file) {
           const blob = await optimizeImage(item.file);
           const path = isPhotography
-            ? `${editor.config.root}/${String(nextPhoto++).padStart(2, '0')}.jpg`
-            : `${editor.config.root}/${folder}/main-${stamp}-${String(i + 1).padStart(2, '0')}.jpg`;
+            ? `${editor.config.root}/${String(nextPhoto++).padStart(2, '0')}.webp`
+            : `${editor.config.root}/${folder}/main-${stamp}-${String(i + 1).padStart(2, '0')}.webp`;
           await uploadBlob(path, blob);
           mainPaths.push(path);
         } else if (item.path) {
@@ -668,7 +670,7 @@
         const item = editor.details[i];
         if (item.file) {
           const blob = await optimizeImage(item.file);
-          const path = `${editor.config.root}/${folder}/detail-${stamp}-${String(i + 1).padStart(2, '0')}.jpg`;
+          const path = `${editor.config.root}/${folder}/detail-${stamp}-${String(i + 1).padStart(2, '0')}.webp`;
           await uploadBlob(path, blob);
           detailPaths.push(path);
         } else if (item.path) {
@@ -689,16 +691,14 @@
         text: $('#fieldText').value.trim(),
         images: mainPaths.map(toDataPath),
       };
+      if (editor.config.kind === 'art' && $('#fieldLayout').value) updated.layout = $('#fieldLayout').value;
+      else delete updated.layout;
       if (stableShareId) updated.shareId = stableShareId;
       delete updated.image;
       if (editor.config.kind === 'art' && detailPaths.length) {
         updated.details = detailPaths.map(toDataPath);
       } else {
         delete updated.details;
-      }
-      if (updated.images.length === 1 && updated.details?.length &&
-          (updated.layout === 'six-grid' || updated.layout === 'portrait-eight-grid')) {
-        delete updated.layout;
       }
 
       if (editor.isNew) state.works.push(updated);
@@ -721,7 +721,7 @@
 
   function setBusy(busy) {
     state.busy = busy;
-    $$('#editorDialog button, #editorDialog input, #editorDialog textarea').forEach(el => {
+    $$('#editorDialog button, #editorDialog input, #editorDialog textarea, #editorDialog select').forEach(el => {
       if (el.id === 'cancelEditorButton') return;
       el.disabled = busy;
     });
@@ -734,12 +734,11 @@
     });
   }
 
-  async function optimizeImage(file, maxSide = 2800, quality = 0.94) {
-    // Kleine JPEGs bleiben byte-identisch: keine erneute Kompression, keine
-    // Reduktion der Pixelmaße. Nur Dateien, die für den GitHub-Upload zu groß
-    // sind (oder ein anderes Format haben), werden neu berechnet.
-    if (/image\/jpe?g/i.test(file.type) && file.size <= 3_900_000) return file;
-
+  async function optimizeImage(file, maxSide = 3000, quality = 0.94) {
+    // Studio-Uploads werden standardmäßig als WebP gespeichert. 3000 px an der
+    // längsten Seite reichen auch für große Retina-Darstellungen, ohne kleine
+    // Dateien künstlich hochzuskalieren. Qualität 0.94 ist visuell praktisch
+    // verlustfrei und reduziert die Übertragungsgröße deutlich.
     const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
     const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
     const width = Math.max(1, Math.round(bitmap.width * scale));
@@ -747,26 +746,15 @@
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
-    const ctx = canvas.getContext('2d', { alpha: false });
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, width, height);
+    const ctx = canvas.getContext('2d', { alpha: true });
     ctx.drawImage(bitmap, 0, 0, width, height);
     bitmap.close();
 
-    for (const q of [quality, 0.9, 0.84, 0.78]) {
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', q));
+    for (const q of [quality, 0.92, 0.89, 0.86]) {
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', q));
       if (blob && blob.size <= 3_950_000) return blob;
     }
-    throw new Error(`${file.name} ist auch nach vorsichtiger Optimierung größer als 4 MB.`);
-  }
-
-  async function blobToBase64(blob) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result).split(',')[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
+    throw new Error(`${file.name} ist auch als vorsichtig optimiertes WebP größer als 4 MB.`);
   }
 
   async function uploadBlob(path, blob) {

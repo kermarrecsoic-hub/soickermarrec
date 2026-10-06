@@ -1,16 +1,16 @@
 {
   "mobile": {
     "slots": [
-      "images/landing/mobile-1.jpg",
-      "images/landing/mobile-2.jpg",
-      "images/landing/mobile-3.jpg"
+      "images/landing/mobile-1.webp",
+      "images/landing/mobile-2.webp",
+      "images/landing/mobile-3.webp"
     ]
   },
   "desktop": {
     "slots": [
-      "images/landing/desktop-1.jpg",
-      "images/landing/desktop-2.jpg",
-      "images/landing/desktop-3.jpg"
+      "images/landing/desktop-1.webp",
+      "images/landing/desktop-2.webp",
+      "images/landing/desktop-3.webp"
     ]
   }
 }
