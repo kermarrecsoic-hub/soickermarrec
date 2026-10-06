@@ -176,7 +176,7 @@ body {
 }
 
 @media (max-width: 700px), (hover: none) and (pointer: coarse) {
-  :root { --row-height: 27px; --landing-nav-font-size: 17px; }
+  :root { --row-height: 27px; --landing-nav-font-size: 16px; }
   .navigation { width: min(220px, calc(100vw - 44px)); gap: 7px; }
   .navigation a { font-size: var(--landing-nav-font-size); }
   /* Touch hat keinen Hover: nur der Name rotiert permanent. */
@@ -241,7 +241,7 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
   outline-offset: 4px;
 }
 @media (max-width: 700px), (hover: none) and (pointer: coarse) {
-  .language-switch { top: 20px; left: 18px; gap: 9px; font-size: 10px; }
+  .language-switch { top: 20px; left: 18px; gap: 9px; font-size: 9px; }
 }
 
 
@@ -256,8 +256,8 @@ img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 .legal-text a { text-decoration: underline; text-underline-offset: 2px; }
 @media (max-width: 700px) {
   .site-footer { bottom: 9px; gap: 4px; }
-  .footer-instagram { font-size: 11px; }
-  .footer-links { gap: 12px; font-size: 10px; }
+  .footer-instagram { font-size: 10px; }
+  .footer-links { gap: 12px; font-size: 9px; }
   .legal-content { width: min(100%, 92vw); }
   .legal-section + .legal-section { margin-top: 28px; }
 }

@@ -279,6 +279,11 @@
     if (![1, 2].includes(columns)) return;
     currentProjectColumns = columns;
     target.dataset.projectColumns = String(columns);
+    if (columns !== 1) {
+      target.querySelectorAll('.details-hover-visible').forEach(section => {
+        section.classList.remove('details-hover-visible');
+      });
+    }
 
     document.querySelectorAll('.project-view-toggle button').forEach(button => {
       const active = Number(button.dataset.columns) === columns;
@@ -485,19 +490,99 @@
     header.appendChild(controls);
   }
 
+  function setArtworkExpanded(section, open, work) {
+    if (!section) return;
+    section.classList.toggle('details-visible', Boolean(open));
+    section.querySelectorAll('.artwork-toggle').forEach(button => {
+      button.setAttribute('aria-expanded', String(Boolean(open)));
+      const label = open
+        ? tr('gallery.hideDetails', 'Close artwork')
+        : tr('gallery.showDetails', 'Open artwork');
+      button.setAttribute('aria-label', `${label}: ${work?.title || tr('gallery.work', 'work')}`);
+      const hint = button.querySelector('.detail-hint');
+      if (hint) hint.textContent = open ? '−' : '+';
+    });
+  }
+
+  function setupSingleColumnHoverExpansion() {
+    if (!projectGrid) return;
+
+    const desktopHover = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 701px)');
+    const sections = [...target.querySelectorAll(':scope > .artwork')];
+
+    const clearHover = section => section.classList.remove('details-hover-visible');
+    const clearAllHover = () => sections.forEach(clearHover);
+
+    sections.forEach(section => {
+      section.addEventListener('pointermove', event => {
+        if (!desktopHover.matches || currentProjectColumns !== 1) {
+          clearHover(section);
+          return;
+        }
+
+        // Die Hover-Zone wird nur über die horizontale Ausdehnung der sichtbaren
+        // Hauptbilder definiert. Vertikal darf der Mauszeiger bis in Text/Details
+        // wandern; sobald er links oder rechts aus dieser Bildbreite herausgeht,
+        // klappt das Werk wieder in den normalen Zustand zurück.
+        const visibleMainImages = [...section.querySelectorAll('.artwork-main')]
+          .filter(img => {
+            const style = getComputedStyle(img);
+            const rect = img.getBoundingClientRect();
+            return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0;
+          });
+
+        if (!visibleMainImages.length) {
+          clearHover(section);
+          return;
+        }
+
+        const rects = visibleMainImages.map(img => img.getBoundingClientRect());
+        const left = Math.min(...rects.map(rect => rect.left));
+        const right = Math.max(...rects.map(rect => rect.right));
+        const insideHorizontalImageBand = event.clientX >= left && event.clientX <= right;
+
+        section.classList.toggle('details-hover-visible', insideHorizontalImageBand);
+      });
+
+      section.addEventListener('pointerleave', () => clearHover(section));
+    });
+
+    desktopHover.addEventListener('change', clearAllHover);
+    window.addEventListener('blur', clearAllHover);
+  }
+
+  function openArtworkFromGrid(section, work) {
+    if (!projectGrid || !section) return;
+    const open = !section.classList.contains('details-visible');
+
+    // In der Zweispaltenansicht ist jedes Werk nur ein Vorschaubild. Ein Klick
+    // wechselt direkt in die Einspaltenansicht und öffnet genau dieses Werk.
+    if (currentProjectColumns === 2) {
+      animateLayoutChange(() => {
+        setProjectColumns(1);
+        setArtworkExpanded(section, true, work);
+        requestAnimationFrame(() => {
+          section.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        });
+      });
+      return;
+    }
+
+    setArtworkExpanded(section, open, work);
+  }
+
   function setupDetailToggle(button, section, hint, work, detailIds) {
     button.type = 'button';
     button.setAttribute('aria-expanded', 'false');
     button.setAttribute('aria-controls', detailIds);
-    button.setAttribute('aria-label', `${tr('gallery.showDetails', 'Show details')}: ${work.title || tr('gallery.work', 'work')}`);
-    button.addEventListener('click', () => {
-      if (!mobile.matches) return;
-      const open = section.classList.toggle('details-visible');
-      button.setAttribute('aria-expanded', String(open));
-      button.setAttribute('aria-label', `${open ? tr('gallery.hideDetails', 'Hide details') : tr('gallery.showDetails', 'Show details')}: ${work.title || tr('gallery.work', 'work')}`);
-      hint.textContent = open ? '−' : '+';
+    button.setAttribute('aria-label', `${tr('gallery.showDetails', 'Open artwork')}: ${work.title || tr('gallery.work', 'work')}`);
+    button.addEventListener('click', event => {
+      if (Date.now() < suppressTapUntil) return;
+      event.preventDefault();
+      event.stopPropagation();
+      openArtworkFromGrid(section, work);
     });
-    button.tabIndex = mobile.matches ? 0 : -1;
+    button.tabIndex = 0;
   }
 
   function slugifyShare(value = '') {
@@ -696,7 +781,7 @@
       workIndex === 0 && paths.length === 1;
 
     const classes = ['artwork'];
-    if (projectGrid) classes.push('project-grid-artwork');
+    if (projectGrid) classes.push('project-grid-artwork', 'is-expandable');
     if (hasDetails) classes.push('has-details');
     if (detailGrid) classes.push('has-detail-gallery');
     if (detailsBottomGrid) classes.push('details-bottom-grid');
@@ -759,10 +844,10 @@
         const main = artworkImage(path, alt, workIndex === 0 && index === 0);
         classifyOrientation(main, hero, section, index === 0);
 
-        // Jedes Einzelbild mit Details ist mobil aufklappbar – auch das
-        // Diptychon. Auf Desktop bleibt der Button neutral; dort übernimmt
-        // Hover/Focus die Detailansicht.
-        if (hasDetails && index === 0) {
+        // Auf Malerei/Grafik ist jedes Projekt aufklappbar, auch wenn es
+        // keine Detailbilder besitzt. Dadurch erscheinen Titel und Werkangaben
+        // ebenfalls erst nach einem bewussten Klick auf das Hauptbild.
+        if (projectGrid && index === 0) {
           const button = element('button', 'artwork-toggle');
           const hint = element('span', 'detail-hint', '+');
           hint.setAttribute('aria-hidden', 'true');
@@ -788,10 +873,16 @@
     if (work.text) description.appendChild(element('p', 'free-text', work.text));
     addShareControl(description, work, workIndex, paths, section);
 
-    // Bei Werken mit Details bilden Text + Details einen eigenen Bereich.
-    // Dadurch bleibt der Text beim Öffnen immer an derselben Position direkt
-    // unter dem Hauptbild; die Details erscheinen erst darunter.
-    if (hasDetails) {
+    // Auf Projektseiten liegen Titel/Werkangaben immer im Ausklappbereich –
+    // auch dann, wenn es keine Detailbilder gibt. Falls Details vorhanden sind,
+    // stehen sie erst unterhalb des statischen Beschreibungstexts.
+    if (projectGrid) {
+      const panel = element('div', 'artwork-detail-panel');
+      panel.id = detailIds;
+      panel.appendChild(description);
+      if (hasDetails) panel.appendChild(detailGallery(detailPaths, work.title));
+      section.appendChild(panel);
+    } else if (hasDetails) {
       const panel = element('div', 'artwork-detail-panel');
       panel.id = detailIds;
       panel.appendChild(description);
@@ -991,6 +1082,7 @@
   }
 
   works.forEach((work, index) => target.appendChild(render(work, index)));
+  setupSingleColumnHoverExpansion();
   setupProjectNavColor();
   setupDetailLightboxTriggers();
   scrollToSharedWork();
@@ -1017,15 +1109,7 @@
 
   mobile.addEventListener('change', () => {
     target.querySelectorAll('.artwork-toggle').forEach(button => {
-      button.tabIndex = mobile.matches ? 0 : -1;
-      if (!mobile.matches) {
-        const artwork = button.closest('.artwork');
-        artwork.classList.remove('details-visible');
-        button.setAttribute('aria-expanded', 'false');
-        button.setAttribute('aria-label', 'Show artwork details');
-        const hint = button.querySelector('.detail-hint');
-        if (hint) hint.textContent = '+';
-      }
+      button.tabIndex = 0;
     });
 
     if (forceSeries && currentColumns) setColumns(currentColumns);

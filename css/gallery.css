@@ -2328,3 +2328,115 @@ html.detail-lightbox-open body {
   .contact-name { font-size: 17px; }
   .contact-practice { font-size: 13px; }
 }
+
+
+/* ================================================================
+   2026-10-06e – Projektvorschau / Click-to-open
+   Zweispaltig = nur Hauptbild. Klick = Einspalte + geöffnetes Werk.
+   Text ist auch ohne Detailbilder ausschließlich im geöffneten Zustand sichtbar.
+   ================================================================ */
+
+/* Ein Projekt wird nicht mehr allein durch Hover geöffnet. Die ältere Hover-
+   Regel wird hier bewusst überschrieben: Aufklappen geschieht nur per Klick. */
+@media (hover: hover) and (pointer: fine) and (min-width: 701px) {
+  .painting-page .artwork.is-expandable > .artwork-detail-panel,
+  .graphic-page .artwork.is-expandable > .artwork-detail-panel,
+  .painting-page .artwork.is-expandable:hover > .artwork-detail-panel,
+  .graphic-page .artwork.is-expandable:hover > .artwork-detail-panel,
+  .painting-page .artwork.is-expandable:focus-within > .artwork-detail-panel,
+  .graphic-page .artwork.is-expandable:focus-within > .artwork-detail-panel,
+  .painting-page .artwork.layout-diptych > .artwork-detail-panel,
+  .graphic-page .artwork.layout-diptych > .artwork-detail-panel {
+    max-height: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .painting-page .artwork.is-expandable.details-visible > .artwork-detail-panel,
+  .graphic-page .artwork.is-expandable.details-visible > .artwork-detail-panel,
+  .painting-page .artwork.layout-diptych.details-visible > .artwork-detail-panel,
+  .graphic-page .artwork.layout-diptych.details-visible > .artwork-detail-panel {
+    max-height: 5000px !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* Zweispaltenansicht ist eine reine Vorschau: keine Werkangaben, keine Details,
+   kein Plus. Nur das Hauptbild bleibt sichtbar. */
+.painting-page .artwork-list[data-project-columns="2"] .artwork-detail-panel,
+.graphic-page .artwork-list[data-project-columns="2"] .artwork-detail-panel,
+.painting-page .artwork-list[data-project-columns="2"] .detail-hint,
+.graphic-page .artwork-list[data-project-columns="2"] .detail-hint {
+  display: none !important;
+}
+
+/* Das Vorschaubild verhält sich beim Hover wie ein Detailbild: sehr leichter
+   Zoom + minimale Aufhellung. Die Bewegung gilt bewusst nur zweispaltig. */
+@media (hover: hover) and (pointer: fine) and (min-width: 701px) {
+  .painting-page .artwork-list[data-project-columns="2"] .hero-wrap,
+  .graphic-page .artwork-list[data-project-columns="2"] .hero-wrap,
+  .painting-page .artwork-list[data-project-columns="2"] .artwork-toggle,
+  .graphic-page .artwork-list[data-project-columns="2"] .artwork-toggle {
+    overflow: hidden;
+  }
+
+  .painting-page .artwork-list[data-project-columns="2"] .hero-wrap:hover .artwork-main,
+  .graphic-page .artwork-list[data-project-columns="2"] .hero-wrap:hover .artwork-main {
+    transform: scale(1.012) !important;
+    filter: brightness(1.025) !important;
+  }
+}
+
+/* Klickflächen bleiben visuell vollständig neutral. */
+.painting-page .artwork-toggle,
+.graphic-page .artwork-toggle {
+  cursor: default;
+}
+
+/* Mobile: derselbe Click-to-open-Modus gilt für jedes Werk, unabhängig davon,
+   ob echte Detailbilder vorhanden sind. */
+@media (max-width: 700px) {
+  .painting-page .artwork.is-expandable > .artwork-detail-panel,
+  .graphic-page .artwork.is-expandable > .artwork-detail-panel {
+    display: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  .painting-page .artwork.is-expandable.details-visible > .artwork-detail-panel,
+  .graphic-page .artwork.is-expandable.details-visible > .artwork-detail-panel {
+    display: flex !important;
+  }
+
+  .painting-page .artwork-list[data-project-columns="2"] .artwork-detail-panel,
+  .graphic-page .artwork-list[data-project-columns="2"] .artwork-detail-panel,
+  .painting-page .artwork-list[data-project-columns="2"] .detail-hint,
+  .graphic-page .artwork-list[data-project-columns="2"] .detail-hint {
+    display: none !important;
+  }
+}
+
+/* ================================================================
+   2026-10-06f – Einspaltiger Desktop-Hover
+   Im 1-Spalten-Modus öffnet die horizontale Bildzone das Werk temporär.
+   Außerhalb dieser Bildbreite fällt es wieder in den normalen Zustand zurück.
+   Ein per Klick geöffnetes Werk (details-visible) bleibt davon unabhängig offen.
+   ================================================================ */
+@media (hover: hover) and (pointer: fine) and (min-width: 701px) {
+  .painting-page .artwork-list[data-project-columns="1"] .artwork.is-expandable.details-hover-visible > .artwork-detail-panel,
+  .graphic-page .artwork-list[data-project-columns="1"] .artwork.is-expandable.details-hover-visible > .artwork-detail-panel {
+    max-height: 5000px !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+}
