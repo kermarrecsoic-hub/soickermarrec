@@ -70,6 +70,23 @@ window.PAINTING_WORKS = [
     "shareId": "untitled-etheral-space-series-of-three"
   },
   {
+    "title": "Prozession, diptychon",
+    "medium": "ink, acrylic on canvas",
+    "dimensions": "100 x 60 cm",
+    "availability": "",
+    "text": "",
+    "images": [
+      "../images/painting/prozession-diptychon/main-20261006094623-01.jpg",
+      "../images/painting/prozession-diptychon/main-20261006094623-02.jpg",
+      "../images/painting/prozession-diptychon/main-20261006094623-03.jpg"
+    ],
+    "shareId": "prozession-diptychon",
+    "details": [
+      "../images/painting/prozession-diptychon/detail-20261006094623-01.jpg",
+      "../images/painting/prozession-diptychon/detail-20261006094623-02.jpg"
+    ]
+  },
+  {
     "title": "Untitled (Kapelle), 2026",
     "medium": "acrylic, ink, on canvas",
     "dimensions": "61 × 46 cm",
@@ -145,23 +162,6 @@ window.PAINTING_WORKS = [
     "details": [
       "../images/painting/kunstdrucke/detail-20261002213210-01.jpg",
       "../images/painting/kunstdrucke/detail-20261002213434-02.jpg"
-    ]
-  },
-  {
-    "title": "Prozession, diptychon",
-    "medium": "ink, acrylic on canvas",
-    "dimensions": "100 x 60 cm",
-    "availability": "",
-    "text": "",
-    "images": [
-      "../images/painting/prozession-diptychon/main-20261006094623-01.jpg",
-      "../images/painting/prozession-diptychon/main-20261006094623-02.jpg",
-      "../images/painting/prozession-diptychon/main-20261006094623-03.jpg"
-    ],
-    "shareId": "prozession-diptychon",
-    "details": [
-      "../images/painting/prozession-diptychon/detail-20261006094623-01.jpg",
-      "../images/painting/prozession-diptychon/detail-20261006094623-02.jpg"
     ]
   }
 ];
