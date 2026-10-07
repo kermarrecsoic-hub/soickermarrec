@@ -213,6 +213,62 @@
     setGlobalColumns(1);
   }
 
+
+  function touchDistance(touches) {
+    if (!touches || touches.length < 2) return 0;
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
+  }
+
+  // Vor dem Continuous-Scroll-Umbau konnte man mobil mit zwei Fingern
+  // zwischen 1 und 2 Spalten wechseln. Diese Funktion gilt jetzt global
+  // für den gesamten Portfolio-Inhalt.
+  function setupMobilePinchColumns() {
+    const target = document.querySelector('.continuous-content');
+    if (!target) return;
+
+    let startDistance = 0;
+    let handled = false;
+    const threshold = 46;
+
+    const reset = () => {
+      startDistance = 0;
+      handled = false;
+    };
+
+    target.addEventListener('touchstart', event => {
+      if (!mobile.matches || event.touches.length !== 2) return;
+      startDistance = touchDistance(event.touches);
+      handled = false;
+    }, { passive: true });
+
+    target.addEventListener('touchmove', event => {
+      if (!mobile.matches || event.touches.length !== 2 || !startDistance) return;
+      event.preventDefault();
+      if (handled) return;
+
+      const delta = touchDistance(event.touches) - startDistance;
+      if (Math.abs(delta) < threshold) return;
+
+      const next = delta < 0 ? 2 : 1;
+      if (next !== globalColumns) setGlobalColumns(next);
+      handled = true;
+    }, { passive: false });
+
+    target.addEventListener('touchend', event => {
+      if (event.touches.length < 2) reset();
+    }, { passive: true });
+    target.addEventListener('touchcancel', reset, { passive: true });
+
+    target.addEventListener('gesturestart', event => {
+      if (mobile.matches) event.preventDefault();
+    }, { passive: false });
+    target.addEventListener('gesturechange', event => {
+      if (mobile.matches) event.preventDefault();
+    }, { passive: false });
+  }
+
   function openProject(card, pinned = false) {
     if (!card) return;
     if (globalColumns === 2) setGlobalColumns(1);
@@ -232,9 +288,12 @@
     setProjectToggleState(card, false);
   }
 
-  function wireProjectInteraction(card, button, img) {
+  function wireProjectInteraction(card, button) {
     button.addEventListener('click', event => {
       event.preventDefault();
+
+      // Zwei Spalten sind reine Vorschau: Klick wechselt auf eine Spalte
+      // und öffnet genau dieses Werk. Das Plus ist dort bewusst ausgeblendet.
       if (globalColumns === 2) {
         setGlobalColumns(1);
         openProject(card, true);
@@ -242,45 +301,10 @@
         return;
       }
 
-      if (mobile.matches) {
-        if (card.classList.contains('is-open') && card.dataset.pinned === 'true') closeProject(card, true);
-        else openProject(card, true);
-        return;
-      }
-
-      // Desktop: Klick fixiert den per Hover geöffneten Zustand.
+      // In einer Spalte wird ausschließlich per Klick geöffnet/geschlossen.
+      // Hover bleibt nur der leichte Bild-Zoom aus dem CSS.
       if (card.classList.contains('is-open') && card.dataset.pinned === 'true') closeProject(card, true);
       else openProject(card, true);
-    });
-
-    if (!finePointer.matches) return;
-
-    let pointerTracking = false;
-    const monitorX = event => {
-      if (!pointerTracking || globalColumns !== 1 || card.dataset.pinned === 'true') return;
-      const rect = img.getBoundingClientRect();
-      if (event.clientX < rect.left || event.clientX > rect.right) {
-        pointerTracking = false;
-        closeProject(card, true);
-        window.removeEventListener('pointermove', monitorX);
-      }
-    };
-
-    button.addEventListener('mouseenter', () => {
-      if (globalColumns !== 1 || card.dataset.pinned === 'true') return;
-      openProject(card, false);
-      pointerTracking = true;
-      window.addEventListener('pointermove', monitorX, { passive: true });
-    });
-
-    card.addEventListener('mouseleave', event => {
-      if (card.dataset.pinned === 'true' || !pointerTracking) return;
-      const rect = img.getBoundingClientRect();
-      if (event.clientX < rect.left || event.clientX > rect.right) {
-        pointerTracking = false;
-        closeProject(card, true);
-        window.removeEventListener('pointermove', monitorX);
-      }
     });
   }
 
@@ -371,7 +395,7 @@
     }
 
     card.appendChild(expanded);
-    wireProjectInteraction(card, button, img);
+    wireProjectInteraction(card, button);
     return card;
   }
 
@@ -830,6 +854,7 @@
 
   renderSections();
   makeGlobalColumns();
+  setupMobilePinchColumns();
   setupContentUi();
   setupScrollState();
 })();

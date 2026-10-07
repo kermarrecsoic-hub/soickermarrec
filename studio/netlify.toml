@@ -1,6 +1,10 @@
 [build]
   publish = "public"
   functions = "netlify/functions"
+  # Nur neu deployen, wenn sich wirklich Studio-Code/-Konfiguration ändert.
+  # Content-Commits aus dem Studio (data/, images/, share/) sollen keinen
+  # neuen Netlify-Deploy auslösen. Exit 0 = Build überspringen.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF ."
 
 [[headers]]
   for = "/*"

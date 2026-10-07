@@ -775,11 +775,21 @@
 
       const titleValue = $('#fieldTitle').value.trim();
       let computedNavColor = editor.work.navColor || '';
-      try {
-        setStatus('Projektfarbe für den Navigator wird berechnet …');
-        computedNavColor = await projectNavColorForItems(editor.main) || computedNavColor;
-      } catch (error) {
-        console.warn('Navigatorfarbe konnte nicht neu berechnet werden:', error);
+      const previousMainPaths = workImages(editor.work).map(toRepoPath);
+      const mainImagesChanged = previousMainPaths.length !== mainPaths.length
+        || previousMainPaths.some((path, index) => path !== mainPaths[index]);
+
+      // Die Farbanalyse lädt bestehende Bilder über eine geschützte Function.
+      // Deshalb nur neu berechnen, wenn sich die Hauptbilder wirklich geändert
+      // haben oder noch gar keine Projektfarbe gespeichert ist. Reine Text-/
+      // Metadatenänderungen erzeugen damit keine unnötigen Function-Aufrufe.
+      if (!computedNavColor || mainImagesChanged) {
+        try {
+          setStatus('Projektfarbe für den Navigator wird berechnet …');
+          computedNavColor = await projectNavColorForItems(editor.main) || computedNavColor;
+        } catch (error) {
+          console.warn('Navigatorfarbe konnte nicht neu berechnet werden:', error);
+        }
       }
       const stableShareId = editor.config.kind === 'art'
         ? (editor.work.shareId || (!editor.isNew ? workShareId(editor.work, editor.index, editor.config) : slugify(folder || titleValue || `werk-${Date.now()}`)))
@@ -1111,9 +1121,18 @@
           const preview = document.createElement('div');
           preview.className = 'landing-slot-preview';
           const img = document.createElement('img');
-          img.src = studioImageUrl(path);
+          // Normalerweise direkt von der öffentlichen GitHub-Pages-Seite laden.
+          // Das spart pro Slot einen Netlify-Function-Aufruf. Nur wenn die Datei
+          // dort noch nicht angekommen ist, wird einmal auf den Proxy ausgewichen.
+          img.src = publicUrl(path);
           img.alt = '';
+          let proxyFallbackUsed = false;
           img.onerror = () => {
+            if (!proxyFallbackUsed) {
+              proxyFallbackUsed = true;
+              img.src = studioImageUrl(path);
+              return;
+            }
             preview.classList.add('is-empty');
             img.remove();
             preview.textContent = 'Slot leer';

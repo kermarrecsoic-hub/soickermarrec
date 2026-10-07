@@ -845,3 +845,48 @@ body.continuous-nav-open .continuous-nav-trigger { visibility: hidden; }
   }
   #contact { padding-bottom: 220px; }
 }
+
+/* ================================================================
+   2026-10-08 – project interaction parity / compact 2-column view
+   ================================================================ */
+
+/* Zwei Spalten sind auf Desktop wieder eine kompaktere Übersicht statt
+   einer fast randlosen Vollbreite. Die Einstellung gilt global. */
+@media (min-width: 701px) and (hover: hover) and (pointer: fine) {
+  .continuous-artworks[data-columns="2"] {
+    width: min(100%, 1120px);
+    margin-inline: auto;
+  }
+}
+
+/* Zwei Spalten = reine Bildvorschau. Kein Plus, kein Share und auch kein
+   leerer Bedienraum unter dem Bild. Geöffnet wird direkt per Bildklick. */
+.continuous-artworks[data-columns="2"] .continuous-project .project-under-controls {
+  display: none;
+}
+
+/* Teilen ist wieder an den geöffneten Werkzustand gekoppelt. */
+.project-share-control { display: none; }
+.continuous-project.is-open .project-share-control { display: inline-flex; }
+
+/* Die expliziten Studio-Layouts Hochformat / Querformat waren vor dem
+   Continuous-Scroll-Umbau wirksam und werden im Einspaltenmodus wieder
+   berücksichtigt. Bilder werden dabei nicht künstlich hochskaliert. */
+.continuous-artworks[data-columns="1"] .continuous-project.layout-portrait .project-main-image {
+  max-width: min(100%, 440px);
+}
+.continuous-artworks[data-columns="1"] .continuous-project.layout-landscape .project-main-image {
+  max-width: min(74vw, 920px);
+  max-height: min(72svh, 760px);
+}
+
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  .continuous-artworks[data-columns="2"] {
+    width: 100%;
+    margin-inline: 0;
+  }
+  .continuous-artworks[data-columns="1"] .continuous-project.layout-portrait .project-main-image,
+  .continuous-artworks[data-columns="1"] .continuous-project.layout-landscape .project-main-image {
+    max-width: 100%;
+  }
+}

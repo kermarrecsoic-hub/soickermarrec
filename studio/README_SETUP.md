@@ -52,3 +52,21 @@ Sortierung: höchste Sättigung zuerst, geringste Sättigung zuletzt.
 Danach kannst du die Hauptbilder weiterhin per Drag & Drop verschieben und mit `Speichern & veröffentlichen` festlegen.
 
 Das Studio ändert die **Galerie-Reihenfolge in data/xxx.js**; es benennt die Bilddateien nicht physisch um. Das ist für die Website robuster und vermeidet gebrochene Pfade.
+
+## Credits / Netlify-Abhängigkeit klein halten
+Die öffentliche Website bleibt vollständig auf GitHub Pages und benötigt Netlify nicht.
+Netlify wird nur für das geschützte Studio und dessen Schreibzugriffe auf GitHub benutzt.
+
+Diese Version enthält zusätzlich eine `ignore`-Regel in `netlify.toml`: normale Inhaltsänderungen,
+die das Studio unter `data/`, `images/` oder `share/` in GitHub schreibt, lösen keinen neuen
+Studio-Deploy aus. Ein Deploy ist nur nötig, wenn sich Dateien im Ordner `studio/` selbst ändern.
+
+Für den geringsten Verbrauch kannst du nach einem erfolgreichen Studio-Deploy in Netlify unter
+**Project configuration → Developer settings → Continuous deployment → Build settings** den
+**Build status auf „Stopped builds“** setzen. Das bereits veröffentlichte Studio und seine Functions
+bleiben dadurch erreichbar; nur automatische neue Builds werden gestoppt. Wenn wir später Studio-Code
+ändern, aktivierst du Builds einmal, deployest die neue Studio-Version und stoppst Builds danach wieder.
+
+Die Bildvorschauen im Studio laden außerdem soweit möglich direkt von `soickermarrec.de`; der
+Netlify-Bildproxy wird nur noch als Fallback bzw. für Funktionen benutzt, die die Bilddatei wirklich
+analysieren müssen. Die Projektfarbe wird bei reinen Textänderungen nicht mehr neu analysiert.
