@@ -2440,3 +2440,123 @@ html.detail-lightbox-open body {
     pointer-events: auto !important;
   }
 }
+
+
+/* ================================================================
+   2026-10-07a – Scrollender Unterseiten-Navigator + 1/2-Ansicht
+   ================================================================ */
+
+/* Der Navigator folgt beim Scrollen der Seite nach oben. Dadurch verlassen
+   die Zeilen den Viewport nacheinander. Die Variable wird global in i18n.js
+   gesetzt, damit das Verhalten auch About, Contact und Legal-Seiten betrifft. */
+.site-nav {
+  transform: translateY(var(--nav-scroll-offset, 0px));
+  will-change: transform;
+}
+
+/* Beim manuellen Öffnen steht der Navigator wieder an seiner Ausgangsposition. */
+.nav-menu-open .site-nav {
+  transform: translateY(0) !important;
+}
+
+/* Reduzierter Dropdown-Pfeil: erst sichtbar, wenn wirklich alle Nav-Zeilen
+   oberhalb des Viewports verschwunden sind. */
+.nav-dropdown-trigger {
+  position: fixed;
+  z-index: 112;
+  top: 54px;
+  right: 6.2%;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  cursor: pointer;
+  transition: opacity .18s ease, visibility .18s ease;
+}
+.nav-dropdown-trigger::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 43%;
+  width: 7px;
+  height: 7px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+body.nav-is-collapsed:not(.nav-menu-open) .nav-dropdown-trigger {
+  opacity: .72;
+  visibility: visible;
+  pointer-events: auto;
+}
+.nav-dropdown-trigger:hover,
+.nav-dropdown-trigger:focus-visible {
+  opacity: 1 !important;
+}
+.nav-dropdown-trigger:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 4px;
+}
+body.nav-menu-open .nav-dropdown-trigger {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Sehr leichte Frost-Schicht beim aufgeklappten Navigator. Sie liegt unter
+   dem Header/Navigator, aber über dem Seiteninhalt. */
+.nav-frost-overlay {
+  position: fixed;
+  z-index: 95;
+  inset: 0;
+  background: rgb(255 255 255 / 7%);
+  -webkit-backdrop-filter: blur(2.5px);
+  backdrop-filter: blur(2.5px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .2s ease, visibility .2s ease;
+}
+body.nav-menu-open .nav-frost-overlay {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+html.nav-menu-open,
+html.nav-menu-open body {
+  overflow: hidden;
+}
+
+/* 1 / 2 sitzt nun exakt in derselben oberen Zeile wie Sprachwahl links und
+   Soïc Kermarrec rechts. Die frühere 4er-Option wird in gallery.js nicht mehr
+   erzeugt. */
+.series-view-toggle {
+  top: 54px !important;
+  line-height: 20px;
+}
+
+@media (max-width: 700px) {
+  .nav-dropdown-trigger {
+    top: 27px;
+    right: 15px;
+    width: 20px;
+    height: 20px;
+  }
+  .series-view-toggle {
+    top: 27px !important;
+    line-height: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-dropdown-trigger,
+  .nav-frost-overlay {
+    transition: none;
+  }
+}
