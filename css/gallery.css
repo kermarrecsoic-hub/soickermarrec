@@ -2443,28 +2443,40 @@ html.detail-lightbox-open body {
 
 
 /* ================================================================
-   2026-10-07a – Scrollender Unterseiten-Navigator + 1/2-Ansicht
+   2026-10-07b – Fester, vom Bildrand verdeckter Unterseiten-Navigator
+   + 1/2-Ansicht
    ================================================================ */
 
-/* Der Navigator folgt beim Scrollen der Seite nach oben. Dadurch verlassen
-   die Zeilen den Viewport nacheinander. Die Variable wird global in i18n.js
-   gesetzt, damit das Verhalten auch About, Contact und Legal-Seiten betrifft. */
+/* Der Navigator selbst bewegt sich nicht mehr. Soïc Kermarrec bleibt immer
+   an exakt derselben Position sichtbar. Die übrigen Links werden in i18n.js
+   zeilenweise mit clip-path von unten nach oben abgeschnitten, sobald die
+   Oberkante des ersten Bildes / Inhalts beim Scrollen an ihnen vorbeizieht. */
 .site-nav {
-  transform: translateY(var(--nav-scroll-offset, 0px));
-  will-change: transform;
+  transform: none !important;
+  will-change: auto;
+}
+.site-nav a:first-child {
+  clip-path: none !important;
+  -webkit-clip-path: none !important;
+  pointer-events: auto !important;
+}
+.site-nav a:not(:first-child) {
+  will-change: clip-path;
 }
 
-/* Beim manuellen Öffnen steht der Navigator wieder an seiner Ausgangsposition. */
-.nav-menu-open .site-nav {
-  transform: translateY(0) !important;
+/* Beim manuellen Öffnen sind alle Unterseiten-Links wieder komplett sichtbar. */
+.nav-menu-open .site-nav a:not(:first-child) {
+  clip-path: inset(0 0 0 0) !important;
+  -webkit-clip-path: inset(0 0 0 0) !important;
+  pointer-events: auto !important;
 }
 
-/* Reduzierter Dropdown-Pfeil: erst sichtbar, wenn wirklich alle Nav-Zeilen
-   oberhalb des Viewports verschwunden sind. */
+/* Reduzierter Pfeil erscheint unterhalb von Soïc Kermarrec, sobald alle
+   Unterseiten-Links vollständig von der Bildkante verdeckt sind. */
 .nav-dropdown-trigger {
   position: fixed;
   z-index: 112;
-  top: 54px;
+  top: 84px;
   right: 6.2%;
   width: 22px;
   height: 22px;
@@ -2509,8 +2521,7 @@ body.nav-menu-open .nav-dropdown-trigger {
   pointer-events: none !important;
 }
 
-/* Sehr leichte Frost-Schicht beim aufgeklappten Navigator. Sie liegt unter
-   dem Header/Navigator, aber über dem Seiteninhalt. */
+/* Leichte Frost-Schicht nur im manuell geöffneten Zustand. */
 .nav-frost-overlay {
   position: fixed;
   z-index: 95;
@@ -2533,9 +2544,8 @@ html.nav-menu-open body {
   overflow: hidden;
 }
 
-/* 1 / 2 sitzt nun exakt in derselben oberen Zeile wie Sprachwahl links und
-   Soïc Kermarrec rechts. Die frühere 4er-Option wird in gallery.js nicht mehr
-   erzeugt. */
+/* 1 / 2 bleibt in derselben oberen Zeile wie Sprachwahl links und
+   Soïc Kermarrec rechts. */
 .series-view-toggle {
   top: 54px !important;
   line-height: 20px;
@@ -2543,7 +2553,7 @@ html.nav-menu-open body {
 
 @media (max-width: 700px) {
   .nav-dropdown-trigger {
-    top: 27px;
+    top: 52px;
     right: 15px;
     width: 20px;
     height: 20px;
