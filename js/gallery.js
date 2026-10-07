@@ -263,7 +263,7 @@
   }
 
   function setColumns(columns) {
-    if (![1, 2, 4].includes(columns)) return;
+    if (![1, 2].includes(columns)) return;
     currentColumns = columns;
     target.dataset.columns = String(columns);
     target.querySelectorAll('.artwork-images.is-series').forEach(images => layoutSeries(images, columns));
@@ -351,7 +351,7 @@
   }
 
   function availableGestureColumns() {
-    if (forceSeries) return [1, 2, 4];
+    if (forceSeries) return [1, 2];
     if (projectGrid) return [1, 2];
     return [];
   }
@@ -445,7 +445,7 @@
     controls.setAttribute('role', 'group');
     controls.setAttribute('aria-label', tr('gallery.imagesPerRow', 'Images per row'));
 
-    [1, 2, 4].forEach(columns => {
+    [1, 2].forEach(columns => {
       const button = element('button', '', '•'.repeat(columns));
       button.type = 'button';
       button.dataset.columns = String(columns);

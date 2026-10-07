@@ -428,6 +428,127 @@
 
   setupImageProtection();
 
+  /* ---------------------------------------------------------------
+     Unterseiten-Navigator
+     - Beim Laden vollständig sichtbar.
+     - Beim Scrollen bewegt er sich 1:1 mit der Seite nach oben, sodass
+       die einzelnen Zeilen nacheinander aus dem Viewport verschwinden.
+     - Erst wenn die Navigation vollständig verschwunden ist, erscheint
+       ein sehr reduzierter Pfeil zum erneuten Öffnen.
+     - Im geöffneten Zustand liegt eine leichte Frost-Schicht über der
+       Seite; Klick außerhalb oder Escape schließt wieder.
+     --------------------------------------------------------------- */
+  function setupCollapsingSubpageNavigator() {
+    const nav = document.querySelector('.site-nav');
+    const header = document.querySelector('.site-header');
+    if (!nav || !header) return;
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'nav-dropdown-trigger';
+    trigger.setAttribute('aria-label', 'Navigation öffnen');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.setAttribute('aria-controls', 'portfolio-site-nav');
+    nav.id ||= 'portfolio-site-nav';
+
+    const frost = document.createElement('div');
+    frost.className = 'nav-frost-overlay';
+    frost.setAttribute('aria-hidden', 'true');
+
+    document.body.appendChild(frost);
+    document.body.appendChild(trigger);
+
+    let menuOpen = false;
+    let scheduled = false;
+    let fullyCollapsed = false;
+    let collapseDistance = 1;
+
+    const px = value => Number.parseFloat(value) || 0;
+
+    function measure() {
+      const navStyle = getComputedStyle(nav);
+      const navTop = px(navStyle.top);
+      const navHeight = nav.getBoundingClientRect().height;
+      // Ein paar Pixel Reserve verhindern, dass die unterste Zeile noch
+      // sichtbar bleibt, wenn der Pfeil bereits erscheint.
+      collapseDistance = Math.max(1, navTop + navHeight + 4);
+      requestUpdate();
+    }
+
+    function setMenuOpen(open) {
+      menuOpen = Boolean(open);
+      document.documentElement.classList.toggle('nav-menu-open', menuOpen);
+      document.body.classList.toggle('nav-menu-open', menuOpen);
+      header.classList.toggle('nav-menu-active', menuOpen);
+      trigger.setAttribute('aria-expanded', String(menuOpen));
+      frost.setAttribute('aria-hidden', String(!menuOpen));
+
+      if (menuOpen) {
+        nav.style.setProperty('--nav-scroll-offset', '0px');
+        requestAnimationFrame(() => {
+          const firstLink = nav.querySelector('a');
+          firstLink?.focus({ preventScroll: true });
+        });
+      } else {
+        requestUpdate();
+        trigger.focus({ preventScroll: true });
+      }
+    }
+
+    function update() {
+      scheduled = false;
+      if (menuOpen) return;
+
+      const y = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
+      const offset = Math.min(y, collapseDistance);
+      nav.style.setProperty('--nav-scroll-offset', `${-offset}px`);
+
+      const nowCollapsed = offset >= collapseDistance - 0.5;
+      if (nowCollapsed !== fullyCollapsed) {
+        fullyCollapsed = nowCollapsed;
+        document.body.classList.toggle('nav-is-collapsed', fullyCollapsed);
+        trigger.tabIndex = fullyCollapsed ? 0 : -1;
+      }
+    }
+
+    function requestUpdate() {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(update);
+    }
+
+    trigger.tabIndex = -1;
+    trigger.addEventListener('click', () => setMenuOpen(true));
+    frost.addEventListener('click', () => setMenuOpen(false));
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && menuOpen) setMenuOpen(false);
+    });
+
+    // Ein Link darf normal navigieren. Beim aktuellen Link wird das Menü
+    // vorher geschlossen, damit man nicht in einem offenen Overlay hängenbleibt.
+    nav.addEventListener('click', event => {
+      const link = event.target.closest('a');
+      if (!link || !menuOpen) return;
+      if (link.getAttribute('aria-current') === 'page') setMenuOpen(false);
+    });
+
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', measure, { passive: true });
+    window.addEventListener('load', measure, { once: true });
+
+    // Fonts und dynamisch erzeugte Galerieinhalte können die Nav-Höhe nach
+    // dem ersten Script-Lauf noch minimal verändern.
+    if ('ResizeObserver' in window) {
+      const resizeObserver = new ResizeObserver(measure);
+      resizeObserver.observe(nav);
+    }
+
+    measure();
+  }
+
+  setupCollapsingSubpageNavigator();
+
   window.SoicI18n = {
     language: lang,
     currentLanguage: () => lang,
