@@ -572,3 +572,135 @@ body.continuous-nav-open .continuous-nav-trigger { visibility: hidden; }
   .continuous-nav-frost,
   .media-viewer { transition: none !important; }
 }
+
+/* ================================================================
+   2026-10-07b – Seitentrennung, Punkt-Umschalter, globale UI
+   ================================================================ */
+
+/* Mehr Weißraum zwischen den Bereichen, ohne den 50%-Landing-Übergang
+   zum ersten Painting-Bild zu verschieben. */
+.portfolio-section + .portfolio-section {
+  margin-top: clamp(170px, 18vw, 300px);
+}
+
+/* Sichtbarer, reduzierter Seitentitel im Weißraum. Painting wird absolut
+   oberhalb des ersten Bildes gesetzt, damit dessen Eintrittspunkt unverändert bleibt. */
+.continuous-section-title {
+  margin: 0 0 clamp(74px, 8vw, 124px);
+  text-align: center;
+  font: 300 12px/1.4 var(--site-font);
+  letter-spacing: .45px;
+  color: var(--ink);
+}
+#painting { position: relative; }
+#painting > .continuous-section-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -72px;
+  margin: 0;
+  pointer-events: none;
+}
+
+/* 1 / 2 nicht mehr als Ziffern, sondern als ein bzw. zwei Punkte. */
+.global-columns {
+  gap: 11px;
+}
+.global-columns button {
+  min-width: 16px;
+  min-height: 16px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: .42;
+  text-decoration: none !important;
+}
+.global-columns button.is-active { opacity: 1; }
+.column-dots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.column-dot {
+  display: block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Rechte UI zurück auf die früheren Unterseiten-Größen. */
+.continuous-name,
+.continuous-nav-menu a {
+  font-size: 14px;
+}
+@keyframes continuous-font-cycle {
+  0%, 33.332% { font-family: var(--site-font); font-size: 14px; font-weight: 300; }
+  33.333%, 66.665% { font-family: Baskerville, "Baskerville Old Face", Georgia, serif; font-size: 14px; font-weight: 300; }
+  66.666%, 100% { font-family: "Michroma", Arial, sans-serif; font-size: 11px; font-weight: 400; }
+}
+
+/* Sprachwahl und Footer gehören jetzt zur dauerhaft sichtbaren globalen UI. */
+.continuous-home .language-switch {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  z-index: 1250;
+}
+.continuous-global-footer {
+  position: fixed !important;
+  z-index: 1180;
+  left: 0;
+  bottom: 12px;
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none;
+}
+.continuous-global-footer a { pointer-events: auto; }
+
+/* Contact wieder in der alten, kleinen Porträtlogik. */
+.continuous-contact-grid {
+  width: min(100%, 620px);
+  display: block;
+  text-align: center;
+}
+.continuous-contact-grid > img {
+  width: clamp(118px, 12vw, 168px);
+  height: auto;
+  max-height: 225px;
+  object-fit: contain;
+  margin: 0 auto 30px;
+}
+.continuous-contact-copy { text-align: center; }
+.continuous-contact-links { justify-content: center; }
+
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  .portfolio-section + .portfolio-section {
+    margin-top: 150px;
+  }
+  .continuous-section-title {
+    margin-bottom: 66px;
+    font-size: 13px;
+  }
+  #painting > .continuous-section-title { top: -58px; }
+
+  .continuous-name,
+  .continuous-nav-menu a { font-size: 12px; }
+  .continuous-name.is-cycling,
+  .continuous-nav-menu a.is-active { animation-name: continuous-font-cycle-mobile-old; }
+  @keyframes continuous-font-cycle-mobile-old {
+    0%, 33.332% { font-family: var(--site-font); font-size: 12px; font-weight: 300; }
+    33.333%, 66.665% { font-family: Baskerville, "Baskerville Old Face", Georgia, serif; font-size: 12px; font-weight: 300; }
+    66.666%, 100% { font-family: "Michroma", Arial, sans-serif; font-size: 9px; font-weight: 400; }
+  }
+
+  .continuous-global-footer { bottom: 9px; }
+  .continuous-contact-grid > img {
+    width: 126px;
+    max-height: none;
+    margin-bottom: 26px;
+  }
+}
