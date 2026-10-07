@@ -784,3 +784,64 @@ body.continuous-nav-open .continuous-nav-trigger { visibility: hidden; }
   .project-under-controls { margin-top: 7px; min-height: 28px; }
   .project-expand-control { font-size: 20px; }
 }
+
+
+/* ================================================================
+   2026-10-07d – spacing, controls and loading refinement
+   ================================================================ */
+
+/* Mehr Luft zwischen einzelnen Projekten in Ausstellung und Architektur. */
+#exhibitions .continuous-artworks[data-columns="1"],
+#architecture .continuous-artworks[data-columns="1"] {
+  row-gap: clamp(170px, 22vh, 300px);
+}
+#exhibitions .continuous-artworks[data-columns="2"],
+#architecture .continuous-artworks[data-columns="2"] {
+  row-gap: clamp(90px, 10vw, 160px);
+}
+
+/* Plus exakt mittig unter dem sichtbaren Hauptbild; Teilen-Punkt bündig
+   mit dessen rechter Außenkante, beide auf derselben Zeile. */
+.project-under-controls {
+  position: relative;
+  align-self: center;
+  justify-content: center;
+  max-width: 100%;
+  min-height: 26px;
+}
+.project-expand-control {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+.project-share-control {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.project-expand-control:hover,
+.project-expand-control:focus-visible {
+  transform: translateX(-50%);
+}
+.project-share-control:hover,
+.project-share-control:focus-visible {
+  transform: scale(1.25);
+}
+
+/* Unter Kontakt bewusst mehr leerer Raum, bevor das Dokument endet. */
+#contact {
+  padding-bottom: clamp(240px, 34vh, 440px);
+}
+
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  #exhibitions .continuous-artworks[data-columns="1"],
+  #architecture .continuous-artworks[data-columns="1"] {
+    row-gap: 150px;
+  }
+  #exhibitions .continuous-artworks[data-columns="2"],
+  #architecture .continuous-artworks[data-columns="2"] {
+    row-gap: 74px;
+  }
+  #contact { padding-bottom: 220px; }
+}
