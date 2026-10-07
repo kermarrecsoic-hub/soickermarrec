@@ -704,3 +704,83 @@ body.continuous-nav-open .continuous-nav-trigger { visibility: hidden; }
     margin-bottom: 26px;
   }
 }
+
+
+/* ================================================================
+   2026-10-07c – ursprüngliche Projektabstände + Plus + Teilen
+   ================================================================ */
+
+/* Painting / Graphic: Abstände wieder wie vor der Continuous-Scroll-Umstellung. */
+#painting .continuous-artworks[data-columns="1"],
+#graphic .continuous-artworks[data-columns="1"] {
+  row-gap: clamp(130px, 23vh, 270px);
+  column-gap: 0;
+}
+#painting .continuous-artworks[data-columns="2"],
+#graphic .continuous-artworks[data-columns="2"] {
+  row-gap: clamp(38px, 4.8vw, 76px);
+  column-gap: clamp(24px, 3.4vw, 50px);
+}
+
+/* Hauptbild + minimalistische Bedienelemente darunter. */
+.project-main-shell {
+  flex-direction: column;
+}
+.project-under-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  min-height: 26px;
+  margin-top: 7px;
+}
+.project-expand-control,
+.project-share-control {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #999;
+  margin: 0;
+  padding: 0;
+  min-width: 18px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--site-font);
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+  opacity: .58;
+  transition: opacity .18s ease, color .18s ease, transform .18s ease;
+}
+.project-expand-control { font-size: 20px; }
+.project-share-control { font-size: 12px; }
+.project-expand-control:hover,
+.project-expand-control:focus-visible,
+.project-share-control:hover,
+.project-share-control:focus-visible {
+  color: var(--ink);
+  opacity: 1;
+}
+.project-share-control:hover,
+.project-share-control:focus-visible { transform: scale(1.25); }
+.project-expand-control:focus-visible,
+.project-share-control:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  #painting .continuous-artworks[data-columns="1"],
+  #graphic .continuous-artworks[data-columns="1"] {
+    row-gap: 140px;
+  }
+  #painting .continuous-artworks[data-columns="2"],
+  #graphic .continuous-artworks[data-columns="2"] {
+    row-gap: 58px;
+    column-gap: 12px;
+  }
+  .project-under-controls { margin-top: 7px; min-height: 28px; }
+  .project-expand-control { font-size: 20px; }
+}
