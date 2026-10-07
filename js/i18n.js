@@ -465,48 +465,21 @@
     document.body.appendChild(trigger);
 
     let menuOpen = false;
-    let scheduled = false;
-    let fullyCollapsed = false;
-    let mobileCollapseLatched = false;
-    const mobileNavQuery = window.matchMedia('(max-width: 700px), (hover: none) and (pointer: coarse)');
-    let coverSource = null;
-    let coverOffset = 0;
 
-    function findCoverSource() {
-      return document.querySelector(
-        '#artworks .artwork-main, .editorial-picture, .contact-portrait, .not-found-content, .legal-content, main'
-      );
-    }
-
-    function syncCoverSource() {
-      const next = findCoverSource();
-      if (!next) return null;
-
-      if (next !== coverSource) {
-        coverSource = next;
-        const sourceTop = next.getBoundingClientRect().top;
-        const navBottom = nav.getBoundingClientRect().bottom;
-        // Auf scrollY = 0 bleibt die Navigation garantiert vollständig sichtbar.
-        // Danach wandert die virtuelle Abdeckkante exakt 1:1 mit dem Bild nach oben.
-        coverOffset = Math.max(0, navBottom - sourceTop + 1);
-      }
-      return coverSource;
-    }
-
-    function resetLinkClipping() {
+    function hidePageLinks() {
       pageLinks.forEach(link => {
-        link.style.removeProperty('--nav-link-eaten');
-        link.style.removeProperty('clip-path');
-        link.style.removeProperty('-webkit-clip-path');
-        link.style.removeProperty('pointer-events');
+        link.style.clipPath = 'inset(0 0 100% 0)';
+        link.style.webkitClipPath = 'inset(0 0 100% 0)';
+        link.style.pointerEvents = 'none';
       });
     }
 
-    function setCollapsedState(collapsed) {
-      if (collapsed === fullyCollapsed) return;
-      fullyCollapsed = collapsed;
-      document.body.classList.toggle('nav-is-collapsed', fullyCollapsed);
-      trigger.tabIndex = fullyCollapsed ? 0 : -1;
+    function showPageLinks() {
+      pageLinks.forEach(link => {
+        link.style.clipPath = 'inset(0 0 0 0)';
+        link.style.webkitClipPath = 'inset(0 0 0 0)';
+        link.style.pointerEvents = 'auto';
+      });
     }
 
     function setMenuOpen(open) {
@@ -518,115 +491,32 @@
       frost.setAttribute('aria-hidden', String(!menuOpen));
 
       if (menuOpen) {
-        resetLinkClipping();
-        setCollapsedState(false);
+        showPageLinks();
         requestAnimationFrame(() => {
           const current = nav.querySelector('a[aria-current="page"]') || pageLinks[0];
           current?.focus({ preventScroll: true });
         });
       } else {
-        requestUpdate();
+        hidePageLinks();
         trigger.focus({ preventScroll: true });
       }
     }
 
-    function update() {
-      scheduled = false;
-      if (menuOpen) return;
+    // Unterseiten verwenden den Navigator ab jetzt ausschließlich als Dropdown.
+    // Scrollrichtung oder Scrollposition verändern seinen Zustand nicht mehr.
+    document.body.classList.add('nav-is-collapsed');
+    hidePageLinks();
+    trigger.tabIndex = 0;
 
-      const y = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
-      const source = syncCoverSource();
-
-      const isMobileNav = mobileNavQuery.matches;
-
-      // Ganz oben ist die Navigation auf jeder Seite wieder vollständig sichtbar.
-      // Auf Mobile wird damit auch die Verriegelung aufgehoben.
-      if (!source || y <= 0.5) {
-        mobileCollapseLatched = false;
-        resetLinkClipping();
-        setCollapsedState(false);
-        return;
-      }
-
-      // Mobile: Sobald der Navigator einmal komplett von der Bildkante
-      // verdeckt wurde, bleibt er geschlossen. Ein kleines Hochscrollen darf
-      // ihn nicht wieder hervorholen; zurück kommt er nur ganz oben oder über
-      // den Pfeil. Desktop bleibt weiterhin rein positionsabhängig.
-      if (!isMobileNav) mobileCollapseLatched = false;
-      if (isMobileNav && mobileCollapseLatched) {
-        pageLinks.forEach(link => {
-          const rect = link.getBoundingClientRect();
-          const eaten = Math.max(0, rect.height);
-          link.style.setProperty('--nav-link-eaten', `${eaten.toFixed(2)}px`);
-          link.style.clipPath = `inset(0 0 ${eaten.toFixed(2)}px 0)`;
-          link.style.webkitClipPath = `inset(0 0 ${eaten.toFixed(2)}px 0)`;
-          link.style.pointerEvents = 'none';
-        });
-        setCollapsedState(true);
-        return;
-      }
-
-      const coverY = source.getBoundingClientRect().top + coverOffset;
-      let allHidden = true;
-
-      pageLinks.forEach(link => {
-        const rect = link.getBoundingClientRect();
-        const eaten = Math.max(0, Math.min(rect.height, rect.bottom - coverY));
-        const fullyHidden = eaten >= rect.height - 0.5;
-
-        // Die Zeile selbst bewegt sich nie. Nur ihr sichtbarer Bereich wird von
-        // unten nach oben abgeschnitten – wie von der Bildoberkante überdeckt.
-        link.style.setProperty('--nav-link-eaten', `${eaten.toFixed(2)}px`);
-        link.style.clipPath = `inset(0 0 ${eaten.toFixed(2)}px 0)`;
-        link.style.webkitClipPath = `inset(0 0 ${eaten.toFixed(2)}px 0)`;
-        link.style.pointerEvents = fullyHidden ? 'none' : 'auto';
-
-        if (!fullyHidden) allHidden = false;
-      });
-
-      if (isMobileNav && allHidden) mobileCollapseLatched = true;
-      setCollapsedState(allHidden);
-    }
-
-    function requestUpdate() {
-      if (scheduled) return;
-      scheduled = true;
-      requestAnimationFrame(update);
-    }
-
-    trigger.tabIndex = -1;
     trigger.addEventListener('click', () => setMenuOpen(true));
     frost.addEventListener('click', () => setMenuOpen(false));
-
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && menuOpen) setMenuOpen(false);
     });
-
     nav.addEventListener('click', event => {
       const link = event.target.closest('a');
-      if (!link || !menuOpen) return;
-      if (link.getAttribute('aria-current') === 'page') setMenuOpen(false);
+      if (link && menuOpen) setMenuOpen(false);
     });
-
-    window.addEventListener('scroll', requestUpdate, { passive: true });
-    window.addEventListener('resize', () => {
-      coverSource = null;
-      requestUpdate();
-    }, { passive: true });
-    window.addEventListener('load', () => {
-      coverSource = null;
-      requestUpdate();
-    }, { once: true });
-
-    // Die Galerien werden nach i18n.js dynamisch aufgebaut. Sobald das erste
-    // Bild erscheint, wird die Abdeckkante neu auf dieses Bild kalibriert.
-    const contentObserver = new MutationObserver(() => {
-      if ((window.scrollY || 0) <= 1) coverSource = null;
-      requestUpdate();
-    });
-    contentObserver.observe(document.body, { childList: true, subtree: true });
-
-    requestUpdate();
   }
 
   setupCollapsingSubpageNavigator();
