@@ -62,6 +62,82 @@
     return img;
   }
 
+  function slugifyShare(value = '') {
+    return String(value)
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/ß/g, 'ss')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60);
+  }
+
+  function projectShareId(work, index, mainPath, sectionId) {
+    const explicit = slugifyShare(work.shareId || '');
+    if (explicit) return explicit;
+
+    const first = String(mainPath || work.image || '').replace(/^\.\.\//, '').replace(/^\/+/, '');
+    const root = sectionId === 'painting' ? 'images/painting/' : 'images/ink/';
+    if (first.startsWith(root)) {
+      const rest = first.slice(root.length);
+      const folder = rest.includes('/') ? rest.split('/')[0] : rest.replace(/\.[^.]+$/, '');
+      const fromFolder = slugifyShare(folder);
+      if (fromFolder) return fromFolder;
+    }
+    return slugifyShare(work.title || '') || `werk-${index + 1}`;
+  }
+
+  function projectShareUrl(work, index, mainPath, sectionId) {
+    const id = projectShareId(work, index, mainPath, sectionId);
+    return new URL(`/share/${sectionId}/${encodeURIComponent(id)}.html`, window.location.origin).href;
+  }
+
+  function shareFileName(title, mime = 'image/jpeg') {
+    const ext = mime.includes('png') ? 'png' : (mime.includes('webp') ? 'webp' : 'jpg');
+    return `${slugifyShare(title || 'soic-kermarrec') || 'soic-kermarrec'}.${ext}`;
+  }
+
+  async function shareProject(work, index, mainPath, sectionId) {
+    const title = work.title || tr('gallery.work', 'Werk');
+    const url = projectShareUrl(work, index, mainPath, sectionId);
+    const text = `${title} — Soïc Kermarrec`;
+
+    if (navigator.share) {
+      try {
+        let file = null;
+        if (mainPath && navigator.canShare) {
+          try {
+            const response = await fetch(mainPath, { cache: 'force-cache' });
+            if (response.ok) {
+              const blob = await response.blob();
+              const candidate = new File([blob], shareFileName(title, blob.type), { type: blob.type || 'image/jpeg' });
+              if (navigator.canShare({ files: [candidate] })) file = candidate;
+            }
+          } catch {}
+        }
+        const data = { title: text, text, url };
+        if (file) data.files = [file];
+        await navigator.share(data);
+        return;
+      } catch (error) {
+        if (error?.name === 'AbortError') return;
+      }
+    }
+
+    const message = `${text}\n${url}`;
+    window.location.href = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  }
+
+  function setProjectToggleState(card, open) {
+    card.querySelector('.project-main-button')?.setAttribute('aria-expanded', String(open));
+    const expand = card.querySelector('.project-expand-control');
+    if (expand) {
+      expand.textContent = open ? '−' : '+';
+      expand.setAttribute('aria-expanded', String(open));
+      expand.setAttribute('aria-label', open ? tr('gallery.hideDetails', 'Details ausblenden') : tr('gallery.showDetails', 'Details zeigen'));
+    }
+  }
+
   function addDescription(panel, work) {
     const box = el('div', 'project-description');
     if (work.title) box.appendChild(el('h3', '', work.title));
@@ -122,8 +198,7 @@
     });
     card.classList.add('is-open');
     if (pinned) card.dataset.pinned = 'true';
-    const button = card.querySelector('.project-main-button');
-    button?.setAttribute('aria-expanded', 'true');
+    setProjectToggleState(card, true);
   }
 
   function closeProject(card, force = false) {
@@ -131,7 +206,7 @@
     if (!force && card.dataset.pinned === 'true') return;
     card.classList.remove('is-open');
     card.dataset.pinned = 'false';
-    card.querySelector('.project-main-button')?.setAttribute('aria-expanded', 'false');
+    setProjectToggleState(card, false);
   }
 
   function wireProjectInteraction(card, button, img) {
@@ -205,6 +280,39 @@
     img.className = 'project-main-image';
     button.appendChild(img);
     shell.appendChild(button);
+
+    const controls = el('div', 'project-under-controls');
+    const expandButton = el('button', 'project-expand-control', '+');
+    expandButton.type = 'button';
+    expandButton.setAttribute('aria-expanded', 'false');
+    expandButton.setAttribute('aria-label', tr('gallery.showDetails', 'Details zeigen'));
+    expandButton.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (globalColumns === 2) {
+        setGlobalColumns(1);
+        openProject(card, true);
+        requestAnimationFrame(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+        return;
+      }
+      if (card.classList.contains('is-open') && card.dataset.pinned === 'true') closeProject(card, true);
+      else openProject(card, true);
+    });
+    controls.appendChild(expandButton);
+
+    if (sectionId === 'painting' || sectionId === 'graphic') {
+      const shareButton = el('button', 'project-share-control', '•');
+      shareButton.type = 'button';
+      shareButton.setAttribute('aria-label', `${tr('gallery.shareViaWhatsApp', 'Werk teilen')}: ${work.title || tr('gallery.work', 'Werk')}`);
+      shareButton.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        shareProject(work, index, paths.main, sectionId);
+      });
+      controls.appendChild(shareButton);
+    }
+
+    shell.appendChild(controls);
     card.appendChild(shell);
 
     const expanded = el('div', 'project-expanded');
