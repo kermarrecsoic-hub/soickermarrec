@@ -467,6 +467,8 @@
     let menuOpen = false;
     let scheduled = false;
     let fullyCollapsed = false;
+    let mobileCollapseLatched = false;
+    const mobileNavQuery = window.matchMedia('(max-width: 700px), (hover: none) and (pointer: coarse)');
     let coverSource = null;
     let coverOffset = 0;
 
@@ -535,10 +537,32 @@
       const y = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
       const source = syncCoverSource();
 
-      // Direkt nach dem Laden: exakt die bisherige, komplett sichtbare Navigation.
+      const isMobileNav = mobileNavQuery.matches;
+
+      // Ganz oben ist die Navigation auf jeder Seite wieder vollständig sichtbar.
+      // Auf Mobile wird damit auch die Verriegelung aufgehoben.
       if (!source || y <= 0.5) {
+        mobileCollapseLatched = false;
         resetLinkClipping();
         setCollapsedState(false);
+        return;
+      }
+
+      // Mobile: Sobald der Navigator einmal komplett von der Bildkante
+      // verdeckt wurde, bleibt er geschlossen. Ein kleines Hochscrollen darf
+      // ihn nicht wieder hervorholen; zurück kommt er nur ganz oben oder über
+      // den Pfeil. Desktop bleibt weiterhin rein positionsabhängig.
+      if (!isMobileNav) mobileCollapseLatched = false;
+      if (isMobileNav && mobileCollapseLatched) {
+        pageLinks.forEach(link => {
+          const rect = link.getBoundingClientRect();
+          const eaten = Math.max(0, rect.height);
+          link.style.setProperty('--nav-link-eaten', `${eaten.toFixed(2)}px`);
+          link.style.clipPath = `inset(0 0 ${eaten.toFixed(2)}px 0)`;
+          link.style.webkitClipPath = `inset(0 0 ${eaten.toFixed(2)}px 0)`;
+          link.style.pointerEvents = 'none';
+        });
+        setCollapsedState(true);
         return;
       }
 
@@ -560,6 +584,7 @@
         if (!fullyHidden) allHidden = false;
       });
 
+      if (isMobileNav && allHidden) mobileCollapseLatched = true;
       setCollapsedState(allHidden);
     }
 
