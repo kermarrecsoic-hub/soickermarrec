@@ -144,6 +144,7 @@
     const H = innerHeight;
     const scale = W / bg.naturalWidth;
     const renderedHeight = bg.naturalHeight * scale;
+    const bgRect = bg.getBoundingClientRect();
     const canvas = document.createElement('canvas');
     canvas.width = bg.naturalWidth;
     canvas.height = bg.naturalHeight;
@@ -155,11 +156,12 @@
       const rect = link.getBoundingClientRect();
       const sxScreen = rect.left + rect.width / 2;
       const syScreen = rect.top + rect.height / 2;
+      const syImage = syScreen - bgRect.top;
       let rgb = [255, 255, 255];
 
-      if (syScreen >= 0 && syScreen < renderedHeight) {
+      if (syImage >= 0 && syImage < renderedHeight) {
         const ox = Math.max(0, Math.min(bg.naturalWidth - 1, Math.round(sxScreen / scale)));
-        const oy = Math.max(0, Math.min(bg.naturalHeight - 1, Math.round(syScreen / scale)));
+        const oy = Math.max(0, Math.min(bg.naturalHeight - 1, Math.round(syImage / scale)));
         const radius = Math.max(2, Math.round(9 / Math.max(scale, .01)));
         const x0 = Math.max(0, ox - radius);
         const y0 = Math.max(0, oy - radius);
@@ -177,7 +179,7 @@
       rgb = rgb.map(v => v * .90 + 255 * .10);
 
       // Gleiche Weißblende wie im CSS: Verlauf von 22 % bis 78 % der Viewporthöhe.
-      const y = Math.max(0, Math.min(1, syScreen / H));
+      const y = Math.max(0, Math.min(1, syImage / H));
       let white = 0;
       if (y > .22 && y < .78) {
         const t = (y - .22) / (.78 - .22);
@@ -221,15 +223,19 @@
     });
   }
 
-  // Auf der Landingpage bedeutet Klick auf den Namen ausdrücklich: neu laden.
+  // Im kontinuierlichen Portfolio führt der Name zurück an den Seitenanfang.
   home.addEventListener('click', event => {
     event.preventDefault();
-    location.reload();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   addEventListener('resize', () => {
     scheduleContrast();
   });
+  addEventListener('scroll', () => {
+    const stage = document.querySelector('.landing-scroll-stage');
+    if (!stage || stage.getBoundingClientRect().bottom > 0) scheduleContrast();
+  }, { passive: true });
   mobileQuery.addEventListener?.('change', () => {
     chooseInitialSlot();
     setBackground();
