@@ -2539,11 +2539,6 @@ body.nav-menu-open .nav-frost-overlay {
   visibility: visible;
   pointer-events: auto;
 }
-html.nav-menu-open,
-html.nav-menu-open body {
-  overflow: hidden;
-}
-
 /* 1 / 2 bleibt in derselben oberen Zeile wie Sprachwahl links und
    Soïc Kermarrec rechts. */
 .series-view-toggle {
@@ -2568,5 +2563,29 @@ html.nav-menu-open body {
   .nav-dropdown-trigger,
   .nav-frost-overlay {
     transition: none;
+  }
+}
+
+
+/* ================================================================
+   2026-10-07c – Mobile-Navigator-Latch + synchrones About-Layout
+   ================================================================ */
+
+/* About: Bild und Text gehören zu derselben normalen Grid-Zeile.
+   Das Bild ist nicht mehr sticky; dadurch scrollen beide Spalten exakt
+   gemeinsam und das Öffnen des Frost-Navigators verändert ihre Position nicht. */
+@media (min-width: 701px) {
+  .about-page .about-content {
+    align-items: start !important;
+  }
+  .about-page .editorial-picture {
+    position: static !important;
+    top: auto !important;
+    align-self: start !important;
+    margin-top: 0 !important;
+  }
+  .about-page .editorial-text {
+    padding-top: 0 !important;
+    align-self: start !important;
   }
 }
