@@ -431,17 +431,23 @@
   /* ---------------------------------------------------------------
      Unterseiten-Navigator
      - Beim Laden vollständig sichtbar.
-     - Beim Scrollen bewegt er sich 1:1 mit der Seite nach oben, sodass
-       die einzelnen Zeilen nacheinander aus dem Viewport verschwinden.
-     - Erst wenn die Navigation vollständig verschwunden ist, erscheint
-       ein sehr reduzierter Pfeil zum erneuten Öffnen.
-     - Im geöffneten Zustand liegt eine leichte Frost-Schicht über der
-       Seite; Klick außerhalb oder Escape schließt wieder.
+     - Soïc Kermarrec bleibt immer fest an seiner Position sichtbar.
+     - Beim Scrollen bleiben auch die übrigen Nav-Zeilen an ihrer Position;
+       die Oberkante des ersten Bildes / Hauptinhalts schneidet sie von unten
+       nach oben weg, statt den Navigator selbst zu verschieben.
+     - Wenn alle Unterseiten-Links verdeckt sind, erscheint ein reduzierter
+       Pfeil. Er öffnet den kompletten Navigator über einer leichten
+       Frost-Schicht; Klick außerhalb oder Escape schließt ihn wieder.
      --------------------------------------------------------------- */
   function setupCollapsingSubpageNavigator() {
     const nav = document.querySelector('.site-nav');
     const header = document.querySelector('.site-header');
     if (!nav || !header) return;
+
+    const links = [...nav.querySelectorAll('a')];
+    const nameLink = links[0];
+    const pageLinks = links.slice(1);
+    if (!nameLink || !pageLinks.length) return;
 
     const trigger = document.createElement('button');
     trigger.type = 'button';
@@ -461,18 +467,44 @@
     let menuOpen = false;
     let scheduled = false;
     let fullyCollapsed = false;
-    let collapseDistance = 1;
+    let coverSource = null;
+    let coverOffset = 0;
 
-    const px = value => Number.parseFloat(value) || 0;
+    function findCoverSource() {
+      return document.querySelector(
+        '#artworks .artwork-main, .editorial-picture, .contact-portrait, .not-found-content, .legal-content, main'
+      );
+    }
 
-    function measure() {
-      const navStyle = getComputedStyle(nav);
-      const navTop = px(navStyle.top);
-      const navHeight = nav.getBoundingClientRect().height;
-      // Ein paar Pixel Reserve verhindern, dass die unterste Zeile noch
-      // sichtbar bleibt, wenn der Pfeil bereits erscheint.
-      collapseDistance = Math.max(1, navTop + navHeight + 4);
-      requestUpdate();
+    function syncCoverSource() {
+      const next = findCoverSource();
+      if (!next) return null;
+
+      if (next !== coverSource) {
+        coverSource = next;
+        const sourceTop = next.getBoundingClientRect().top;
+        const navBottom = nav.getBoundingClientRect().bottom;
+        // Auf scrollY = 0 bleibt die Navigation garantiert vollständig sichtbar.
+        // Danach wandert die virtuelle Abdeckkante exakt 1:1 mit dem Bild nach oben.
+        coverOffset = Math.max(0, navBottom - sourceTop + 1);
+      }
+      return coverSource;
+    }
+
+    function resetLinkClipping() {
+      pageLinks.forEach(link => {
+        link.style.removeProperty('--nav-link-eaten');
+        link.style.removeProperty('clip-path');
+        link.style.removeProperty('-webkit-clip-path');
+        link.style.removeProperty('pointer-events');
+      });
+    }
+
+    function setCollapsedState(collapsed) {
+      if (collapsed === fullyCollapsed) return;
+      fullyCollapsed = collapsed;
+      document.body.classList.toggle('nav-is-collapsed', fullyCollapsed);
+      trigger.tabIndex = fullyCollapsed ? 0 : -1;
     }
 
     function setMenuOpen(open) {
@@ -484,10 +516,11 @@
       frost.setAttribute('aria-hidden', String(!menuOpen));
 
       if (menuOpen) {
-        nav.style.setProperty('--nav-scroll-offset', '0px');
+        resetLinkClipping();
+        setCollapsedState(false);
         requestAnimationFrame(() => {
-          const firstLink = nav.querySelector('a');
-          firstLink?.focus({ preventScroll: true });
+          const current = nav.querySelector('a[aria-current="page"]') || pageLinks[0];
+          current?.focus({ preventScroll: true });
         });
       } else {
         requestUpdate();
@@ -500,15 +533,34 @@
       if (menuOpen) return;
 
       const y = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
-      const offset = Math.min(y, collapseDistance);
-      nav.style.setProperty('--nav-scroll-offset', `${-offset}px`);
+      const source = syncCoverSource();
 
-      const nowCollapsed = offset >= collapseDistance - 0.5;
-      if (nowCollapsed !== fullyCollapsed) {
-        fullyCollapsed = nowCollapsed;
-        document.body.classList.toggle('nav-is-collapsed', fullyCollapsed);
-        trigger.tabIndex = fullyCollapsed ? 0 : -1;
+      // Direkt nach dem Laden: exakt die bisherige, komplett sichtbare Navigation.
+      if (!source || y <= 0.5) {
+        resetLinkClipping();
+        setCollapsedState(false);
+        return;
       }
+
+      const coverY = source.getBoundingClientRect().top + coverOffset;
+      let allHidden = true;
+
+      pageLinks.forEach(link => {
+        const rect = link.getBoundingClientRect();
+        const eaten = Math.max(0, Math.min(rect.height, rect.bottom - coverY));
+        const fullyHidden = eaten >= rect.height - 0.5;
+
+        // Die Zeile selbst bewegt sich nie. Nur ihr sichtbarer Bereich wird von
+        // unten nach oben abgeschnitten – wie von der Bildoberkante überdeckt.
+        link.style.setProperty('--nav-link-eaten', `${eaten.toFixed(2)}px`);
+        link.style.clipPath = `inset(0 0 ${eaten.toFixed(2)}px 0)`;
+        link.style.webkitClipPath = `inset(0 0 ${eaten.toFixed(2)}px 0)`;
+        link.style.pointerEvents = fullyHidden ? 'none' : 'auto';
+
+        if (!fullyHidden) allHidden = false;
+      });
+
+      setCollapsedState(allHidden);
     }
 
     function requestUpdate() {
@@ -525,8 +577,6 @@
       if (event.key === 'Escape' && menuOpen) setMenuOpen(false);
     });
 
-    // Ein Link darf normal navigieren. Beim aktuellen Link wird das Menü
-    // vorher geschlossen, damit man nicht in einem offenen Overlay hängenbleibt.
     nav.addEventListener('click', event => {
       const link = event.target.closest('a');
       if (!link || !menuOpen) return;
@@ -534,17 +584,24 @@
     });
 
     window.addEventListener('scroll', requestUpdate, { passive: true });
-    window.addEventListener('resize', measure, { passive: true });
-    window.addEventListener('load', measure, { once: true });
+    window.addEventListener('resize', () => {
+      coverSource = null;
+      requestUpdate();
+    }, { passive: true });
+    window.addEventListener('load', () => {
+      coverSource = null;
+      requestUpdate();
+    }, { once: true });
 
-    // Fonts und dynamisch erzeugte Galerieinhalte können die Nav-Höhe nach
-    // dem ersten Script-Lauf noch minimal verändern.
-    if ('ResizeObserver' in window) {
-      const resizeObserver = new ResizeObserver(measure);
-      resizeObserver.observe(nav);
-    }
+    // Die Galerien werden nach i18n.js dynamisch aufgebaut. Sobald das erste
+    // Bild erscheint, wird die Abdeckkante neu auf dieses Bild kalibriert.
+    const contentObserver = new MutationObserver(() => {
+      if ((window.scrollY || 0) <= 1) coverSource = null;
+      requestUpdate();
+    });
+    contentObserver.observe(document.body, { childList: true, subtree: true });
 
-    measure();
+    requestUpdate();
   }
 
   setupCollapsingSubpageNavigator();
