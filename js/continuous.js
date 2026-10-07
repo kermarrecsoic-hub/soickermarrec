@@ -52,13 +52,36 @@
     };
   }
 
+  const deferredImages = new Set();
+  const deferredImageObserver = 'IntersectionObserver' in window
+    ? new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const img = entry.target;
+          const src = img.dataset.src;
+          if (src && !img.src) img.src = src;
+          delete img.dataset.src;
+          deferredImages.delete(img);
+          deferredImageObserver.unobserve(img);
+        });
+      }, { rootMargin: '1000px 0px' })
+    : null;
+
   function makeImage(src, alt, eager = false) {
     const img = el('img');
-    img.src = src;
     img.alt = alt || '';
     img.loading = eager ? 'eager' : 'lazy';
     img.decoding = 'async';
     img.draggable = false;
+    try { img.fetchPriority = eager ? 'high' : 'low'; } catch (_) {}
+
+    if (eager || !deferredImageObserver) {
+      img.src = src;
+    } else {
+      img.dataset.src = src;
+      deferredImages.add(img);
+      deferredImageObserver.observe(img);
+    }
     return img;
   }
 
@@ -299,6 +322,17 @@
       else openProject(card, true);
     });
     controls.appendChild(expandButton);
+
+    const syncControlsToMainImage = () => {
+      const width = Math.round(img.getBoundingClientRect().width);
+      if (width > 0) controls.style.width = `${width}px`;
+    };
+    if (img.complete && img.naturalWidth) requestAnimationFrame(syncControlsToMainImage);
+    else img.addEventListener('load', syncControlsToMainImage, { once: true });
+    if ('ResizeObserver' in window) {
+      const controlResizeObserver = new ResizeObserver(syncControlsToMainImage);
+      controlResizeObserver.observe(img);
+    }
 
     if (sectionId === 'painting' || sectionId === 'graphic') {
       const shareButton = el('button', 'project-share-control', '•');
