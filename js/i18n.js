@@ -22,10 +22,10 @@
         study: 'B.A. Architektur, HTWK Leipzig',
         exchange: 'Auslandsstudium ENSA PVS, Paris',
         exhibitionsHeading: 'Ausstellungen',
-        ex8: 'Ausstellung 8qm Paris',
-        ex111: 'Ausstellung 1+1+1',
-        exwar: 'Ausstellung „Im Krieg“',
-        exaerial: 'Ausstellung Aerial&Art'
+        ex8: 'Ausstellung 8qm Paris, Leipzig',
+        ex111: 'Ausstellung 1+1+1, Leipzig',
+        exwar: 'Ausstellung „war mine yours ours, lindenow20“, Leipzig',
+        exaerial: 'Ausstellung Aerial&Art, Leipzig'
       },
       contact: {
         role: 'Künstler & Architekturstudent',
@@ -94,10 +94,10 @@
         study: 'B.A. Architecture, HTWK Leipzig',
         exchange: 'Études en échange, ENSA PVS, Paris',
         exhibitionsHeading: 'Expositions',
-        ex8: 'Exposition 8qm Paris',
-        ex111: 'Exposition 1+1+1',
-        exwar: 'Exposition « Im Krieg »',
-        exaerial: 'Exposition Aerial&Art'
+        ex8: 'Exposition 8qm Paris, Leipzig',
+        ex111: 'Exposition 1+1+1, Leipzig',
+        exwar: 'Exposition « war mine yours ours, lindenow20 », Leipzig',
+        exaerial: 'Exposition Aerial&Art, Leipzig'
       },
       contact: {
         role: 'Artiste & étudiant en architecture',
@@ -166,10 +166,10 @@
         study: 'B.A. Architecture, HTWK Leipzig',
         exchange: 'Exchange studies, ENSA PVS, Paris',
         exhibitionsHeading: 'Exhibitions',
-        ex8: 'Exhibition 8qm Paris',
-        ex111: 'Exhibition 1+1+1',
-        exwar: 'Exhibition “Im Krieg”',
-        exaerial: 'Exhibition Aerial&Art'
+        ex8: 'Exhibition 8qm Paris, Leipzig',
+        ex111: 'Exhibition 1+1+1, Leipzig',
+        exwar: 'Exhibition “war mine yours ours, lindenow20”, Leipzig',
+        exaerial: 'Exhibition Aerial&Art, Leipzig'
       },
       contact: {
         role: 'Artist & architecture student',

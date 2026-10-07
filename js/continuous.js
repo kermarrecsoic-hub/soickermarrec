@@ -98,10 +98,16 @@
     if (!wrap) return;
     wrap.innerHTML = '';
     [1, 2].forEach(columns => {
-      const button = el('button', '', String(columns));
+      const button = el('button', 'column-dot-button');
       button.type = 'button';
       button.dataset.columns = String(columns);
       button.setAttribute('aria-label', columns === 1 ? tr('gallery.oneColumn', '1 Spalte') : `2 ${tr('gallery.columns', 'Spalten')}`);
+
+      const dots = el('span', 'column-dots');
+      dots.setAttribute('aria-hidden', 'true');
+      for (let i = 0; i < columns; i += 1) dots.appendChild(el('span', 'column-dot'));
+      button.appendChild(dots);
+
       button.addEventListener('click', () => setGlobalColumns(columns));
       wrap.appendChild(button);
     });
