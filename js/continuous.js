@@ -171,107 +171,8 @@
     panel.appendChild(box);
   }
 
-  let globalColumns = 1;
-  const allArtworkContainers = () => [...document.querySelectorAll('.continuous-artworks')];
-
-  function setGlobalColumns(columns) {
-    if (![1, 2].includes(columns)) return;
-    globalColumns = columns;
-    document.documentElement.style.setProperty('--global-columns', String(columns));
-    allArtworkContainers().forEach(container => {
-      container.dataset.columns = String(columns);
-    });
-    document.querySelectorAll('.global-columns button').forEach(button => {
-      const active = Number(button.dataset.columns) === columns;
-      button.classList.toggle('is-active', active);
-      button.setAttribute('aria-pressed', String(active));
-    });
-
-    if (columns === 2) {
-      document.querySelectorAll('.continuous-project.is-open').forEach(card => closeProject(card, true));
-    }
-  }
-
-  function makeGlobalColumns() {
-    const wrap = document.querySelector('.global-columns');
-    if (!wrap) return;
-    wrap.innerHTML = '';
-    [1, 2].forEach(columns => {
-      const button = el('button', 'column-dot-button');
-      button.type = 'button';
-      button.dataset.columns = String(columns);
-      button.setAttribute('aria-label', columns === 1 ? tr('gallery.oneColumn', '1 Spalte') : `2 ${tr('gallery.columns', 'Spalten')}`);
-
-      const dots = el('span', 'column-dots');
-      dots.setAttribute('aria-hidden', 'true');
-      for (let i = 0; i < columns; i += 1) dots.appendChild(el('span', 'column-dot'));
-      button.appendChild(dots);
-
-      button.addEventListener('click', () => setGlobalColumns(columns));
-      wrap.appendChild(button);
-    });
-    setGlobalColumns(1);
-  }
-
-
-  function touchDistance(touches) {
-    if (!touches || touches.length < 2) return 0;
-    const dx = touches[0].clientX - touches[1].clientX;
-    const dy = touches[0].clientY - touches[1].clientY;
-    return Math.hypot(dx, dy);
-  }
-
-  // Vor dem Continuous-Scroll-Umbau konnte man mobil mit zwei Fingern
-  // zwischen 1 und 2 Spalten wechseln. Diese Funktion gilt jetzt global
-  // für den gesamten Portfolio-Inhalt.
-  function setupMobilePinchColumns() {
-    const target = document.querySelector('.continuous-content');
-    if (!target) return;
-
-    let startDistance = 0;
-    let handled = false;
-    const threshold = 46;
-
-    const reset = () => {
-      startDistance = 0;
-      handled = false;
-    };
-
-    target.addEventListener('touchstart', event => {
-      if (!mobile.matches || event.touches.length !== 2) return;
-      startDistance = touchDistance(event.touches);
-      handled = false;
-    }, { passive: true });
-
-    target.addEventListener('touchmove', event => {
-      if (!mobile.matches || event.touches.length !== 2 || !startDistance) return;
-      event.preventDefault();
-      if (handled) return;
-
-      const delta = touchDistance(event.touches) - startDistance;
-      if (Math.abs(delta) < threshold) return;
-
-      const next = delta < 0 ? 2 : 1;
-      if (next !== globalColumns) setGlobalColumns(next);
-      handled = true;
-    }, { passive: false });
-
-    target.addEventListener('touchend', event => {
-      if (event.touches.length < 2) reset();
-    }, { passive: true });
-    target.addEventListener('touchcancel', reset, { passive: true });
-
-    target.addEventListener('gesturestart', event => {
-      if (mobile.matches) event.preventDefault();
-    }, { passive: false });
-    target.addEventListener('gesturechange', event => {
-      if (mobile.matches) event.preventDefault();
-    }, { passive: false });
-  }
-
   function openProject(card, pinned = false) {
     if (!card) return;
-    if (globalColumns === 2) setGlobalColumns(1);
     document.querySelectorAll('.continuous-project.is-open').forEach(other => {
       if (other !== card && other.dataset.pinned !== 'true') closeProject(other, true);
     });
@@ -288,23 +189,17 @@
     setProjectToggleState(card, false);
   }
 
-  function wireProjectInteraction(card, button) {
+  function wireProjectInteraction(card, button, galleryItems, label) {
     button.addEventListener('click', event => {
       event.preventDefault();
 
-      // Zwei Spalten sind reine Vorschau: Klick wechselt auf eine Spalte
-      // und öffnet genau dieses Werk. Das Plus ist dort bewusst ausgeblendet.
-      if (globalColumns === 2) {
-        setGlobalColumns(1);
-        openProject(card, true);
-        requestAnimationFrame(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+      // Erstes Klicken klappt das Werk auf. Ist es bereits geöffnet, wird das
+      // Hauptbild zum Einstieg in die Whitebox/Galerie des gesamten Projekts.
+      if (card.classList.contains('is-open')) {
+        openViewer(galleryItems, 0, label);
         return;
       }
-
-      // In einer Spalte wird ausschließlich per Klick geöffnet/geschlossen.
-      // Hover bleibt nur der leichte Bild-Zoom aus dem CSS.
-      if (card.classList.contains('is-open') && card.dataset.pinned === 'true') closeProject(card, true);
-      else openProject(card, true);
+      openProject(card, true);
     });
   }
 
@@ -336,12 +231,6 @@
     expandButton.addEventListener('click', event => {
       event.preventDefault();
       event.stopPropagation();
-      if (globalColumns === 2) {
-        setGlobalColumns(1);
-        openProject(card, true);
-        requestAnimationFrame(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-        return;
-      }
       if (card.classList.contains('is-open') && card.dataset.pinned === 'true') closeProject(card, true);
       else openProject(card, true);
     });
@@ -395,7 +284,7 @@
     }
 
     card.appendChild(expanded);
-    wireProjectInteraction(card, button);
+    wireProjectInteraction(card, button, [paths.main, ...paths.details], work.title || tr('gallery.work', 'Werk'));
     return card;
   }
 
@@ -775,6 +664,7 @@
 
   function setupScrollState() {
     const name = document.querySelector('.continuous-name');
+    const currentTitle = document.querySelector('[data-current-section]');
     const menuLinks = [...document.querySelectorAll('.continuous-nav-menu a[href^="#"]')];
     const photoButtons = [...document.querySelectorAll('#photography .series-image-button')];
     photoButtons.forEach(button => {
@@ -805,6 +695,13 @@
         if (active) link.setAttribute('aria-current', 'page');
         else link.removeAttribute('aria-current');
       });
+
+      // Der bisherige Spalten-Schalter ist jetzt eine ruhige Orientierung:
+      // in der Mitte steht immer der Titel des aktuell sichtbaren Abschnitts.
+      if (currentTitle && activeSection) {
+        const heading = document.querySelector(`#${activeSection} > .continuous-section-title`);
+        currentTitle.textContent = heading?.textContent?.trim() || '';
+      }
 
       if (!name || !document.body.classList.contains('content-ui-visible')) return;
 
@@ -849,12 +746,11 @@
     addEventListener('scroll', requestUpdate, { passive: true });
     addEventListener('resize', requestUpdate, { passive: true });
     addEventListener('load', requestUpdate, { once: true });
+    document.querySelector('.language-switch')?.addEventListener('click', () => setTimeout(requestUpdate, 0));
     requestUpdate();
   }
 
   renderSections();
-  makeGlobalColumns();
-  setupMobilePinchColumns();
   setupContentUi();
   setupScrollState();
 })();
