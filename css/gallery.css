@@ -2589,3 +2589,29 @@ body.nav-menu-open .nav-frost-overlay {
     align-self: start !important;
   }
 }
+
+/* ================================================================
+   2026-10-08b – leichter Kopfbalken-Gradient auf Unterseiten
+   ================================================================ */
+.site-header::before {
+  inset: 0 0 auto 0;
+  height: 126px;
+  background: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 96%) 0%,
+    rgb(255 255 255 / 86%) 38%,
+    rgb(255 255 255 / 54%) 64%,
+    rgb(255 255 255 / 0%) 100%
+  );
+}
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  .site-header::before {
+    height: 92px;
+    background: linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 96%) 0%,
+      rgb(255 255 255 / 82%) 42%,
+      rgb(255 255 255 / 0%) 100%
+    );
+  }
+}

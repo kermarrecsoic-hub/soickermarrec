@@ -890,3 +890,115 @@ body.continuous-nav-open .continuous-nav-trigger { visibility: hidden; }
     max-width: 100%;
   }
 }
+
+/* ================================================================
+   2026-10-08b – feste Abschnittslayouts / Seitentitel statt Spaltenwahl
+   ================================================================ */
+
+/* Die Spaltenauswahl ist entfernt. In der Mitte der globalen UI steht
+   stattdessen der Titel des aktuell sichtbaren Abschnitts. */
+.global-columns { display: none !important; }
+.continuous-current-section {
+  position: fixed;
+  top: var(--continuous-top);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1220;
+  max-width: min(42vw, 360px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+  text-align: center;
+  font: 300 10px/1 var(--site-font);
+  letter-spacing: .45px;
+  pointer-events: none;
+}
+
+/* Malerei und Grafik bleiben immer einspaltig. Serienseiten sind immer
+   zweispaltig; die Whitebox übernimmt dort die großformatige Einzelansicht. */
+#painting .continuous-artworks,
+#graphic .continuous-artworks {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+#exhibitions .series-grid,
+#architecture .series-grid,
+#photography .series-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+#exhibitions .series-grid,
+#architecture .series-grid {
+  width: min(100%, 1080px);
+  margin-inline: auto;
+}
+#photography .series-grid {
+  width: min(100%, 980px);
+  margin-inline: auto;
+}
+
+/* Reguläre Hauptbilder werden auf Desktop bewusst in einer ruhigen
+   Darstellungsbox gehalten. Ein Querformat erhält dadurch nicht automatisch
+   mehr visuelle Fläche als ein Hochformat. Das ausdrücklich breite
+   Diptychon behält seine Sonderbehandlung. */
+@media (min-width: 701px) and (hover: hover) and (pointer: fine) {
+  #painting .continuous-project:not(.layout-diptych) .project-main-button,
+  #graphic .continuous-project:not(.layout-diptych) .project-main-button {
+    max-width: min(72vw, 680px);
+  }
+  #painting .continuous-project:not(.layout-diptych) .project-main-image,
+  #graphic .continuous-project:not(.layout-diptych) .project-main-image {
+    max-width: 100%;
+    max-height: min(72svh, 680px);
+  }
+  #painting .continuous-project.layout-portrait .project-main-button,
+  #graphic .continuous-project.layout-portrait .project-main-button {
+    max-width: min(58vw, 470px);
+  }
+  #painting .continuous-project.layout-landscape .project-main-button,
+  #graphic .continuous-project.layout-landscape .project-main-button {
+    max-width: min(72vw, 680px);
+  }
+
+  #photography .series-image-button {
+    width: min(100%, 440px);
+    justify-self: center;
+  }
+  #photography .series-image-button img {
+    width: auto;
+    max-width: 100%;
+    max-height: min(70svh, 620px);
+  }
+}
+
+/* Ohne Umschalter sind alte data-columns-Regeln nur noch Datenattribute.
+   Painting/Graphic behalten den großzügigen einspaltigen Projektabstand. */
+#painting .continuous-artworks,
+#graphic .continuous-artworks {
+  row-gap: clamp(130px, 23vh, 270px);
+  column-gap: 0;
+}
+
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  .continuous-current-section {
+    top: 20px;
+    max-width: 38vw;
+    font-size: 10px;
+  }
+  #exhibitions .series-grid,
+  #architecture .series-grid,
+  #photography .series-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+  }
+  #photography .series-image-button,
+  #photography .series-image-button img {
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+  }
+  #painting .continuous-artworks,
+  #graphic .continuous-artworks {
+    row-gap: 140px;
+  }
+}
