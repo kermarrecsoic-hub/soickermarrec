@@ -614,16 +614,67 @@
     requestUpdate();
   }
 
-  /* ---------- section + project color tracking ---------- */
+  /* ---------- section + image color tracking ---------- */
   function hexToRgb(hex) {
     const value = String(hex || '').trim().replace('#', '');
     if (!/^[0-9a-f]{6}$/i.test(value)) return null;
     return [0, 2, 4].map(offset => parseInt(value.slice(offset, offset + 2), 16));
   }
+
   function srgb(v) {
     const c = v / 255;
     return c <= .04045 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4);
   }
+
+  function rgbToHsl(rgb) {
+    const [r0, g0, b0] = rgb.map(v => clamp(v / 255, 0, 1));
+    const max = Math.max(r0, g0, b0);
+    const min = Math.min(r0, g0, b0);
+    const d = max - min;
+    let h = 0;
+    let s = 0;
+    const l = (max + min) / 2;
+
+    if (d > 0) {
+      s = d / (1 - Math.abs(2 * l - 1));
+      switch (max) {
+        case r0: h = ((g0 - b0) / d) % 6; break;
+        case g0: h = (b0 - r0) / d + 2; break;
+        default: h = (r0 - g0) / d + 4;
+      }
+      h *= 60;
+      if (h < 0) h += 360;
+    }
+    return [h, s, l];
+  }
+
+  function hslToRgb([h, s, l]) {
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const hp = h / 60;
+    const x = c * (1 - Math.abs((hp % 2) - 1));
+    let r1 = 0, g1 = 0, b1 = 0;
+
+    if (hp >= 0 && hp < 1) [r1, g1] = [c, x];
+    else if (hp < 2) [r1, g1] = [x, c];
+    else if (hp < 3) [g1, b1] = [c, x];
+    else if (hp < 4) [g1, b1] = [x, c];
+    else if (hp < 5) [r1, b1] = [x, c];
+    else [r1, b1] = [c, x];
+
+    const m = l - c / 2;
+    return [r1, g1, b1].map(v => Math.round((v + m) * 255));
+  }
+
+  function saturateAverage(rgb) {
+    if (!rgb) return null;
+    const hsl = rgbToHsl(rgb);
+    // Die Durchschnittsfarbe soll wahrnehmbar bleiben, ohne eine neue Farbe
+    // zu erfinden. Sehr schwach farbige Bilder werden daher nur moderat,
+    // bereits farbige Bilder etwas stärker nachgesättigt.
+    if (hsl[1] > .015) hsl[1] = Math.min(.78, Math.max(hsl[1] * 1.65, .20));
+    return hslToRgb(hsl);
+  }
+
   function readable(rgb) {
     if (!rgb) return null;
     let out = rgb.map(v => clamp(Math.round(v), 0, 255));
@@ -636,50 +687,79 @@
       const candidate = out.map(v => Math.round(v * f));
       if (contrast(candidate) >= 4.5) return candidate;
     }
-    return [65,65,65];
+    return [65, 65, 65];
   }
+
+  function displayColor(rgb) {
+    return readable(saturateAverage(rgb));
+  }
+
   const rgbCss = rgb => `rgb(${rgb.join(',')})`;
 
-  async function averageColor(img) {
+  function averageColor(img) {
     try {
-      if (!img.complete) await new Promise(resolve => img.addEventListener('load', resolve, { once: true }));
-      if (!img.naturalWidth || !img.naturalHeight) return null;
-      const ratio = Math.min(48 / img.naturalWidth, 48 / img.naturalHeight, 1);
+      if (!img?.naturalWidth || !img?.naturalHeight) return null;
+      const ratio = Math.min(56 / img.naturalWidth, 56 / img.naturalHeight, 1);
       const w = Math.max(1, Math.round(img.naturalWidth * ratio));
       const h = Math.max(1, Math.round(img.naturalHeight * ratio));
       const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
+      canvas.width = w;
+      canvas.height = h;
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
       ctx.drawImage(img, 0, 0, w, h);
+
       const data = ctx.getImageData(0, 0, w, h).data;
-      let r=0,g=0,b=0,n=0;
-      for (let i=0;i<data.length;i+=4) {
-        const a = data[i+3] / 255;
+      let r = 0, g = 0, b = 0, n = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        const a = data[i + 3] / 255;
         if (a < .1) continue;
-        r += data[i]*a; g += data[i+1]*a; b += data[i+2]*a; n += a;
+        r += data[i] * a;
+        g += data[i + 1] * a;
+        b += data[i + 2] * a;
+        n += a;
       }
-      return n ? readable([r/n,g/n,b/n]) : null;
-    } catch (_) { return null; }
+      return n ? displayColor([r / n, g / n, b / n]) : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   function setupScrollState() {
     const name = document.querySelector('.continuous-name');
     const currentTitle = document.querySelector('[data-current-section]');
     const menuLinks = [...document.querySelectorAll('.continuous-nav-menu a[href^="#"]')];
-    const photoButtons = [...document.querySelectorAll('#photography .series-image-button')];
-    photoButtons.forEach(button => {
-      const img = button.querySelector('img');
-      averageColor(img).then(rgb => { if (rgb) button.dataset.imageColor = rgbCss(rgb); });
-    });
+    const colorImages = [...document.querySelectorAll('.continuous-content img')];
 
     let scheduled = false;
     const visibleAmount = rect => Math.max(0, Math.min(innerHeight, rect.bottom) - Math.max(0, rect.top));
 
-    const update = () => {
+    const requestUpdate = () => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(update);
+    };
+
+    const cacheImageColor = img => {
+      if (!img || img.dataset.colorBound === 'true') return;
+      img.dataset.colorBound = 'true';
+
+      const analyze = () => {
+        const rgb = averageColor(img);
+        if (rgb) img.dataset.imageColor = rgbCss(rgb);
+        requestUpdate();
+      };
+
+      if (img.complete && img.naturalWidth) analyze();
+      else img.addEventListener('load', analyze, { once: true });
+    };
+
+    colorImages.forEach(cacheImageColor);
+
+    function update() {
       scheduled = false;
       const viewportCenter = innerHeight / 2;
 
-      // Aktive Seite im Dropdown.
+      // Aktiver Abschnitt für Dropdown und den kleinen Orientierungstitel.
       let activeSection = null;
       let bestSectionDistance = Infinity;
       sectionIds.forEach(id => {
@@ -687,62 +767,63 @@
         if (!section) return;
         const rect = section.getBoundingClientRect();
         if (rect.bottom <= 0 || rect.top >= innerHeight) return;
-        const distance = Math.abs((Math.max(0, rect.top) + Math.min(innerHeight, rect.bottom)) / 2 - viewportCenter);
-        if (distance < bestSectionDistance) { bestSectionDistance = distance; activeSection = id; }
+        const visibleTop = Math.max(0, rect.top);
+        const visibleBottom = Math.min(innerHeight, rect.bottom);
+        const distance = Math.abs((visibleTop + visibleBottom) / 2 - viewportCenter);
+        if (distance < bestSectionDistance) {
+          bestSectionDistance = distance;
+          activeSection = id;
+        }
       });
+
       menuLinks.forEach(link => {
         const active = link.getAttribute('href') === `#${activeSection}`;
         if (active) link.setAttribute('aria-current', 'page');
         else link.removeAttribute('aria-current');
       });
 
-      // Der bisherige Spalten-Schalter ist jetzt eine ruhige Orientierung:
-      // in der Mitte steht immer der Titel des aktuell sichtbaren Abschnitts.
-      if (currentTitle && activeSection) {
-        const heading = document.querySelector(`#${activeSection} > .continuous-section-title`);
-        currentTitle.textContent = heading?.textContent?.trim() || '';
+      if (currentTitle) {
+        if (activeSection) {
+          const heading = document.querySelector(`#${activeSection} > .continuous-section-title`);
+          currentTitle.textContent = heading?.textContent?.trim() || '';
+        } else {
+          currentTitle.textContent = '';
+        }
       }
 
       if (!name || !document.body.classList.contains('content-ui-visible')) return;
 
-      // Fotografie: Farbe des am stärksten sichtbaren Fotos.
-      if (activeSection === 'photography' && photoButtons.length) {
-        let best = null, bestVisible = -1, bestDistance = Infinity;
-        photoButtons.forEach(button => {
-          const rect = button.getBoundingClientRect();
-          const visible = visibleAmount(rect);
-          if (visible <= 0) return;
-          const distance = Math.abs((rect.top + rect.bottom)/2 - viewportCenter);
-          if (visible > bestVisible + 1 || (Math.abs(visible-bestVisible)<=1 && distance < bestDistance)) {
-            best = button; bestVisible = visible; bestDistance = distance;
-          }
-        });
-        if (best) {
-          name.style.setProperty('--scroll-project-color', best.dataset.imageColor || '#595857');
-          return;
-        }
-      }
+      // Auf der gesamten Continuous-Seite bestimmt immer das aktuell am
+      // stärksten sichtbare Bild die Farbe von "Soïc Kermarrec". Damit gilt
+      // dieselbe Logik für Malerei, Grafik, Ausstellung, Architektur,
+      // Fotografie sowie About und Kontakt.
+      let bestImage = null;
+      let bestVisible = -1;
+      let bestDistance = Infinity;
 
-      const candidates = [...document.querySelectorAll('.continuous-project, .series-project')];
-      let best = null, bestVisible = -1, bestDistance = Infinity;
-      candidates.forEach(node => {
-        const rect = node.getBoundingClientRect();
+      colorImages.forEach(img => {
+        const rect = img.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
         const visible = visibleAmount(rect);
         if (visible <= 0) return;
-        const distance = Math.abs((rect.top + rect.bottom)/2 - viewportCenter);
-        if (visible > bestVisible + 1 || (Math.abs(visible-bestVisible)<=1 && distance < bestDistance)) {
-          best = node; bestVisible = visible; bestDistance = distance;
+
+        const distance = Math.abs((Math.max(0, rect.top) + Math.min(innerHeight, rect.bottom)) / 2 - viewportCenter);
+        if (visible > bestVisible + 1 || (Math.abs(visible - bestVisible) <= 1 && distance < bestDistance)) {
+          bestImage = img;
+          bestVisible = visible;
+          bestDistance = distance;
         }
       });
-      const rgb = readable(hexToRgb(best?.dataset.navColor));
-      name.style.setProperty('--scroll-project-color', rgb ? rgbCss(rgb) : 'var(--ink)');
-    };
 
-    const requestUpdate = () => {
-      if (scheduled) return;
-      scheduled = true;
-      requestAnimationFrame(update);
-    };
+      let color = bestImage?.dataset.imageColor || '';
+      if (!color && bestImage) {
+        const owner = bestImage.closest('.continuous-project, .series-project');
+        const fallback = displayColor(hexToRgb(owner?.dataset.navColor));
+        if (fallback) color = rgbCss(fallback);
+      }
+      name.style.setProperty('--scroll-project-color', color || 'var(--ink)');
+    }
+
     addEventListener('scroll', requestUpdate, { passive: true });
     addEventListener('resize', requestUpdate, { passive: true });
     addEventListener('load', requestUpdate, { once: true });

@@ -1002,3 +1002,82 @@ body.continuous-nav-open .continuous-nav-trigger { visibility: hidden; }
     row-gap: 140px;
   }
 }
+
+/* ================================================================
+   2026-10-09 – ruhige Abschnittstitel / Bildfarbe / Top-UI-Schutz
+   ================================================================ */
+
+/* Die großen Abschnittstitel zwischen zwei Bereichen bleiben im DOM als
+   semantische Überschriften und als Quelle für den kleinen Titel oben,
+   sind im Seitenfluss aber nicht mehr sichtbar. Ihr bisheriger Abstand
+   bleibt erhalten, damit die großzügige Trennung der Bereiche unverändert
+   bleibt. */
+.continuous-section-title {
+  visibility: hidden;
+}
+
+/* Alle drei Elemente der oberen Zeile sitzen exakt auf derselben Höhe. */
+.continuous-home .language-switch,
+.continuous-current-section,
+.continuous-nav-compact {
+  top: 18px;
+  height: 22px;
+  align-items: center;
+}
+.continuous-current-section {
+  display: flex;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* Ein sehr leichter Weißverlauf hält die feste UI beim Scrollen lesbar,
+   ohne als eigener Balken wahrgenommen zu werden. */
+.continuous-ui {
+  height: 78px;
+  z-index: 2200;
+}
+.continuous-ui::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 78px;
+  z-index: 0;
+  background: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 90%) 0%,
+    rgb(255 255 255 / 70%) 34%,
+    rgb(255 255 255 / 30%) 68%,
+    rgb(255 255 255 / 0%) 100%
+  );
+  pointer-events: none;
+}
+body.content-ui-visible .continuous-ui {
+  pointer-events: auto;
+}
+.continuous-nav-compact { z-index: 2230; }
+.continuous-current-section { z-index: 2220; }
+.continuous-home .language-switch { z-index: 2250; }
+.continuous-nav-frost { z-index: 2210; }
+.continuous-nav-menu { z-index: 2240; }
+
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  /* Mobile: die feste Leiste fängt Berührungen in ihrer gesamten Fläche ab.
+     Dadurch kann ein Tap zwischen den UI-Elementen kein darunterliegendes
+     Werk oder Detailbild mehr öffnen. */
+  .continuous-ui {
+    height: 72px;
+    touch-action: manipulation;
+  }
+  .continuous-ui::before { height: 72px; }
+  .continuous-home .language-switch,
+  .continuous-current-section,
+  .continuous-nav-compact {
+    top: 16px;
+    height: 22px;
+  }
+  .continuous-current-section {
+    max-width: 40vw;
+    font-size: 11px;
+  }
+}
