@@ -45,8 +45,15 @@ window.XXX_WORKS = [
       "../images/foto1/fotogalerie_sortiert/47.webp",
       "../images/foto1/fotogalerie_sortiert/37.webp",
       "../images/foto1/fotogalerie_sortiert/38.webp",
-      "../images/foto1/fotogalerie_sortiert/39.webp"
+      "../images/foto1/fotogalerie_sortiert/39.webp",
+      "../images/foto1/fotogalerie_sortiert/48.webp",
+      "../images/foto1/fotogalerie_sortiert/49.webp",
+      "../images/foto1/fotogalerie_sortiert/50.webp",
+      "../images/foto1/fotogalerie_sortiert/51.webp",
+      "../images/foto1/fotogalerie_sortiert/52.webp",
+      "../images/foto1/fotogalerie_sortiert/53.webp",
+      "../images/foto1/fotogalerie_sortiert/54.webp"
     ],
-    "navColor": "#4d4947"
+    "navColor": "#5a5b5b"
   }
 ];
