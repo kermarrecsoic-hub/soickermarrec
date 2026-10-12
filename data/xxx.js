@@ -7,7 +7,6 @@ window.XXX_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/foto1/fotogalerie_sortiert/10.webp",
       "../images/foto1/fotogalerie_sortiert/07.webp",
       "../images/foto1/fotogalerie_sortiert/04.webp",
       "../images/foto1/fotogalerie_sortiert/01.webp",
@@ -48,6 +47,6 @@ window.XXX_WORKS = [
       "../images/foto1/fotogalerie_sortiert/38.webp",
       "../images/foto1/fotogalerie_sortiert/39.webp"
     ],
-    "navColor": "#595857"
+    "navColor": "#4d4947"
   }
 ];
