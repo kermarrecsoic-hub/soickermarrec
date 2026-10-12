@@ -1081,3 +1081,33 @@ body.content-ui-visible .continuous-ui {
     font-size: 11px;
   }
 }
+
+
+/* 2026-10-12 – Stop-Motion ganz oben in Fotografie.
+   Das Video wird erst kurz vor dem Sichtbereich geladen und verhält sich
+   optisch wie ein ruhiges, animiertes Foto. */
+.photography-feature-video-project {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+.photography-feature-video-wrap {
+  width: min(72vw, 680px);
+  margin-inline: auto;
+}
+.photography-feature-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(62svh, 620px);
+  object-fit: contain;
+  background: transparent;
+}
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  .photography-feature-video-wrap {
+    width: 100%;
+  }
+  .photography-feature-video {
+    width: 100%;
+    max-height: none;
+  }
+}

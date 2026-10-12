@@ -288,6 +288,53 @@
     return card;
   }
 
+  function renderPhotographyFeatureVideo() {
+    const article = el('article', 'series-project photography-feature-video-project');
+    article.dataset.section = 'photography';
+    article.setAttribute('aria-label', 'Stop-Motion');
+
+    const wrap = el('div', 'photography-feature-video-wrap');
+    const video = document.createElement('video');
+    video.className = 'photography-feature-video';
+    video.autoplay = true;
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'none';
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('aria-label', 'Stop-Motion Fotografie');
+
+    const source = document.createElement('source');
+    source.type = 'video/mp4';
+    source.dataset.src = 'images/foto1/animation-klein.mp4';
+    video.appendChild(source);
+    wrap.appendChild(video);
+    article.appendChild(wrap);
+
+    const loadVideo = () => {
+      if (!source.src) {
+        source.src = source.dataset.src;
+        video.load();
+      }
+      video.play().catch(() => {});
+    };
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) loadVideo();
+          else if (!video.paused) video.pause();
+        });
+      }, { rootMargin: '500px 0px' });
+      observer.observe(video);
+    } else {
+      loadVideo();
+    }
+
+    return article;
+  }
+
   function renderSeriesProject(work, workIndex, sectionId) {
     const paths = imagePaths(work);
     if (!paths.mains.length) return null;
@@ -319,6 +366,7 @@
       const target = document.querySelector(`#${sectionId} .continuous-artworks`);
       if (!target) return;
       target.innerHTML = '';
+      if (sectionId === 'photography') target.appendChild(renderPhotographyFeatureVideo());
       const works = visibleWorks(source.works);
       works.forEach((work, index) => {
         const node = source.mode === 'projects'

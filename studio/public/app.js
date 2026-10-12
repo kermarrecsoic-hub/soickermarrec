@@ -873,6 +873,27 @@
     throw new Error(`${file.name} ist auch als vorsichtig optimiertes WebP größer als 4 MB.`);
   }
 
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      if (!(blob instanceof Blob)) {
+        reject(new Error('Upload-Datei ist kein gültiger Blob.'));
+        return;
+      }
+      const reader = new FileReader();
+      reader.onerror = () => reject(reader.error || new Error('Blob konnte nicht in Base64 umgewandelt werden.'));
+      reader.onload = () => {
+        const result = String(reader.result || '');
+        const comma = result.indexOf(',');
+        if (comma < 0) {
+          reject(new Error('Blob konnte nicht in Base64 umgewandelt werden.'));
+          return;
+        }
+        resolve(result.slice(comma + 1));
+      };
+      reader.readAsDataURL(blob);
+    });
+  }
+
   async function uploadBlob(path, blob) {
     const base64 = await blobToBase64(blob);
     return api('upload-image', { method: 'POST', body: JSON.stringify({ path, base64 }) });
