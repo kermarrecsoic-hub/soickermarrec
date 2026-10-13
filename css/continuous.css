@@ -1257,3 +1257,68 @@ img.is-frost-preview {
     margin-top: 62vw;
   }
 }
+
+/* ================================================================
+   2026-10-13c – Edge-safe Zentrierung + kompaktere Projektabstände
+   ================================================================ */
+@media (min-width: 701px) and (hover:hover) and (pointer:fine) {
+  /* Exakt viewport-zentriert, unabhängig von Browser/Section-Padding:
+     12.5vw außen + 35vw + 5vw + 35vw + 12.5vw außen. */
+  #exhibitions .series-grid,
+  #architecture .series-grid,
+  #photography .series-grid {
+    box-sizing: border-box;
+    width: 75vw;
+    max-width: 75vw;
+    margin-left: calc(50% - 37.5vw);
+    margin-right: calc(50% - 37.5vw);
+    grid-template-columns: 35vw 35vw;
+    column-gap: 5vw;
+    justify-content: start;
+  }
+
+  #exhibitions .series-image-button,
+  #architecture .series-image-button,
+  #photography .series-image-button {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Projektabstand halbiert: vorher 49vw. */
+  #exhibitions .series-project + .series-project,
+  #architecture .series-project + .series-project,
+  #photography .series-project + .series-project {
+    margin-top: 24.5vw;
+  }
+
+  /* Die einleitenden Elemente in Architektur und Fotografie gehören visuell
+     enger zum ersten regulären Projekt. */
+  #architecture .series-project:first-child + .series-project,
+  #photography .photography-feature-video-project + .series-project {
+    margin-top: clamp(70px, 9vw, 135px);
+  }
+
+  #architecture.portfolio-section,
+  #photography.portfolio-section {
+    padding-top: clamp(20px, 3vw, 44px);
+  }
+}
+
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  /* Projektabstand ebenfalls halbiert: vorher 62vw. */
+  #exhibitions .series-project + .series-project,
+  #architecture .series-project + .series-project,
+  #photography .series-project + .series-project {
+    margin-top: 31vw;
+  }
+
+  #architecture .series-project:first-child + .series-project,
+  #photography .photography-feature-video-project + .series-project {
+    margin-top: clamp(44px, 13vw, 82px);
+  }
+
+  #architecture.portfolio-section,
+  #photography.portfolio-section {
+    padding-top: 22px;
+  }
+}
