@@ -52,37 +52,105 @@
     };
   }
 
+  /* ---------- progressive frosted image loading ---------- */
+  function previewStem(src = '') {
+    let clean = String(src).split(/[?#]/)[0]
+      .replace(/^https?:\/\/[^/]+\//i, '')
+      .replace(/^(\.\.\/)+/, '')
+      .replace(/^\/+/, '');
+    if (clean.startsWith('images/')) clean = clean.slice(7);
+    clean = clean.replace(/\.[^.\/]+$/, '');
+    return clean
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase().replace(/ß/g, 'ss')
+      .split('/')
+      .map(part => part.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'item')
+      .join('--');
+  }
+
+  function previewPath(src) {
+    const size = mobile.matches ? 'm' : 'd';
+    return `Vorschaubild/${previewStem(src)}-${size}.webp`;
+  }
+
   const deferredImages = new Set();
+
+  function loadFullImage(img, force = false) {
+    const src = img?.dataset?.fullSrc;
+    if (!src || img.dataset.fullLoaded === 'true' || img.dataset.fullLoading === 'true') return;
+    img.dataset.fullLoading = 'true';
+
+    const full = new Image();
+    full.decoding = 'async';
+    try { full.fetchPriority = force ? 'high' : 'low'; } catch (_) {}
+    full.onload = async () => {
+      try { await full.decode?.(); } catch (_) {}
+      img.src = src;
+      img.dataset.fullLoaded = 'true';
+      img.dataset.fullLoading = 'false';
+      img.classList.remove('is-frost-preview');
+      deferredImages.delete(img);
+    };
+    full.onerror = () => {
+      img.dataset.fullLoading = 'false';
+      img.classList.remove('is-frost-preview');
+    };
+    full.src = src;
+  }
+
   const deferredImageObserver = 'IntersectionObserver' in window
     ? new IntersectionObserver(entries => {
         entries.forEach(entry => {
           if (!entry.isIntersecting) return;
           const img = entry.target;
-          const src = img.dataset.src;
-          if (src && !img.src) img.src = src;
-          delete img.dataset.src;
-          deferredImages.delete(img);
+          loadFullImage(img);
           deferredImageObserver.unobserve(img);
         });
-      }, { rootMargin: '1000px 0px' })
+      }, { rootMargin: '1200px 0px' })
     : null;
 
   function makeImage(src, alt, eager = false) {
     const img = el('img');
     img.alt = alt || '';
-    img.loading = eager ? 'eager' : 'lazy';
+    img.loading = 'eager';
     img.decoding = 'async';
     img.draggable = false;
+    img.dataset.fullSrc = src;
+    img.classList.add('is-frost-preview');
     try { img.fetchPriority = eager ? 'high' : 'low'; } catch (_) {}
 
+    img.addEventListener('error', () => {
+      if (img.dataset.fullLoaded !== 'true') loadFullImage(img, true);
+    }, { once: true });
+
+    img.src = previewPath(src);
+
     if (eager || !deferredImageObserver) {
-      img.src = src;
+      loadFullImage(img, eager);
     } else {
-      img.dataset.src = src;
       deferredImages.add(img);
       deferredImageObserver.observe(img);
     }
     return img;
+  }
+
+  function setupStaticProgressiveImages() {
+    document.querySelectorAll('img[data-progressive-full]').forEach(img => {
+      const src = img.dataset.progressiveFull;
+      if (!src) return;
+      img.dataset.fullSrc = src;
+      img.classList.add('is-frost-preview');
+      img.loading = 'eager';
+      img.decoding = 'async';
+      img.src = previewPath(src);
+      img.addEventListener('error', () => loadFullImage(img, true), { once: true });
+      if (deferredImageObserver) {
+        deferredImages.add(img);
+        deferredImageObserver.observe(img);
+      } else {
+        loadFullImage(img);
+      }
+    });
   }
 
   function slugifyShare(value = '') {
@@ -344,6 +412,20 @@
     article.dataset.section = sectionId;
     article.id = `${sectionId}-project-${workIndex + 1}`;
 
+    const descriptionBits = [
+      ['h3', 'series-project-title', work.title],
+      ['p', 'series-project-medium', work.medium],
+      ['p', 'series-project-dimensions', work.dimensions],
+      ['p', 'series-project-availability', work.availability],
+      ['p', 'series-project-text', work.text]
+    ].filter(([, , value]) => String(value || '').trim());
+
+    if (descriptionBits.length) {
+      const info = el('div', 'series-project-description');
+      descriptionBits.forEach(([tag, className, value]) => info.appendChild(el(tag, className, value)));
+      article.appendChild(info);
+    }
+
     const grid = el('div', 'series-grid');
     paths.mains.forEach((src, imageIndex) => {
       const button = el('button', 'series-image-button');
@@ -357,7 +439,6 @@
       grid.appendChild(button);
     });
     article.appendChild(grid);
-    if (work.title) article.appendChild(el('h3', 'series-project-title', work.title));
     return article;
   }
 
@@ -619,6 +700,28 @@
 
     trigger.addEventListener('click', () => setOpen(true));
     frost.addEventListener('click', () => setOpen(false));
+    const jumpToSection = id => {
+      const target = document.getElementById(id);
+      if (!target) return;
+      const align = () => target.scrollIntoView({ block: 'start', behavior: 'auto' });
+      align();
+      // Keep the requested section locked in place while tiny previews establish
+      // their intrinsic height and while the video placeholder settles.
+      [80, 220, 520, 900].forEach(delay => setTimeout(align, delay));
+    };
+
+    [...landingNav.querySelectorAll('a[href^="#"]'), ...menu.querySelectorAll('a[href^="#"]')].forEach(link => {
+      const href = link.getAttribute('href') || '';
+      const id = href.slice(1);
+      if (!sectionIds.includes(id)) return;
+      link.addEventListener('click', event => {
+        event.preventDefault();
+        setOpen(false);
+        try { history.pushState(null, '', `#${id}`); } catch (_) {}
+        jumpToSection(id);
+      });
+    });
+
     menu.addEventListener('click', event => {
       if (event.target.closest('a')) setOpen(false);
     });
@@ -884,6 +987,7 @@
     requestUpdate();
   }
 
+  setupStaticProgressiveImages();
   renderSections();
   setupContentUi();
   setupScrollState();
