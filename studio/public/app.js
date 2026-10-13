@@ -148,6 +148,7 @@
       const add = button('Neues Projekt', 'primary', () => openProjectEditor(-1));
       headerActions.appendChild(add);
       if (view === 'xxx') {
+        headerActions.prepend(button('Vorschaubilder aktualisieren', 'secondary', refreshSectionPreviews));
         headerActions.prepend(button('Alle Bilder nach Sättigung', 'secondary', sortAllPhotographyBySaturation));
       }
       try {
@@ -894,9 +895,99 @@
     });
   }
 
+  function previewStemFromRepoPath(path = '') {
+    let clean = toRepoPath(path);
+    if (clean.startsWith('images/')) clean = clean.slice(7);
+    clean = clean.replace(/\.[^.\/]+$/, '');
+    return clean
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase().replace(/ß/g, 'ss')
+      .split('/')
+      .map(part => part.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'item')
+      .join('--');
+  }
+
+  async function tinyPreviewBlob(blob, maxSide, quality) {
+    const bitmap = await createImageBitmap(blob);
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext('2d', { alpha: true }).drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+    const out = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', quality));
+    if (!out) throw new Error('Vorschaubild konnte nicht erzeugt werden.');
+    return out;
+  }
+
   async function uploadBlob(path, blob) {
-    const base64 = await blobToBase64(blob);
-    return api('upload-image', { method: 'POST', body: JSON.stringify({ path, base64 }) });
+    const stem = previewStemFromRepoPath(path);
+    const [base64, desktopBlob, mobileBlob] = await Promise.all([
+      blobToBase64(blob),
+      tinyPreviewBlob(blob, 160, 0.45),
+      tinyPreviewBlob(blob, 96, 0.42)
+    ]);
+    const [desktopBase64, mobileBase64] = await Promise.all([
+      blobToBase64(desktopBlob),
+      blobToBase64(mobileBlob)
+    ]);
+    return api('upload-image', {
+      method: 'POST',
+      body: JSON.stringify({
+        path,
+        base64,
+        previews: [
+          { path: `Vorschaubild/${stem}-d.webp`, base64: desktopBase64 },
+          { path: `Vorschaubild/${stem}-m.webp`, base64: mobileBase64 }
+        ]
+      })
+    });
+  }
+
+  async function refreshSectionPreviews() {
+    if (state.busy) return;
+    const paths = [...new Set(state.works.flatMap(work => [...workImages(work), ...workDetails(work)]).filter(Boolean).map(toRepoPath))];
+    if (!paths.length) return;
+    if (!confirm(`${paths.length} Vorschaubilder aus den aktuell im Studio gespeicherten Bildern neu erzeugen?`)) return;
+
+    state.busy = true;
+    try {
+      for (let i = 0; i < paths.length; i++) {
+        const path = paths[i];
+        setStatus(`Vorschaubilder ${i + 1} / ${paths.length}: ${path}`);
+        const response = await fetch(studioImageUrl(path), { cache: 'no-store' });
+        if (!response.ok) throw new Error(`Bild konnte nicht geladen werden: ${path}`);
+        const blob = await response.blob();
+        const stem = previewStemFromRepoPath(path);
+        const [desktopBlob, mobileBlob] = await Promise.all([
+          tinyPreviewBlob(blob, 160, 0.45),
+          tinyPreviewBlob(blob, 96, 0.42)
+        ]);
+        const [desktopBase64, mobileBase64] = await Promise.all([
+          blobToBase64(desktopBlob),
+          blobToBase64(mobileBlob)
+        ]);
+        await api('upload-image', {
+          method: 'POST',
+          body: JSON.stringify({
+            previewOnly: true,
+            previews: [
+              { path: `Vorschaubild/${stem}-d.webp`, base64: desktopBase64 },
+              { path: `Vorschaubild/${stem}-m.webp`, base64: mobileBase64 }
+            ]
+          })
+        });
+      }
+      setStatus(`${paths.length} Vorschaubilder aktualisiert.`);
+      showToast('Vorschaubilder aktualisiert');
+    } catch (error) {
+      setStatus(error.message, true);
+      alert(`Vorschaubilder fehlgeschlagen:\n${error.message}`);
+    } finally {
+      state.busy = false;
+    }
   }
 
   async function ensureMedia() {
