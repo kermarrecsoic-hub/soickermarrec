@@ -1111,3 +1111,22 @@ body.content-ui-visible .continuous-ui {
     max-height: none;
   }
 }
+
+
+/* ================================================================
+   2026-10-13 – feste Desktopbreite der zweispaltigen Serienansicht
+   ================================================================ */
+@media (min-width: 701px) and (hover: hover) and (pointer: fine) {
+  #exhibitions .series-grid,
+  #architecture .series-grid,
+  #photography .series-grid {
+    width: 75vw;
+    max-width: none;
+    margin-inline: auto;
+  }
+
+  /* Das Architektur-Vorschaubild bleibt innerhalb des 75-vw-Rasters. */
+  #architecture .architecture-feature {
+    width: min(100%, 920px);
+  }
+}
