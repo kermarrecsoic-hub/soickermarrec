@@ -1130,3 +1130,130 @@ body.content-ui-visible .continuous-ui {
     width: min(100%, 920px);
   }
 }
+
+/* ================================================================
+   2026-10-13b – exact 75vw series grid + frosted progressive previews
+   ================================================================ */
+
+/* Tiny previews are loaded immediately; the full image replaces them near
+   the viewport. The strong blur intentionally matches the supplied frosted
+   reference while keeping each placeholder only a few KB. */
+img.is-frost-preview {
+  filter: blur(16px) saturate(.88);
+  transform: scale(1.075) !important;
+  opacity: .96;
+}
+.project-main-image,
+.project-detail-button img,
+.series-image-button img,
+.continuous-editorial img {
+  transition: filter .42s ease, opacity .34s ease, transform .45s cubic-bezier(.2,.7,.2,1);
+}
+
+.portfolio-section { scroll-margin-top: 72px; }
+
+/* Ausstellung / Architektur / Fotografie: exakt 12.5vw außen und 5vw Mitte.
+   Daraus entstehen zwei gleich breite Bildspalten à 35vw. */
+@media (min-width: 701px) and (hover:hover) and (pointer:fine) {
+  #exhibitions .series-grid,
+  #architecture .series-grid,
+  #photography .series-grid {
+    width: 75vw;
+    max-width: 75vw;
+    grid-template-columns: repeat(2, minmax(0, 35vw));
+    column-gap: 5vw;
+    row-gap: clamp(18px, 2vw, 34px);
+    margin-inline: auto;
+  }
+
+  #exhibitions .series-image-button,
+  #architecture .series-image-button,
+  #photography .series-image-button {
+    width: 35vw;
+    max-width: 35vw;
+    justify-self: stretch;
+  }
+
+  #exhibitions .series-image-button img,
+  #architecture .series-image-button img,
+  #photography .series-image-button img {
+    display: block;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    object-fit: contain;
+  }
+
+  /* Das bekannte große Architektur-Vorschaubild bleibt die Ausnahme. */
+  #architecture .architecture-feature {
+    grid-column: 1 / -1;
+    width: min(75vw, 920px);
+    max-width: min(75vw, 920px);
+    justify-self: center;
+  }
+  #architecture .architecture-feature img { width: 100%; }
+
+  /* Genau eine optische 5:7-Rasterreihe Leerraum zwischen Projekten. */
+  #exhibitions .continuous-artworks,
+  #architecture .continuous-artworks,
+  #photography .continuous-artworks { row-gap: 0; }
+  #exhibitions .series-project + .series-project,
+  #architecture .series-project + .series-project,
+  #photography .series-project + .series-project {
+    margin-top: 49vw;
+  }
+}
+
+/* Projekttexte der Serienseiten stehen immer VOR dem Bildraster. */
+.series-project-description {
+  width: min(760px, 75vw);
+  margin: 0 auto 28px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.series-project-description h3,
+.series-project-description p { margin: 0; font: inherit; }
+.series-project-description h3 { margin-bottom: 10px; }
+.series-project-description .series-project-availability { margin-top: 12px; color: #8c8c8c; font-style: italic; }
+.series-project-description .series-project-text { margin-top: 14px; white-space: pre-line; }
+
+/* Das Stop-Motion reserviert seine endgültige Fläche schon bevor die MP4 lädt,
+   damit Sprünge zu #photography nicht durch nachträgliches Layout verrutschen. */
+.photography-feature-video-wrap { aspect-ratio: 1602 / 1080; }
+.photography-feature-video { width: 100%; height: 100%; object-fit: contain; }
+
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  .portfolio-section { scroll-margin-top: 58px; }
+  #exhibitions .series-grid,
+  #architecture .series-grid,
+  #photography .series-grid {
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  #exhibitions .series-image-button,
+  #architecture .series-image-button,
+  #photography .series-image-button,
+  #exhibitions .series-image-button img,
+  #architecture .series-image-button img,
+  #photography .series-image-button img {
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+  }
+  .series-project-description {
+    width: min(92vw, 620px);
+    margin-bottom: 20px;
+  }
+  #exhibitions .continuous-artworks,
+  #architecture .continuous-artworks,
+  #photography .continuous-artworks { row-gap: 0; }
+  #exhibitions .series-project + .series-project,
+  #architecture .series-project + .series-project,
+  #photography .series-project + .series-project {
+    margin-top: 62vw;
+  }
+}
