@@ -493,6 +493,11 @@
     viewer.addEventListener('click', event => {
       if (event.target === viewer) closeViewer();
     });
+    // Klick in den freien Bereich der Whitebox schließt die Galerie ebenfalls.
+    // Das Bild selbst und die Bedienelemente bleiben interaktiv (Zoom/Swipe/Pfeile).
+    stage.addEventListener('click', event => {
+      if (event.target === stage) closeViewer();
+    });
     viewer.addEventListener('wheel', event => {
       if (event.target === viewer) event.preventDefault();
     }, { passive: false });
