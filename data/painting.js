@@ -88,10 +88,6 @@ window.PAINTING_WORKS = [
       "../images/painting/prozession-diptychon/main-20261018110409-01.webp"
     ],
     "shareId": "prozession-diptychon",
-    "details": [
-      "../images/painting/prozession-diptychon/detail-20261018110409-01.webp",
-      "../images/painting/prozession-diptychon/detail-20261018110409-02.webp"
-    ],
     "navColor": "#7c7577"
   },
   {
