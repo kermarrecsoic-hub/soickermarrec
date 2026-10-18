@@ -10,11 +10,11 @@
 <link href="../favicon.png" rel="icon" sizes="any" type="image/png"/>
 <link href="../style.css?v=20261018b" rel="stylesheet"/>
 <link href="../css/gallery.css?v=20261013c" rel="stylesheet"/>
-<link href="../css/available.css?v=20261018ui5" rel="stylesheet"/>
-<script defer="" src="../js/i18n.js?v=20261007e"></script>
+<link href="../css/available.css?v=20261018ui7" rel="stylesheet"/>
+<script defer="" src="../js/i18n.js?v=20261018auto1"></script>
 
 
-<script data-base="../" defer="True" src="../js/project-data-loader.js?v=20261018ui1"></script><script defer="" src="../js/available.js?v=20261018ui5"></script>
+<script data-base="../" defer="True" src="../js/project-data-loader.js?v=20261018ui1"></script><script defer="" src="../js/available.js?v=20261018ui6"></script>
 </head>
 <body class="available-page">
 <header aria-label="Available Works controls" class="available-topbar"><a class="available-site-name is-cycling" href="../index.html#top">Soïc Kermarrec</a><button aria-controls="available-nav-menu" aria-expanded="false" aria-label="Navigation öffnen" class="available-current-section" type="button">Available Works</button></header>
@@ -25,14 +25,14 @@
 <div class="available-gate-inner">
 <h1 class="available-gate-title">Available Works</h1>
 <p class="available-intro">Gib deine E-Mail-Adresse ein, um verfügbare Arbeiten und Preise zu sehen.</p>
-<form action="https://studio.soickermarrec.de/available-access.html" id="availableAccessForm" method="POST" target="availableSubmitFrame">
+<form action="https://studio.soickermarrec.de/available-access.html" id="availableAccessForm" method="POST" target="availableSubmitFrame" novalidate>
 <input name="form-name" type="hidden" value="available-works-access"/>
 <input name="source" type="hidden" value="available-works"/>
 <p hidden=""><label>Nicht ausfüllen <input name="bot-field"/></label></p>
 <label class="available-field"><span>E-Mail</span><input autocomplete="email" inputmode="email" name="email" required="" type="email"/></label>
-<label class="available-check"><input name="project_updates" type="checkbox" value="yes"/><span>Bei neuen Projekten per E-Mail benachrichtigen.</span></label>
+<label class="available-check"><input name="project_updates" type="checkbox" value="yes"/><span>Optional: Bei neuen Projekten per E-Mail benachrichtigen.</span></label>
 <button class="available-gate-button" type="submit">Liste öffnen</button>
-<p class="available-privacy-note">Die Adresse wird über Netlify Forms gespeichert. Projektbenachrichtigungen sind freiwillig. <a href="datenschutz.html">Datenschutz</a></p>
+<p class="available-privacy-note">Die E-Mail-Adresse wird zur Freischaltung und Verwaltung der Interessentenliste über Netlify Forms gespeichert. Nur mit dem optionalen Häkchen darf sie später für Projektbenachrichtigungen verwendet werden. <a href="datenschutz.html">Datenschutz</a></p>
 </form>
 <iframe hidden="" id="availableSubmitFrame" name="availableSubmitFrame" title=""></iframe>
 <p aria-live="polite" class="available-form-status" id="availableFormStatus"></p>
