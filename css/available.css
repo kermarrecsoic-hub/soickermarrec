@@ -459,3 +459,38 @@ body.continuous-home .available-works-fixed-link {
   .available-footer > a{padding:0 !important;}
   .available-footer > a::before{inset:-11px -15px;background:rgba(255,255,255,.42);-webkit-backdrop-filter:blur(11px) saturate(112%);backdrop-filter:blur(11px) saturate(112%);}
 }
+\n\n/* 2026-10-18 UI6 – no middle banner, gradient-only corner links */\n.available-site-name { display: none !important; }\n.available-footer > a {\n  background: transparent !important;\n  -webkit-backdrop-filter: none !important;\n  backdrop-filter: none !important;\n  border-radius: 0 !important;\n}\n.available-footer > a::before {\n  content: \"\";\n  position: absolute;\n  z-index: -1;\n  inset: -14px -22px;\n  pointer-events: none;\n  background: radial-gradient(ellipse at center, rgba(255,255,255,.98) 0%, rgba(255,255,255,.82) 36%, rgba(255,255,255,.36) 64%, rgba(255,255,255,0) 88%);\n  -webkit-backdrop-filter: none !important;\n  backdrop-filter: none !important;\n  -webkit-mask-image: none !important;\n  mask-image: none !important;\n}\n.available-current-section { text-align: center; }\n.available-gate-button:disabled { opacity: .45; cursor: wait; }\n
+
+/* 2026-10-18 UI7 – automatic language + rotating name at top-left */
+.language-switch { display: none !important; }
+.available-site-name {
+  display: flex !important;
+  position: fixed !important;
+  top: 18px !important;
+  left: 24px !important;
+  right: auto !important;
+  transform: none !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  line-height: 22px !important;
+  color: #9a9a9a;
+  text-decoration: none;
+  white-space: nowrap;
+  z-index: 2300;
+}
+.available-site-name.is-cycling { animation: available-site-font-cycle-ui7 1.2s step-end infinite !important; }
+@keyframes available-site-font-cycle-ui7 {
+  0%,33.332% { font-family: var(--available-font); font-size:14px; font-weight:300; letter-spacing:.45px; }
+  33.333%,66.665% { font-family:Baskerville,"Baskerville Old Face",Georgia,serif; font-size:14px; font-weight:300; letter-spacing:.45px; }
+  66.666%,100% { font-family:"Michroma",Arial,sans-serif; font-size:10px; font-weight:400; letter-spacing:.45px; }
+}
+@media (max-width:700px),(hover:none) and (pointer:coarse) {
+  .available-site-name { top:16px !important; left:18px !important; font-size:12px !important; }
+  .available-site-name.is-cycling { animation-name:available-site-font-cycle-ui7-mobile !important; }
+  @keyframes available-site-font-cycle-ui7-mobile {
+    0%,33.332% { font-family:var(--available-font); font-size:12px; font-weight:300; letter-spacing:.45px; }
+    33.333%,66.665% { font-family:Baskerville,"Baskerville Old Face",Georgia,serif; font-size:12px; font-weight:300; letter-spacing:.45px; }
+    66.666%,100% { font-family:"Michroma",Arial,sans-serif; font-size:8px; font-weight:400; letter-spacing:.45px; }
+  }
+}

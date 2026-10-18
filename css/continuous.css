@@ -1937,3 +1937,61 @@ body.continuous-nav-open .continuous-nav-frost { opacity: 1; visibility: visible
     backdrop-filter: blur(11px) saturate(112%);
   }
 }
+\n\n/* ================================================================\n   2026-10-18 UI6 – no middle banner; lower links use soft gradients only\n   ================================================================ */\n.continuous-site-name { display: none !important; }\n\n.continuous-global-footer .footer-instagram,\n.available-works-fixed-link {\n  transition: color .22s ease, opacity .22s ease;\n  background: transparent !important;\n  -webkit-backdrop-filter: none !important;\n  backdrop-filter: none !important;\n  border-radius: 0 !important;\n}\n/* On the untouched landing state the two corner entries stay quiet. */\nbody.continuous-home:not(.has-scrolled) .continuous-global-footer .footer-instagram,\nbody.continuous-home:not(.has-scrolled) .available-works-fixed-link {\n  color: #aaa !important;\n}\nbody.continuous-home.has-scrolled .continuous-global-footer .footer-instagram,\nbody.continuous-home.has-scrolled .available-works-fixed-link {\n  color: var(--ink) !important;\n}\n/* No glass rectangle: only a soft white gradient that dissolves into the page. */\n.continuous-global-footer .footer-instagram::before,\n.available-works-fixed-link::before {\n  content: \"\";\n  position: absolute;\n  z-index: -1;\n  inset: -14px -22px;\n  pointer-events: none;\n  background: radial-gradient(ellipse at center, rgba(255,255,255,.98) 0%, rgba(255,255,255,.80) 36%, rgba(255,255,255,.34) 64%, rgba(255,255,255,0) 88%);\n  -webkit-backdrop-filter: none !important;\n  backdrop-filter: none !important;\n  -webkit-mask-image: none !important;\n  mask-image: none !important;\n}\n@media (max-width:700px),(hover:none) and (pointer:coarse){\n  .continuous-global-footer .footer-instagram,\n  .available-works-fixed-link { padding: 0 !important; }\n  .continuous-global-footer .footer-instagram::before,\n  .available-works-fixed-link::before { inset: -15px -23px; }\n}\n
+
+/* ================================================================
+   2026-10-18 UI7 – rotating Soïc Kermarrec top-left, automatic language
+   ================================================================ */
+.language-switch { display: none !important; }
+.continuous-site-name {
+  display: flex !important;
+  position: fixed !important;
+  top: 18px !important;
+  left: 24px !important;
+  right: auto !important;
+  transform: none !important;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 22px;
+  align-items: center;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  line-height: 22px !important;
+  color: #9a9a9a;
+}
+.continuous-site-name.is-cycling {
+  animation: continuous-site-font-cycle-ui7 1.2s step-end infinite !important;
+}
+@keyframes continuous-site-font-cycle-ui7 {
+  0%, 33.332% {
+    font-family: var(--site-font);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: .45px;
+  }
+  33.333%, 66.665% {
+    font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: .45px;
+  }
+  66.666%, 100% {
+    font-family: "Michroma", Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: .45px;
+  }
+}
+@media (max-width:700px),(hover:none) and (pointer:coarse) {
+  .continuous-site-name {
+    top: 16px !important;
+    left: 18px !important;
+    font-size: 12px !important;
+  }
+  .continuous-site-name.is-cycling { animation-name: continuous-site-font-cycle-ui7-mobile !important; }
+  @keyframes continuous-site-font-cycle-ui7-mobile {
+    0%, 33.332% { font-family: var(--site-font); font-size: 12px; font-weight: 300; letter-spacing: .45px; }
+    33.333%, 66.665% { font-family: Baskerville, "Baskerville Old Face", Georgia, serif; font-size: 12px; font-weight: 300; letter-spacing: .45px; }
+    66.666%, 100% { font-family: "Michroma", Arial, sans-serif; font-size: 8px; font-weight: 400; letter-spacing: .45px; }
+  }
+}
