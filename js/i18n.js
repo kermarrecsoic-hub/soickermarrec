@@ -285,8 +285,7 @@
   }
 
   function currentLanguage() {
-    const fromUrl = new URL(location.href).searchParams.get('lang');
-    return VALID.includes(fromUrl) ? fromUrl : browserLanguage();
+    return browserLanguage();
   }
 
   function propagateLanguage(lang) {
@@ -379,8 +378,8 @@
 
   const lang = currentLanguage();
   applyStaticText(lang);
-  makeSwitch(lang);
-  propagateLanguage(lang);
+  // Language is selected automatically from the browser. No manual switch or ?lang propagation.
+  document.querySelector('.language-switch')?.remove();
 
   function setupImageProtection() {
     const protectImage = img => {
