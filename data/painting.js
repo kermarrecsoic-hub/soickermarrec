@@ -85,17 +85,14 @@ window.PAINTING_WORKS = [
     "availability": "",
     "text": "",
     "images": [
-      "../images/painting/prozession-diptychon/main-20261006094623-01.webp"
+      "../images/painting/prozession-diptychon/main-20261018110409-01.webp"
     ],
     "shareId": "prozession-diptychon",
     "details": [
-      "../images/painting/prozession-diptychon/detail-20261006094623-01.webp",
-      "../images/painting/prozession-diptychon/detail-20261006094623-02.webp",
-      "../images/painting/prozession-diptychon/main-20261006094623-02.webp",
-      "../images/painting/prozession-diptychon/main-20261006094623-03.webp"
+      "../images/painting/prozession-diptychon/detail-20261018110409-01.webp",
+      "../images/painting/prozession-diptychon/detail-20261018110409-02.webp"
     ],
-    "navColor": "#787676",
-    "visible": false
+    "navColor": "#7c7577"
   },
   {
     "title": "Köpfe, 2026",
