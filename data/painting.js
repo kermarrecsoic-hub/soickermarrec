@@ -6,14 +6,16 @@ window.PAINTING_WORKS = [
     "dimensions": "65 × 50 cm",
     "availability": "",
     "text": "",
-    "details": {
-      "left": "../images/painting/dante/detail-left.webp",
-      "right": "../images/painting/dante/detail-right.webp"
-    },
+    "details": [
+      "../images/painting/dante/detail-left.webp",
+      "../images/painting/dante/detail-right.webp"
+    ],
     "images": [
       "../images/painting/dante/main.webp"
     ],
-    "navColor": "#976158"
+    "navColor": "#976158",
+    "layout": "portrait",
+    "shareId": "dante"
   },
   {
     "title": "Untitled (8 Holzplatten), 2026",
