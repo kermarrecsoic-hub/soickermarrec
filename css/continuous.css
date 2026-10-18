@@ -1132,17 +1132,9 @@ body.content-ui-visible .continuous-ui {
 }
 
 /* ================================================================
-   2026-10-13b – exact 75vw series grid + frosted progressive previews
+   2026-10-18a – exact 75vw series grid + native image loading
    ================================================================ */
 
-/* Tiny previews are loaded immediately; the full image replaces them near
-   the viewport. The strong blur intentionally matches the supplied frosted
-   reference while keeping each placeholder only a few KB. */
-img.is-frost-preview {
-  filter: blur(16px) saturate(.88);
-  transform: scale(1.075) !important;
-  opacity: .96;
-}
 .project-main-image,
 .project-detail-button img,
 .series-image-button img,

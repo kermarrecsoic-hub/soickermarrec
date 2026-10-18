@@ -65,25 +65,6 @@
     return paths[slotIndex % paths.length] || fallbackPath();
   }
 
-  function previewStem(path = '') {
-    let clean = String(path).split(/[?#]/)[0]
-      .replace(/^https?:\/\/[^/]+\//i, '')
-      .replace(/^(\.\.\/)+/, '')
-      .replace(/^\/+/, '');
-    if (clean.startsWith('images/')) clean = clean.slice(7);
-    clean = clean.replace(/\.[^.\/]+$/, '');
-    return clean
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase().replace(/ß/g, 'ss')
-      .split('/')
-      .map(part => part.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'item')
-      .join('--');
-  }
-
-  function previewPath(path) {
-    return `Vorschaubild/${previewStem(path)}-${mobileQuery.matches ? 'm' : 'd'}.webp`;
-  }
-
   async function loadConfig() {
     try {
       const response = await fetch(`${CONFIG_URL}?v=${Date.now()}`, { cache: 'no-store' });
@@ -108,19 +89,10 @@
 
   function showPath(path, animate = false) {
     if (!path) return;
-
-    // The tiny local preview is visible immediately while the full image loads.
-    if (!animate || !bg.src) {
-      bg.src = previewPath(path);
-      bg.classList.add('is-frost-preview');
-      bg.classList.remove('is-hidden');
-    }
-
     const probe = new Image();
     probe.onload = () => {
       if (!animate || !bg.src) {
         bg.src = path;
-        bg.classList.remove('is-frost-preview');
         bg.classList.remove('is-hidden');
         scheduleContrast();
         return;
@@ -135,16 +107,12 @@
 
       setTimeout(() => {
         bg.src = path;
-        bg.classList.remove('is-frost-preview');
         bg.classList.remove('is-hidden');
         incoming.classList.remove('is-visible');
         scheduleContrast();
       }, 900);
     };
-    probe.onerror = () => {
-      bg.classList.remove('is-frost-preview');
-      rotateBackground();
-    };
+    probe.onerror = rotateBackground;
     probe.src = path;
   }
 
