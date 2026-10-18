@@ -28,13 +28,17 @@
   const scheduleClose=()=>{ clearTimeout(navTimer); navTimer=setTimeout(()=>setOpen(false),150); };
   trigger?.addEventListener('click',e=>{ e.stopPropagation(); setOpen(!navOpen); });
   if(finePointer.matches){
+    const pointerInsideNavArea=e=>{
+      if(!navOpen||!trigger||!menu)return false;
+      const a=trigger.getBoundingClientRect(), b=menu.getBoundingClientRect(), pad=18;
+      return e.clientX>=Math.min(a.left,b.left)-pad && e.clientX<=Math.max(a.right,b.right)+pad && e.clientY>=Math.min(a.top,b.top)-pad && e.clientY<=Math.max(a.bottom,b.bottom)+pad;
+    };
     trigger?.addEventListener('mouseenter',()=>{cancelClose();setOpen(true)});
-    trigger?.addEventListener('mouseleave',scheduleClose);
     menu?.addEventListener('mouseenter',cancelClose);
+    document.addEventListener('pointermove',e=>{ if(!navOpen)return; if(pointerInsideNavArea(e))cancelClose(); else scheduleClose(); },{passive:true});
     menu?.addEventListener('mouseleave',()=>{
       menu.querySelectorAll('a').forEach(a=>a.classList.remove('is-active'));
       siteName?.classList.add('is-cycling');
-      scheduleClose();
     });
     menu?.querySelectorAll('a').forEach(link=>{
       link.addEventListener('mouseenter',()=>{

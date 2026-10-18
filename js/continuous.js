@@ -622,10 +622,24 @@
       setOpen(!open);
     });
     if (finePointer.matches) {
+      const pointerInsideNavArea = event => {
+        if (!open) return false;
+        const a = trigger.getBoundingClientRect();
+        const b = menu.getBoundingClientRect();
+        const pad = 18;
+        const left = Math.min(a.left, b.left) - pad;
+        const right = Math.max(a.right, b.right) + pad;
+        const top = Math.min(a.top, b.top) - pad;
+        const bottom = Math.max(a.bottom, b.bottom) + pad;
+        return event.clientX >= left && event.clientX <= right && event.clientY >= top && event.clientY <= bottom;
+      };
       trigger.addEventListener('mouseenter', () => { cancelClose(); setOpen(true); });
-      trigger.addEventListener('mouseleave', scheduleClose);
       menu.addEventListener('mouseenter', cancelClose);
-      menu.addEventListener('mouseleave', scheduleClose);
+      document.addEventListener('pointermove', event => {
+        if (!open) return;
+        if (pointerInsideNavArea(event)) cancelClose();
+        else scheduleClose();
+      }, { passive: true });
     }
     frost.addEventListener('click', () => setOpen(false));
 
@@ -678,7 +692,6 @@
       menu.addEventListener('mouseleave', () => {
         menu.querySelectorAll('a').forEach(a => a.classList.remove('is-active'));
         siteName.classList.add('is-cycling');
-        scheduleClose();
       });
     }
 

@@ -1799,3 +1799,141 @@ body.continuous-nav-open .continuous-nav-frost { opacity: 1; visibility: visible
     font-size: 10px;
   }
 }
+
+
+/* ================================================================
+   2026-10-18 UI5 – top-row alignment, softer lower frost, stable nav hover
+   ================================================================ */
+
+/* All three top-row controls share the same vertical centre. The middle
+   Soïc Kermarrec label now matches the navigator title size. */
+.continuous-home .language-switch,
+.continuous-site-name,
+.continuous-current-section {
+  top: 18px !important;
+  min-height: 22px;
+}
+.continuous-site-name,
+.continuous-current-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 22px !important;
+}
+.continuous-site-name {
+  font-size: 14px !important;
+  transform: translateX(-50%);
+  text-align: center;
+}
+.continuous-current-section {
+  text-align: center;
+}
+
+/* Keep each font in the rotation optically centred in the same 22px box. */
+@keyframes continuous-site-font-cycle {
+  0%, 33.332% {
+    font-family: var(--site-font);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: .45px;
+  }
+  33.333%, 66.665% {
+    font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: .45px;
+  }
+  66.666%, 100% {
+    font-family: "Michroma", Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: .45px;
+  }
+}
+
+/* Frost belongs only to the bottom corner links. Remove the mobile glass
+   boxes from the top row while keeping the existing soft top gradient. */
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  .continuous-home .language-switch,
+  .continuous-site-name,
+  .continuous-current-section {
+    top: 16px !important;
+    min-height: 22px;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+  .continuous-site-name {
+    font-size: 12px !important;
+  }
+  @keyframes continuous-site-font-cycle-mobile {
+    0%, 33.332% {
+      font-family: var(--site-font);
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: .45px;
+    }
+    33.333%, 66.665% {
+      font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: .45px;
+    }
+    66.666%, 100% {
+      font-family: "Michroma", Arial, sans-serif;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: .45px;
+    }
+  }
+}
+
+/* Soft local frost behind the two lower links. A masked pseudo-element makes
+   the blur fade outwards instead of ending at a hard rounded rectangle. */
+.continuous-global-footer .footer-instagram,
+.available-works-fixed-link {
+  isolation: isolate;
+  overflow: visible;
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border-radius: 0 !important;
+}
+.continuous-global-footer .footer-instagram::before,
+.available-works-fixed-link::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -10px -14px;
+  pointer-events: none;
+  background: rgba(255,255,255,.38);
+  -webkit-backdrop-filter: blur(10px) saturate(112%);
+  backdrop-filter: blur(10px) saturate(112%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 36%, rgba(0,0,0,.82) 54%, transparent 82%);
+  mask-image: radial-gradient(ellipse at center, #000 36%, rgba(0,0,0,.82) 54%, transparent 82%);
+}
+
+/* Two-line lower-right label. */
+.available-works-fixed-link {
+  text-align: right;
+  line-height: 1.02 !important;
+  white-space: nowrap;
+}
+
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  .continuous-global-footer .footer-instagram,
+  .available-works-fixed-link {
+    padding: 0 !important;
+  }
+  .continuous-global-footer .footer-instagram::before,
+  .available-works-fixed-link::before {
+    inset: -11px -15px;
+    background: rgba(255,255,255,.42);
+    -webkit-backdrop-filter: blur(11px) saturate(112%);
+    backdrop-filter: blur(11px) saturate(112%);
+  }
+}

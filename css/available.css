@@ -403,3 +403,59 @@ body.continuous-home .available-works-fixed-link {
     66.666%, 100% { font-family: "Michroma", Arial, sans-serif; font-size: 8px; font-weight: 400; }
   }
 }
+
+
+/* 2026-10-18 UI5 – match the main portfolio top-row alignment and soft frost. */
+.available-site-name,
+.available-current-section {
+  top: 18px !important;
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 22px !important;
+  text-align: center;
+}
+.available-site-name { font-size: 14px !important; }
+@keyframes available-site-font-cycle {
+  0%, 33.332% { font-family: var(--available-font); font-size: 14px; font-weight: 300; letter-spacing:.45px; }
+  33.333%, 66.665% { font-family: Baskerville, "Baskerville Old Face", Georgia, serif; font-size: 14px; font-weight: 300; letter-spacing:.45px; }
+  66.666%, 100% { font-family: "Michroma", Arial, sans-serif; font-size: 11px; font-weight: 400; letter-spacing:.45px; }
+}
+.available-footer > a {
+  isolation: isolate;
+  overflow: visible;
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border-radius: 0 !important;
+}
+.available-footer > a::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:-10px -14px;
+  pointer-events:none;
+  background:rgba(255,255,255,.38);
+  -webkit-backdrop-filter:blur(10px) saturate(112%);
+  backdrop-filter:blur(10px) saturate(112%);
+  -webkit-mask-image:radial-gradient(ellipse at center,#000 36%,rgba(0,0,0,.82) 54%,transparent 82%);
+  mask-image:radial-gradient(ellipse at center,#000 36%,rgba(0,0,0,.82) 54%,transparent 82%);
+}
+@media (max-width:700px),(hover:none) and (pointer:coarse){
+  .available-site-name,.available-current-section{
+    top:16px !important;
+    background:transparent !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+    box-shadow:none !important;
+  }
+  .available-site-name{font-size:12px !important;}
+  @keyframes available-site-font-cycle-mobile {
+    0%,33.332%{font-family:var(--available-font);font-size:12px;font-weight:300;}
+    33.333%,66.665%{font-family:Baskerville,"Baskerville Old Face",Georgia,serif;font-size:12px;font-weight:300;}
+    66.666%,100%{font-family:"Michroma",Arial,sans-serif;font-size:9px;font-weight:400;}
+  }
+  .available-footer > a{padding:0 !important;}
+  .available-footer > a::before{inset:-11px -15px;background:rgba(255,255,255,.42);-webkit-backdrop-filter:blur(11px) saturate(112%);backdrop-filter:blur(11px) saturate(112%);}
+}
