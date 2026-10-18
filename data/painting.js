@@ -108,7 +108,8 @@ window.PAINTING_WORKS = [
     "images": [
       "../images/painting/Koepfe/main.webp"
     ],
-    "shareId": "koepfe"
+    "shareId": "koepfe",
+    "layout": "portrait"
   },
   {
     "title": "Untitled (Bär), 2024",
