@@ -26,7 +26,9 @@
         s4h: 'Kontaktaufnahme',
         s4b: '<p>Wenn Sie per E-Mail Kontakt aufnehmen, werden die von Ihnen übermittelten Daten ausschließlich zur Bearbeitung der Anfrage verarbeitet. Rechtsgrundlage ist je nach Inhalt der Anfrage Art. 6 Abs. 1 lit. b oder lit. f DSGVO.</p>',
         s5h: 'Ihre Rechte',
-        s5b: '<p>Im Rahmen der gesetzlichen Voraussetzungen bestehen insbesondere Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Außerdem besteht ein Beschwerderecht bei einer zuständigen Datenschutz-Aufsichtsbehörde.</p>'
+        s5b: '<p>Im Rahmen der gesetzlichen Voraussetzungen bestehen insbesondere Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Außerdem besteht ein Beschwerderecht bei einer zuständigen Datenschutz-Aufsichtsbehörde.</p>',
+        s6h: 'Available Works / E-Mail-Liste',
+        s6b: '<p>Für den Zugang zur Seite „Available Works“ wird eine E-Mail-Adresse abgefragt und über Netlify Forms verarbeitet. Die Adresse wird verwendet, um den Zugang zur nicht öffentlich beworbenen Preisliste zu ermöglichen und eine Interessentenliste zu führen. Rechtsgrundlage ist – soweit die Anfrage auf den Erwerb eines Werks gerichtet ist – Art. 6 Abs. 1 lit. b DSGVO, im Übrigen Art. 6 Abs. 1 lit. f DSGVO.</p><p>Die zusätzliche Option, Benachrichtigungen über neue Projekte zu erhalten, ist freiwillig. Wird sie aktiviert, erfolgt die Verarbeitung hierfür auf Grundlage der Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO. Die Einwilligung kann jederzeit mit Wirkung für die Zukunft per E-Mail widerrufen werden.</p><p>Formulardaten werden über Netlify verarbeitet. Sie werden gelöscht, wenn der jeweilige Zweck entfällt und keine gesetzlichen Aufbewahrungspflichten entgegenstehen. Die Seite speichert außerdem lokal im Browser, ob der Zugang bereits freigeschaltet wurde; dabei wird keine E-Mail-Adresse im Browser gespeichert.</p>'
       }
     },
     fr: {
@@ -50,7 +52,9 @@
         s4h: 'Prise de contact',
         s4b: '<p>Si vous me contactez par e-mail, les données transmises sont traitées uniquement pour répondre à votre demande. Selon la nature de la demande, la base juridique est l’art. 6, par. 1, let. b ou let. f RGPD.</p>',
         s5h: 'Vos droits',
-        s5b: '<p>Dans les conditions prévues par la loi, vous disposez notamment de droits d’accès, de rectification, d’effacement, de limitation, de portabilité et d’opposition. Vous pouvez également déposer une réclamation auprès d’une autorité de contrôle compétente.</p>'
+        s5b: '<p>Dans les conditions prévues par la loi, vous disposez notamment de droits d’accès, de rectification, d’effacement, de limitation, de portabilité et d’opposition. Vous pouvez également déposer une réclamation auprès d’une autorité de contrôle compétente.</p>',
+        s6h: 'Available Works / liste e-mail',
+        s6b: '<p>Pour accéder à la page « Available Works », une adresse e-mail est demandée et traitée via Netlify Forms. Elle sert à donner accès à la liste de prix non promue publiquement et à tenir une liste de personnes intéressées. Lorsque la demande concerne l’achat éventuel d’une œuvre, le traitement repose sur l’art. 6, par. 1, let. b RGPD ; dans les autres cas, sur l’art. 6, par. 1, let. f RGPD.</p><p>L’option de recevoir des notifications sur de nouveaux projets est facultative. Si elle est activée, ce traitement repose sur le consentement au sens de l’art. 6, par. 1, let. a RGPD. Le consentement peut être retiré à tout moment pour l’avenir par e-mail.</p><p>Les données du formulaire sont traitées via Netlify. Elles sont supprimées lorsque leur finalité disparaît, sous réserve d’éventuelles obligations légales de conservation. Le site enregistre également localement dans le navigateur si l’accès a déjà été accordé ; l’adresse e-mail elle-même n’est pas stockée dans le navigateur.</p>'
       }
     },
     en: {
@@ -74,7 +78,9 @@
         s4h: 'Contact',
         s4b: '<p>If you contact me by email, the data you provide is processed solely in order to handle your enquiry. Depending on the enquiry, the legal basis is Art. 6(1)(b) or Art. 6(1)(f) GDPR.</p>',
         s5h: 'Your rights',
-        s5b: '<p>Subject to the statutory requirements, you have rights including access, rectification, erasure, restriction of processing, data portability and objection. You also have the right to lodge a complaint with a competent data protection supervisory authority.</p>'
+        s5b: '<p>Subject to the statutory requirements, you have rights including access, rectification, erasure, restriction of processing, data portability and objection. You also have the right to lodge a complaint with a competent data protection supervisory authority.</p>',
+        s6h: 'Available Works / email list',
+        s6b: '<p>Access to the “Available Works” page requires an email address, which is processed through Netlify Forms. The address is used to provide access to the non-publicly promoted price list and to maintain an interested-parties list. Where the enquiry concerns a possible purchase, processing is based on Art. 6(1)(b) GDPR; otherwise on Art. 6(1)(f) GDPR.</p><p>The additional option to receive notifications about new projects is voluntary. If selected, that processing is based on consent under Art. 6(1)(a) GDPR. Consent can be withdrawn at any time with future effect by email.</p><p>Form data is processed through Netlify. It is deleted when the relevant purpose no longer applies, subject to statutory retention obligations. The site also stores locally in the browser whether access has already been granted; the email address itself is not stored in the browser.</p>'
       }
     }
   };

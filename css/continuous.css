@@ -1314,3 +1314,488 @@ body.content-ui-visible .continuous-ui {
     padding-top: 22px;
   }
 }
+
+
+/* ================================================================
+   2026-10-18 UI2 – neue globale UI / echte Projektlayouts
+   ================================================================ */
+
+/* Oben: Sprache links, Name mittig, aktueller Bereich rechts. */
+.continuous-site-name {
+  position: fixed;
+  z-index: 2260;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #a0a0a0;
+  text-decoration: none;
+  white-space: nowrap;
+  font: 300 12px/1 var(--site-font);
+  letter-spacing: .45px;
+  pointer-events: auto;
+}
+.continuous-current-section {
+  position: fixed;
+  z-index: 2270;
+  top: 18px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  width: auto;
+  max-width: min(36vw, 300px);
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  appearance: none;
+  color: var(--scroll-project-color, var(--ink));
+  cursor: pointer;
+  font-family: var(--site-font);
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 22px;
+  letter-spacing: .45px;
+  text-align: right;
+  transition: color .32s linear;
+  pointer-events: auto;
+}
+.continuous-current-section.is-cycling,
+.continuous-nav-menu a.is-active { animation: continuous-font-cycle 1.2s step-end infinite; }
+.continuous-nav-compact,
+.continuous-nav-trigger { display: none !important; }
+.continuous-nav-menu {
+  top: 48px;
+  right: 24px;
+}
+body.continuous-nav-open .continuous-nav-menu,
+body.continuous-nav-open .continuous-nav-frost { opacity: 1; visibility: visible; }
+
+/* Sprache bleibt wie auf der ursprünglichen Seite links. */
+.continuous-home .language-switch { left: 24px; right: auto; }
+
+/* Footer: Instagram links, Available Works rechts; Legal bleibt mittig. */
+.continuous-global-footer {
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+}
+.continuous-global-footer .footer-instagram {
+  position: fixed;
+  left: 24px;
+  bottom: 12px;
+}
+.available-works-fixed-link { right: 24px; bottom: 12px; }
+
+/* Die expliziten Studio-Layouts verändern im geöffneten Zustand nun wirklich
+   die Projektkomposition – nicht nur die Maximalbreite des Hauptbildes. */
+@media (min-width: 701px) and (hover:hover) and (pointer:fine) {
+  .continuous-project.layout-portrait.is-open,
+  .continuous-project.layout-landscape.is-open {
+    width: min(92vw, 1120px);
+    margin-inline: auto;
+    display: grid;
+    align-items: start;
+    column-gap: clamp(30px, 4vw, 64px);
+  }
+  .continuous-project.layout-portrait.is-open {
+    grid-template-columns: minmax(260px, 430px) minmax(0, 1fr);
+  }
+  .continuous-project.layout-landscape.is-open {
+    grid-template-columns: minmax(420px, 690px) minmax(260px, 1fr);
+  }
+  .continuous-project.layout-portrait.is-open .project-main-shell,
+  .continuous-project.layout-landscape.is-open .project-main-shell,
+  .continuous-project.layout-portrait.is-open .project-expanded,
+  .continuous-project.layout-landscape.is-open .project-expanded {
+    width: 100%;
+    min-width: 0;
+  }
+  .continuous-project.layout-portrait.is-open .project-main-button,
+  .continuous-project.layout-landscape.is-open .project-main-button {
+    width: 100%;
+    max-width: 100% !important;
+  }
+  .continuous-project.layout-portrait.is-open .project-main-image,
+  .continuous-project.layout-landscape.is-open .project-main-image {
+    width: 100%;
+    max-width: 100% !important;
+    max-height: 76svh;
+  }
+  .continuous-project.layout-portrait.is-open .project-expanded,
+  .continuous-project.layout-landscape.is-open .project-expanded {
+    max-height: none;
+    overflow: visible;
+  }
+  .continuous-project.layout-portrait.is-open .project-description,
+  .continuous-project.layout-landscape.is-open .project-description {
+    width: 100%;
+    margin: 0 0 22px;
+    text-align: left;
+  }
+  .continuous-project.layout-portrait.is-open .project-details-grid,
+  .continuous-project.layout-landscape.is-open .project-details-grid {
+    width: 100%;
+    margin: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+/* Diptychon: Plus direkt unter der sichtbaren Bildkante. */
+.continuous-project.layout-diptych .project-under-controls {
+  margin-top: 1px;
+  min-height: 20px;
+  transform: translateY(-2px);
+}
+
+/* Das feste Architektur-Vorschaubild bleibt bewusst kleiner. */
+@media (min-width: 701px) and (hover:hover) and (pointer:fine) {
+  #architecture .architecture-feature {
+    width: min(75vw, 650px) !important;
+    max-width: min(75vw, 650px) !important;
+  }
+}
+
+/* Mobile: lokale Frost-Flächen direkt unter den UI-Texten, nicht über der
+   ganzen Seite. Untere Links stehen etwas höher und bleiben gut lesbar. */
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  .continuous-site-name {
+    top: 16px;
+    font-size: 11px;
+    padding: 5px 8px;
+    border-radius: 10px;
+    background: rgb(255 255 255 / 48%);
+    -webkit-backdrop-filter: blur(9px) saturate(115%);
+    backdrop-filter: blur(9px) saturate(115%);
+  }
+  .continuous-current-section {
+    top: 16px;
+    right: 18px;
+    max-width: 34vw;
+    font-size: 12px;
+    line-height: 22px;
+    padding: 0 7px;
+    border-radius: 10px;
+    background: rgb(255 255 255 / 48%);
+    -webkit-backdrop-filter: blur(9px) saturate(115%);
+    backdrop-filter: blur(9px) saturate(115%);
+  }
+  .continuous-home .language-switch {
+    top: 16px;
+    left: 18px;
+    height: 22px;
+    padding: 4px 7px;
+    border-radius: 10px;
+    background: rgb(255 255 255 / 48%);
+    -webkit-backdrop-filter: blur(9px) saturate(115%);
+    backdrop-filter: blur(9px) saturate(115%);
+  }
+  .continuous-nav-menu { top: 48px; right: 18px; }
+  .continuous-global-footer .footer-instagram {
+    left: 18px;
+    bottom: 22px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    background: rgb(255 255 255 / 52%);
+    -webkit-backdrop-filter: blur(10px) saturate(115%);
+    backdrop-filter: blur(10px) saturate(115%);
+  }
+  .available-works-fixed-link {
+    right: 18px;
+    bottom: 22px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    background: rgb(255 255 255 / 52%);
+    -webkit-backdrop-filter: blur(10px) saturate(115%);
+    backdrop-filter: blur(10px) saturate(115%);
+  }
+  .continuous-global-footer .footer-links {
+    bottom: 8px;
+  }
+  .continuous-project.layout-portrait.is-open,
+  .continuous-project.layout-landscape.is-open {
+    display: flex;
+    width: 100%;
+  }
+}
+
+/* ================================================================
+   2026-10-18 UI3 – Footer typography + portrait detail composition
+   ================================================================ */
+
+/* Instagram und Available Works: dieselbe Grundtypografie/-farbe wie der
+   rechte Seitentitel im Banner (ohne dessen dynamische Projektfarbe). */
+.continuous-global-footer .footer-instagram,
+.available-works-fixed-link {
+  color: var(--ink) !important;
+  font-family: var(--site-font) !important;
+  font-size: 14px !important;
+  font-weight: 300 !important;
+  line-height: 22px !important;
+  letter-spacing: .45px !important;
+  opacity: 1 !important;
+  text-decoration: none;
+}
+.continuous-global-footer .footer-instagram:hover,
+.continuous-global-footer .footer-instagram:focus-visible,
+.available-works-fixed-link:hover,
+.available-works-fixed-link:focus-visible {
+  color: var(--ink) !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Alle Beschreibungen bleiben wieder klassisch zentriert unter dem
+   Hauptbild. Querformat nutzt daher keinen seitlichen Text-/Detailblock. */
+@media (min-width: 701px) and (hover:hover) and (pointer:fine) {
+  .continuous-project.layout-landscape.is-open {
+    width: 100%;
+    max-width: none;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .continuous-project.layout-landscape.is-open .project-main-shell {
+    width: 100%;
+    min-width: 0;
+  }
+  .continuous-project.layout-landscape.is-open .project-main-button {
+    width: auto;
+    max-width: 100% !important;
+    margin-inline: auto;
+  }
+  .continuous-project.layout-landscape.is-open .project-main-image {
+    width: auto;
+    max-width: min(74vw, 920px) !important;
+    max-height: min(72svh, 760px);
+  }
+  .continuous-project.layout-landscape.is-open .project-expanded {
+    display: block;
+    width: 100%;
+    max-height: 5000px;
+    overflow: visible;
+  }
+  .continuous-project.layout-landscape.is-open .project-description {
+    width: min(620px, 92%);
+    margin: 18px auto 0;
+    text-align: center;
+  }
+  .continuous-project.layout-landscape.is-open .project-details-grid {
+    width: min(100%, 1180px);
+    margin: 24px auto 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(12px, 2vw, 28px);
+  }
+
+  /* Hochformat: Hauptbild bleibt mittig. Detailbilder flankieren es links
+     und rechts; der Beschreibungstext bleibt mittig direkt darunter. */
+  .continuous-project.layout-portrait.is-open {
+    width: min(94vw, 1320px);
+    max-width: none;
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 440px) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: clamp(20px, 3vw, 46px);
+    align-items: start;
+  }
+  .continuous-project.layout-portrait.is-open .project-main-shell {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    min-width: 0;
+    z-index: 2;
+  }
+  .continuous-project.layout-portrait.is-open .project-main-button {
+    width: 100%;
+    max-width: 100% !important;
+    margin-inline: auto;
+  }
+  .continuous-project.layout-portrait.is-open .project-main-image {
+    display: block;
+    width: 100%;
+    max-width: 440px !important;
+    max-height: 76svh;
+    margin-inline: auto;
+    object-fit: contain;
+  }
+  .continuous-project.layout-portrait.is-open .project-expanded {
+    display: contents;
+  }
+  .continuous-project.layout-portrait.is-open .project-description {
+    grid-column: 2;
+    grid-row: 2;
+    width: min(100%, 620px);
+    margin: 18px auto 0;
+    text-align: center;
+    opacity: 1;
+    visibility: visible;
+  }
+  .continuous-project.layout-portrait.is-open .project-details-grid {
+    grid-column: 1 / 4;
+    grid-row: 1;
+    align-self: stretch;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 440px) minmax(0, 1fr);
+    gap: clamp(20px, 3vw, 46px);
+    align-items: start;
+    pointer-events: none;
+    opacity: 1;
+    visibility: visible;
+  }
+  .continuous-project.layout-portrait.is-open .project-detail-button {
+    width: 100%;
+    max-width: 100%;
+    pointer-events: auto;
+    align-self: start;
+  }
+  .continuous-project.layout-portrait.is-open .project-detail-button:nth-child(odd) {
+    grid-column: 1;
+  }
+  .continuous-project.layout-portrait.is-open .project-detail-button:nth-child(even) {
+    grid-column: 3;
+  }
+  .continuous-project.layout-portrait.is-open .project-detail-button img {
+    width: 100%;
+    max-width: 100%;
+    max-height: 76svh;
+    object-fit: contain;
+  }
+}
+
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  .continuous-global-footer .footer-instagram,
+  .available-works-fixed-link {
+    font-size: 12px !important;
+    line-height: 22px !important;
+    color: var(--ink) !important;
+  }
+
+  /* Mobile bleibt für alle Layouts bewusst linear: Hauptbild,
+     Beschreibung, anschließend Detailbilder. */
+  .continuous-project.layout-portrait.is-open,
+  .continuous-project.layout-landscape.is-open {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  .continuous-project.layout-portrait.is-open .project-expanded,
+  .continuous-project.layout-landscape.is-open .project-expanded {
+    display: block;
+    width: 100%;
+  }
+  .continuous-project.layout-portrait.is-open .project-description,
+  .continuous-project.layout-landscape.is-open .project-description {
+    width: min(620px, 92%);
+    margin: 18px auto 0;
+    text-align: center;
+  }
+  .continuous-project.layout-portrait.is-open .project-details-grid,
+  .continuous-project.layout-landscape.is-open .project-details-grid {
+    width: 100%;
+    margin: 24px auto 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    pointer-events: auto;
+  }
+}
+
+
+/* ================================================================
+   2026-10-18 UI4 – ruhiger Footer / Legal nur in Kontakt / Rotation Mitte
+   ================================================================ */
+
+/* Der aktuelle Bereich oben rechts bleibt ein statischer Navigator-Titel.
+   Die permanente Schriftrotation sitzt nun ausschließlich auf dem dezenten
+   Soïc-Kermarrec-Schriftzug in der Mitte. */
+.continuous-current-section,
+.continuous-current-section.is-cycling {
+  animation: none !important;
+}
+.continuous-site-name.is-cycling {
+  animation: continuous-site-font-cycle 1.2s step-end infinite;
+}
+@keyframes continuous-site-font-cycle {
+  0%, 33.332% {
+    font-family: var(--site-font);
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: .45px;
+  }
+  33.333%, 66.665% {
+    font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: .45px;
+  }
+  66.666%, 100% {
+    font-family: "Michroma", Arial, sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: .45px;
+  }
+}
+
+/* Impressum und Datenschutz sind keine dauerhaft eingeblendete Footer-Zeile
+   mehr. Sie stehen ausschließlich am Ende des Kontaktbereichs. */
+.continuous-global-footer .footer-links {
+  display: none !important;
+}
+.contact-legal-links {
+  width: min(100%, 620px);
+  margin: clamp(72px, 10vh, 130px) auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  color: #8f8f8f;
+  font: 300 10px/1.35 var(--site-font);
+  letter-spacing: .35px;
+}
+.contact-legal-links a {
+  color: inherit;
+  text-decoration: none;
+}
+.contact-legal-links a:hover,
+.contact-legal-links a:focus-visible {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 700px), (hover:none) and (pointer:coarse) {
+  .continuous-site-name.is-cycling {
+    animation-name: continuous-site-font-cycle-mobile;
+  }
+  @keyframes continuous-site-font-cycle-mobile {
+    0%, 33.332% {
+      font-family: var(--site-font);
+      font-size: 12px;
+      font-weight: 300;
+    }
+    33.333%, 66.665% {
+      font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
+      font-size: 12px;
+      font-weight: 300;
+    }
+    66.666%, 100% {
+      font-family: "Michroma", Arial, sans-serif;
+      font-size: 9px;
+      font-weight: 400;
+    }
+  }
+  .contact-legal-links {
+    margin-top: 72px;
+    gap: 16px;
+    font-size: 10px;
+  }
+}

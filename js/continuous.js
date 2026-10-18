@@ -1,6 +1,8 @@
 /* Soïc Kermarrec — continuous one-page portfolio */
-(() => {
+(async () => {
   'use strict';
+
+  if (window.SoicProjectDataReady) await window.SoicProjectDataReady;
 
   if (!document.body.classList.contains('continuous-home')) return;
 
@@ -20,7 +22,7 @@
     photography: { works: window.XXX_WORKS || [], mode: 'series' }
   };
 
-  const sectionIds = ['painting', 'graphic', 'exhibitions', 'architecture', 'photography', 'about', 'contact'];
+  const sectionIds = ['painting', 'graphic', 'photography', 'architecture', 'exhibitions', 'about', 'contact'];
   const visibleWorks = works => (works || [])
     .filter(work => work && work.visible !== false)
     .map(work => i18n?.localizeWork ? i18n.localizeWork(work) : work);
@@ -592,32 +594,46 @@
   /* ---------- Fixed UI + dropdown ---------- */
   function setupContentUi() {
     const landingNav = document.querySelector('.landing-navigation');
-    const trigger = document.querySelector('.continuous-nav-trigger');
+    const trigger = document.querySelector('[data-current-section]');
+    const siteName = document.querySelector('.continuous-site-name');
     const menu = document.querySelector('.continuous-nav-menu');
     const frost = document.querySelector('.continuous-nav-frost');
-    const name = document.querySelector('.continuous-name');
-    if (!landingNav || !trigger || !menu || !frost || !name) return;
+    if (!landingNav || !trigger || !siteName || !menu || !frost) return;
 
     let open = false;
     let scheduled = false;
+    let closeTimer = 0;
 
     const setOpen = value => {
       open = Boolean(value);
       document.body.classList.toggle('continuous-nav-open', open);
       trigger.setAttribute('aria-expanded', String(open));
       frost.setAttribute('aria-hidden', String(!open));
-      if (open) requestAnimationFrame(() => menu.querySelector('a[aria-current="page"]')?.focus({ preventScroll: true }) || menu.querySelector('a')?.focus({ preventScroll: true }));
+    };
+    const cancelClose = () => clearTimeout(closeTimer);
+    const scheduleClose = () => {
+      clearTimeout(closeTimer);
+      closeTimer = setTimeout(() => setOpen(false), 150);
     };
 
-    trigger.addEventListener('click', () => setOpen(true));
+    trigger.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(!open);
+    });
+    if (finePointer.matches) {
+      trigger.addEventListener('mouseenter', () => { cancelClose(); setOpen(true); });
+      trigger.addEventListener('mouseleave', scheduleClose);
+      menu.addEventListener('mouseenter', cancelClose);
+      menu.addEventListener('mouseleave', scheduleClose);
+    }
     frost.addEventListener('click', () => setOpen(false));
+
     const jumpToSection = id => {
       const target = document.getElementById(id);
       if (!target) return;
       const align = () => target.scrollIntoView({ block: 'start', behavior: 'auto' });
       align();
-      // Keep the requested section aligned while native lazy-loaded images
-      // establish their intrinsic height and the video placeholder settles.
       [80, 220, 520, 900, 1500].forEach(delay => setTimeout(align, delay));
     };
 
@@ -640,7 +656,7 @@
       if (event.key === 'Escape' && open) setOpen(false);
     });
 
-    name.addEventListener('click', event => {
+    siteName.addEventListener('click', event => {
       event.preventDefault();
       setOpen(false);
       history.replaceState(null, '', `${location.pathname}${location.search}`);
@@ -650,18 +666,19 @@
     if (finePointer.matches) {
       menu.querySelectorAll('a').forEach(link => {
         link.addEventListener('mouseenter', () => {
-          name.classList.remove('is-cycling');
+          siteName.classList.remove('is-cycling');
           menu.querySelectorAll('a').forEach(a => a.classList.remove('is-active'));
           link.classList.add('is-active');
         });
         link.addEventListener('mouseleave', () => {
           link.classList.remove('is-active');
-          name.classList.add('is-cycling');
+          siteName.classList.add('is-cycling');
         });
       });
       menu.addEventListener('mouseleave', () => {
         menu.querySelectorAll('a').forEach(a => a.classList.remove('is-active'));
-        name.classList.add('is-cycling');
+        siteName.classList.add('is-cycling');
+        scheduleClose();
       });
     }
 
@@ -792,7 +809,6 @@
   }
 
   function setupScrollState() {
-    const name = document.querySelector('.continuous-name');
     const currentTitle = document.querySelector('[data-current-section]');
     const menuLinks = [...document.querySelectorAll('.continuous-nav-menu a[href^="#"]')];
     const colorImages = [...document.querySelectorAll('.continuous-content img')];
@@ -858,12 +874,10 @@
         }
       }
 
-      if (!name || !document.body.classList.contains('content-ui-visible')) return;
+      if (!currentTitle || !document.body.classList.contains('content-ui-visible')) return;
 
-      // Auf der gesamten Continuous-Seite bestimmt immer das aktuell am
-      // stärksten sichtbare Bild die Farbe von "Soïc Kermarrec". Damit gilt
-      // dieselbe Logik für Malerei, Grafik, Ausstellung, Architektur,
-      // Fotografie sowie About und Kontakt.
+      // Auf der gesamten Continuous-Seite bestimmt das aktuell am stärksten
+      // sichtbare Bild die Farbe des rotierenden Abschnittstitels oben rechts.
       let bestImage = null;
       let bestVisible = -1;
       let bestDistance = Infinity;
@@ -888,7 +902,7 @@
         const fallback = displayColor(hexToRgb(owner?.dataset.navColor));
         if (fallback) color = rgbCss(fallback);
       }
-      name.style.setProperty('--scroll-project-color', color || 'var(--ink)');
+      currentTitle.style.setProperty('--scroll-project-color', color || 'var(--ink)');
     }
 
     addEventListener('scroll', requestUpdate, { passive: true });

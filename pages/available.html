@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Available Works | Soïc Kermarrec</title>
+<meta content="Private list of currently available works by Soïc Kermarrec." name="description"/>
+<meta content="noindex,nofollow,noarchive" name="robots"/>
+<link href="../favicon.png" rel="icon" sizes="any" type="image/png"/>
+<link href="../style.css?v=20261018b" rel="stylesheet"/>
+<link href="../css/gallery.css?v=20261013c" rel="stylesheet"/>
+<link href="../css/available.css?v=20261018ui4" rel="stylesheet"/>
+<script defer="" src="../js/i18n.js?v=20261007e"></script>
+
+
+<script data-base="../" defer="True" src="../js/project-data-loader.js?v=20261018ui1"></script><script defer="" src="../js/available.js?v=20261018ui4"></script>
+</head>
+<body class="available-page">
+<header aria-label="Available Works controls" class="available-topbar"><a class="available-site-name is-cycling" href="../index.html#top">Soïc Kermarrec</a><button aria-controls="available-nav-menu" aria-expanded="false" aria-label="Navigation öffnen" class="available-current-section" type="button">Available Works</button></header>
+<div aria-hidden="true" class="available-nav-frost"></div>
+<nav aria-label="Portfolio sections" class="available-nav-menu" id="available-nav-menu"><a data-i18n="nav.painting" href="../index.html#painting">Malerei</a><a data-i18n="nav.graphic" href="../index.html#graphic">Grafik</a><a data-i18n="nav.photography" href="../index.html#photography">Fotografie</a><a data-i18n="nav.architecture" href="../index.html#architecture">Arch.0</a><a data-i18n="nav.exhibitions" href="../index.html#exhibitions">Ausstellung</a><a data-i18n="nav.about" href="../index.html#about">About</a><a data-i18n="nav.contact" href="../index.html#contact">Kontakt</a></nav>
+<main class="available-main">
+<section class="available-gate" id="availableGate">
+<div class="available-gate-inner">
+<h1 class="available-gate-title">Available Works</h1>
+<p class="available-intro">Gib deine E-Mail-Adresse ein, um verfügbare Arbeiten und Preise zu sehen.</p>
+<form action="https://studio.soickermarrec.de/available-access.html" id="availableAccessForm" method="POST" target="availableSubmitFrame">
+<input name="form-name" type="hidden" value="available-works-access"/>
+<input name="source" type="hidden" value="available-works"/>
+<p hidden=""><label>Nicht ausfüllen <input name="bot-field"/></label></p>
+<label class="available-field"><span>E-Mail</span><input autocomplete="email" inputmode="email" name="email" required="" type="email"/></label>
+<label class="available-check"><input name="project_updates" type="checkbox" value="yes"/><span>Bei neuen Projekten per E-Mail benachrichtigen.</span></label>
+<button class="available-gate-button" type="submit">Liste öffnen</button>
+<p class="available-privacy-note">Die Adresse wird über Netlify Forms gespeichert. Projektbenachrichtigungen sind freiwillig. <a href="datenschutz.html">Datenschutz</a></p>
+</form>
+<iframe hidden="" id="availableSubmitFrame" name="availableSubmitFrame" title=""></iframe>
+<p aria-live="polite" class="available-form-status" id="availableFormStatus"></p>
+</div>
+</section>
+<section class="available-list-shell" hidden="" id="availableListShell">
+<header class="available-list-intro"><p>Aktuell verfügbare Arbeiten</p></header>
+<div class="available-list" id="availableList"></div>
+<p class="available-empty" hidden="" id="availableEmpty">Zurzeit sind keine Arbeiten in dieser Liste.</p>
+</section>
+</main>
+<footer class="available-footer">
+<a href="https://www.instagram.com/soicyv/" rel="noopener noreferrer me" target="_blank">Instagram</a>
+<a class="available-portfolio-back" href="../index.html">Portfolio</a></footer>
+</body>
+</html>
