@@ -16,6 +16,7 @@
         contact: 'Kontakt'
       },
       legal: { imprint: 'Impressum', privacy: 'Datenschutz' },
+      ui: { availableWorks: 'Verfügbare<br>Werke' },
       about: {
         bio1: 'Soïc Kermarrec wurde 2004 in Leipzig geboren und lebt und arbeitet in dieser Stadt als Künstler und Architekturstudent.<br>In seiner Jugend wollte er den großen Mangaka nacheifern und kam so zur Grafik mit Tinte und Feder. Als er 2025 nach Paris zog, fing er an, seine Eindrücke und Erlebnisse in Farben auf die Leinwand zu bannen, was zu seinem jetzigen Werk führte.',
         bio2: 'Er arbeitet intuitiv und stellt mit Tinte und Acryl, verschiedenen Fragmenten und Schrift Abhängigkeiten zwischen den einzelnen Elementen her. So entstehen visuelle Eindrücke, in denen sich komplexe und manchmal zufällige Zusammenhänge unserer subjektiv wahrgenommenen Realität widerspiegeln.',
@@ -88,6 +89,7 @@
         contact: 'Contact'
       },
       legal: { imprint: 'Mentions légales', privacy: 'Confidentialité' },
+      ui: { availableWorks: 'Œuvres<br>disponibles' },
       about: {
         bio1: 'Soïc Kermarrec est né à Leipzig en 2004 et y vit et travaille comme artiste et étudiant en architecture.<br>Dans sa jeunesse, il voulait suivre les traces des grands mangakas et s’est ainsi tourné vers le dessin à l’encre et à la plume. Lorsqu’il s’installe à Paris en 2025, il commence à transposer sur la toile, par la couleur, ses impressions et ses expériences, ce qui l’amène à son travail actuel.',
         bio2: 'Il travaille de manière intuitive et crée, avec l’encre et l’acrylique, différents fragments et l’écriture, des relations entre les éléments. Il en résulte des impressions visuelles dans lesquelles se reflètent les liens complexes et parfois fortuits de notre réalité perçue subjectivement.',
@@ -160,6 +162,7 @@
         contact: 'Contact'
       },
       legal: { imprint: 'Legal notice', privacy: 'Privacy' },
+      ui: { availableWorks: 'Available<br>Works' },
       about: {
         bio1: 'Soïc Kermarrec was born in Leipzig in 2004 and lives and works there as an artist and architecture student.<br>In his youth, he wanted to follow in the footsteps of the great manga artists and thus came to drawing with ink and nib. When he moved to Paris in 2025, he began translating his impressions and experiences into colour on canvas, leading to his current body of work.',
         bio2: 'He works intuitively, using ink and acrylic, various fragments and writing to establish relationships between individual elements. The result is a series of visual impressions in which the complex and sometimes accidental connections of our subjectively perceived reality are reflected.',
