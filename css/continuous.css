@@ -1674,7 +1674,6 @@ body.continuous-nav-open .continuous-nav-frost { opacity: 1; visibility: visible
 @media (max-width: 700px), (hover:none) and (pointer:coarse) {
   .continuous-global-footer .footer-instagram,
   .available-works-fixed-link {
-    font-size: 12px !important;
     line-height: 22px !important;
     color: var(--ink) !important;
   }
@@ -1868,7 +1867,6 @@ body.continuous-nav-open .continuous-nav-frost { opacity: 1; visibility: visible
     box-shadow: none !important;
   }
   .continuous-site-name {
-    font-size: 12px !important;
   }
   @keyframes continuous-site-font-cycle-mobile {
     0%, 33.332% {
@@ -1986,7 +1984,6 @@ body.continuous-nav-open .continuous-nav-frost { opacity: 1; visibility: visible
   .continuous-site-name {
     top: 16px !important;
     left: 18px !important;
-    font-size: 12px !important;
   }
   .continuous-site-name.is-cycling { animation-name: continuous-site-font-cycle-ui7-mobile !important; }
   @keyframes continuous-site-font-cycle-ui7-mobile {
@@ -2018,7 +2015,7 @@ body.continuous-nav-open .continuous-nav-frost { opacity: 1; visibility: visible
   }
   66.666%, 100% {
     font-family: "Michroma", Arial, sans-serif;
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 400;
     letter-spacing: .45px;
   }
@@ -2063,7 +2060,7 @@ body.continuous-nav-open .continuous-nav-frost { opacity: 1; visibility: visible
     }
     66.666%,100% {
       font-family:"Michroma",Arial,sans-serif;
-      font-size:7px;
+      font-size:11px;
       font-weight:400;
       letter-spacing:.45px;
     }
@@ -2106,5 +2103,31 @@ body.continuous-nav-open .continuous-nav-frost { opacity: 1; visibility: visible
     display: none !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+  }
+}
+
+
+/* ================================================================
+   2026-10-19 UI9 – compact mobile bottom fade + baseline alignment
+   ================================================================ */
+@media (max-width:700px),(hover:none) and (pointer:coarse) {
+  .continuous-global-footer::before {
+    height: 52px !important;
+    background: linear-gradient(
+      to top,
+      rgba(255,255,255,.99) 0%,
+      rgba(255,255,255,.90) 26%,
+      rgba(255,255,255,.58) 56%,
+      rgba(255,255,255,.20) 78%,
+      rgba(255,255,255,0) 100%
+    ) !important;
+  }
+  .continuous-global-footer .footer-instagram {
+    bottom: 8px !important;
+  }
+  .available-works-fixed-link {
+    bottom: 10px !important;
+    line-height: 1.02 !important;
+    text-align: right;
   }
 }
