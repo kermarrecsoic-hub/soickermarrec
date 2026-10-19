@@ -54,13 +54,40 @@
     };
   }
 
-  /* ---------- native image loading (no preview assets) ---------- */
+  /* ---------- native image loading with stable pre-load geometry ---------- */
+  const imageDimensions = window.SOIC_IMAGE_DIMENSIONS || {};
+
+  function imageDimensionKey(src = '') {
+    return String(src)
+      .split(/[?#]/, 1)[0]
+      .replace(/\\/g, '/')
+      .replace(/^https?:\/\/[^/]+\/+/, '')
+      .replace(/^(?:\.\.\/)+/, '')
+      .replace(/^\.\//, '')
+      .replace(/^\/+/, '');
+  }
+
+  function applyStableImageGeometry(img, src) {
+    const dims = imageDimensions[imageDimensionKey(src)];
+    if (!Array.isArray(dims) || dims.length < 2) return;
+    const width = Number(dims[0]);
+    const height = Number(dims[1]);
+    if (!(width > 0 && height > 0)) return;
+    // Width/height attributes let the browser calculate the final aspect ratio
+    // before the lazy resource has downloaded. This removes section growth and
+    // keeps deep links stable without fighting the user's scrolling.
+    img.width = width;
+    img.height = height;
+    img.style.aspectRatio = `${width} / ${height}`;
+  }
+
   function makeImage(src, alt, eager = false) {
     const img = el('img');
     img.alt = alt || '';
     img.loading = eager ? 'eager' : 'lazy';
     img.decoding = 'async';
     img.draggable = false;
+    applyStableImageGeometry(img, src);
     img.src = src;
     try { img.fetchPriority = eager ? 'high' : 'low'; } catch (_) {}
     return img;
@@ -282,6 +309,8 @@
     video.muted = true;
     video.playsInline = true;
     video.preload = 'none';
+    video.width = 1602;
+    video.height = 1080;
     video.setAttribute('muted', '');
     video.setAttribute('playsinline', '');
     video.setAttribute('aria-label', 'Stop-Motion Fotografie');
@@ -705,110 +734,8 @@
     requestUpdate();
   }
 
-  /* ---------- layout-shift protection for lazy-loaded media ---------- */
-  function setupLayoutShiftProtection() {
-    const content = document.querySelector('.continuous-content');
-    if (!content) return;
-
-    let anchor = null;
-    let anchorTop = 0;
-    let scheduled = false;
-    let compensating = false;
-
-    const insideProtectedContent = node => node && content.contains(node) &&
-      !node.closest('.media-viewer, .continuous-ui, .continuous-global-footer');
-
-    const chooseAnchor = () => {
-      if (compensating || document.body.classList.contains('media-viewer-open')) return;
-      if (window.scrollY < Math.max(32, window.innerHeight * .12)) {
-        anchor = null;
-        return;
-      }
-
-      // Suche ein konkretes sichtbares Element nahe dem oberen Lesebereich.
-      // Dadurch bleibt nicht nur der Abschnitt, sondern genau der Text/das Bild,
-      // das der Nutzer gerade betrachtet, an derselben Bildschirmposition.
-      const probeY = [82, 120, 170, 240, Math.round(window.innerHeight * .34)];
-      let candidate = null;
-      for (const y of probeY) {
-        const hit = document.elementFromPoint(Math.round(window.innerWidth / 2), Math.min(window.innerHeight - 2, y));
-        if (insideProtectedContent(hit)) {
-          candidate = hit;
-          break;
-        }
-      }
-
-      if (!candidate) {
-        const visibleSection = [...document.querySelectorAll('.portfolio-section')].find(section => {
-          const r = section.getBoundingClientRect();
-          return r.bottom > 80 && r.top < window.innerHeight;
-        });
-        candidate = visibleSection || null;
-      }
-
-      if (!candidate) {
-        anchor = null;
-        return;
-      }
-
-      const rect = candidate.getBoundingClientRect();
-      if (!Number.isFinite(rect.top)) return;
-      anchor = candidate;
-      anchorTop = rect.top;
-    };
-
-    const compensate = () => {
-      scheduled = false;
-      if (compensating || !anchor || !document.contains(anchor)) {
-        chooseAnchor();
-        return;
-      }
-      if (window.scrollY < Math.max(32, window.innerHeight * .12)) return;
-
-      const now = anchor.getBoundingClientRect().top;
-      const delta = now - anchorTop;
-
-      // Nur echte Layoutverschiebungen korrigieren. Normales Scrollen aktualisiert
-      // den Anker separat und wird dadurch nicht bekämpft.
-      if (Math.abs(delta) > .75 && Math.abs(delta) < window.innerHeight * 2) {
-        compensating = true;
-        window.scrollBy({ top: delta, left: 0, behavior: 'auto' });
-        requestAnimationFrame(() => {
-          anchorTop = anchor?.getBoundingClientRect().top ?? anchorTop;
-          requestAnimationFrame(() => { compensating = false; });
-        });
-      } else {
-        anchorTop = now;
-      }
-    };
-
-    const requestCompensation = () => {
-      if (scheduled) return;
-      scheduled = true;
-      requestAnimationFrame(compensate);
-    };
-
-    let scrollTimer = 0;
-    addEventListener('scroll', () => {
-      if (compensating) return;
-      clearTimeout(scrollTimer);
-      // Während der Nutzer selbst scrollt, folgt der Anker seiner aktuellen
-      // Leseposition. Erst nach kurzer Ruhe werden spätere Bild-Loads ausgeglichen.
-      scrollTimer = setTimeout(chooseAnchor, 40);
-    }, { passive: true });
-    addEventListener('resize', () => requestAnimationFrame(chooseAnchor), { passive: true });
-
-    // load wird nicht gebubbelt, funktioniert aber in der Capture-Phase.
-    content.addEventListener('load', requestCompensation, true);
-    content.addEventListener('loadedmetadata', requestCompensation, true);
-
-    if ('ResizeObserver' in window) {
-      const observer = new ResizeObserver(requestCompensation);
-      observer.observe(content);
-    }
-
-    requestAnimationFrame(chooseAnchor);
-  }
+  /* Image geometry is reserved up front from data/image-dimensions.js.
+     No scroll-lock / compensation code is needed; native scrolling stays untouched. */
 
   function alignInitialHashAfterRender() {
     const raw = String(location.hash || '').replace(/^#/, '');
@@ -1036,7 +963,6 @@
   }
 
   renderSections();
-  setupLayoutShiftProtection();
   setupContentUi();
   setupScrollState();
   alignInitialHashAfterRender();
