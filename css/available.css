@@ -494,3 +494,55 @@ body.continuous-home .available-works-fixed-link {
     66.666%,100% { font-family:"Michroma",Arial,sans-serif; font-size:8px; font-weight:400; letter-spacing:.45px; }
   }
 }
+
+/* ================================================================
+   2026-10-19 UI8 – mobile bottom fade + optically smaller Michroma
+   ================================================================ */
+@keyframes available-site-font-cycle-ui7 {
+  0%,33.332% { font-family:var(--available-font); font-size:14px; font-weight:300; letter-spacing:.45px; }
+  33.333%,66.665% { font-family:Baskerville,"Baskerville Old Face",Georgia,serif; font-size:14px; font-weight:300; letter-spacing:.45px; }
+  66.666%,100% { font-family:"Michroma",Arial,sans-serif; font-size:9px; font-weight:400; letter-spacing:.45px; }
+}
+
+@media (max-width:700px),(hover:none) and (pointer:coarse) {
+  @keyframes available-site-font-cycle-ui7-mobile {
+    0%,33.332% { font-family:var(--available-font); font-size:12px; font-weight:300; letter-spacing:.45px; }
+    33.333%,66.665% { font-family:Baskerville,"Baskerville Old Face",Georgia,serif; font-size:12px; font-weight:300; letter-spacing:.45px; }
+    66.666%,100% { font-family:"Michroma",Arial,sans-serif; font-size:7px; font-weight:400; letter-spacing:.45px; }
+  }
+
+  .available-footer {
+    isolation: isolate;
+  }
+  .available-footer::before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 104px;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      rgba(255,255,255,.99) 0%,
+      rgba(255,255,255,.92) 24%,
+      rgba(255,255,255,.68) 50%,
+      rgba(255,255,255,.28) 74%,
+      rgba(255,255,255,0) 100%
+    );
+  }
+  .available-footer > a {
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  .available-footer > a::before {
+    content: none !important;
+    display: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
