@@ -125,7 +125,7 @@ body {
   }
   66.666%, 100% {
     font-family: "Michroma", Arial, sans-serif;
-    font-size: calc(var(--landing-nav-font-size) - 2px);
+    font-size: calc(var(--landing-nav-font-size) - 3px);
     font-weight: 400;
     letter-spacing: .45px;
   }
