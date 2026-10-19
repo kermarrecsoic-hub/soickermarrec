@@ -595,10 +595,9 @@
   function setupContentUi() {
     const landingNav = document.querySelector('.landing-navigation');
     const trigger = document.querySelector('[data-current-section]');
-    const siteName = document.querySelector('.continuous-site-name');
     const menu = document.querySelector('.continuous-nav-menu');
     const frost = document.querySelector('.continuous-nav-frost');
-    if (!landingNav || !trigger || !siteName || !menu || !frost) return;
+    if (!landingNav || !trigger || !menu || !frost) return;
 
     let open = false;
     let scheduled = false;
@@ -646,9 +645,14 @@
     const jumpToSection = id => {
       const target = document.getElementById(id);
       if (!target) return;
-      const align = () => target.scrollIntoView({ block: 'start', behavior: 'auto' });
-      align();
-      [80, 220, 520, 900, 1500].forEach(delay => setTimeout(align, delay));
+
+      // Einmal sauber zum Abschnitt springen. Frühere Versionen haben den
+      // Sprung über 1,5 Sekunden mehrfach wiederholt. Wenn währenddessen
+      // Bilder oberhalb nachgeladen wurden, wurde der Nutzer beim Lesen
+      // immer wieder zurück an den Abschnittsanfang gezogen.
+      requestAnimationFrame(() => {
+        target.scrollIntoView({ block: 'start', behavior: 'auto' });
+      });
     };
 
     [...landingNav.querySelectorAll('a[href^="#"]'), ...menu.querySelectorAll('a[href^="#"]')].forEach(link => {
@@ -670,28 +674,17 @@
       if (event.key === 'Escape' && open) setOpen(false);
     });
 
-    siteName.addEventListener('click', event => {
-      event.preventDefault();
-      setOpen(false);
-      history.replaceState(null, '', `${location.pathname}${location.search}`);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
 
     if (finePointer.matches) {
       menu.querySelectorAll('a').forEach(link => {
         link.addEventListener('mouseenter', () => {
-          siteName.classList.remove('is-cycling');
           menu.querySelectorAll('a').forEach(a => a.classList.remove('is-active'));
           link.classList.add('is-active');
         });
-        link.addEventListener('mouseleave', () => {
-          link.classList.remove('is-active');
-          siteName.classList.add('is-cycling');
-        });
+        link.addEventListener('mouseleave', () => link.classList.remove('is-active'));
       });
       menu.addEventListener('mouseleave', () => {
         menu.querySelectorAll('a').forEach(a => a.classList.remove('is-active'));
-        siteName.classList.add('is-cycling');
       });
     }
 
@@ -699,6 +692,7 @@
       scheduled = false;
       const uiVisible = landingNav.getBoundingClientRect().bottom <= 0;
       document.body.classList.toggle('content-ui-visible', uiVisible);
+      document.body.classList.toggle('has-scrolled', window.scrollY > 12);
       if (!uiVisible && open) setOpen(false);
     };
     const requestUpdate = () => {
@@ -709,6 +703,122 @@
     addEventListener('scroll', requestUpdate, { passive: true });
     addEventListener('resize', requestUpdate, { passive: true });
     requestUpdate();
+  }
+
+  /* ---------- layout-shift protection for lazy-loaded media ---------- */
+  function setupLayoutShiftProtection() {
+    const content = document.querySelector('.continuous-content');
+    if (!content) return;
+
+    let anchor = null;
+    let anchorTop = 0;
+    let scheduled = false;
+    let compensating = false;
+
+    const insideProtectedContent = node => node && content.contains(node) &&
+      !node.closest('.media-viewer, .continuous-ui, .continuous-global-footer');
+
+    const chooseAnchor = () => {
+      if (compensating || document.body.classList.contains('media-viewer-open')) return;
+      if (window.scrollY < Math.max(32, window.innerHeight * .12)) {
+        anchor = null;
+        return;
+      }
+
+      // Suche ein konkretes sichtbares Element nahe dem oberen Lesebereich.
+      // Dadurch bleibt nicht nur der Abschnitt, sondern genau der Text/das Bild,
+      // das der Nutzer gerade betrachtet, an derselben Bildschirmposition.
+      const probeY = [82, 120, 170, 240, Math.round(window.innerHeight * .34)];
+      let candidate = null;
+      for (const y of probeY) {
+        const hit = document.elementFromPoint(Math.round(window.innerWidth / 2), Math.min(window.innerHeight - 2, y));
+        if (insideProtectedContent(hit)) {
+          candidate = hit;
+          break;
+        }
+      }
+
+      if (!candidate) {
+        const visibleSection = [...document.querySelectorAll('.portfolio-section')].find(section => {
+          const r = section.getBoundingClientRect();
+          return r.bottom > 80 && r.top < window.innerHeight;
+        });
+        candidate = visibleSection || null;
+      }
+
+      if (!candidate) {
+        anchor = null;
+        return;
+      }
+
+      const rect = candidate.getBoundingClientRect();
+      if (!Number.isFinite(rect.top)) return;
+      anchor = candidate;
+      anchorTop = rect.top;
+    };
+
+    const compensate = () => {
+      scheduled = false;
+      if (compensating || !anchor || !document.contains(anchor)) {
+        chooseAnchor();
+        return;
+      }
+      if (window.scrollY < Math.max(32, window.innerHeight * .12)) return;
+
+      const now = anchor.getBoundingClientRect().top;
+      const delta = now - anchorTop;
+
+      // Nur echte Layoutverschiebungen korrigieren. Normales Scrollen aktualisiert
+      // den Anker separat und wird dadurch nicht bekämpft.
+      if (Math.abs(delta) > .75 && Math.abs(delta) < window.innerHeight * 2) {
+        compensating = true;
+        window.scrollBy({ top: delta, left: 0, behavior: 'auto' });
+        requestAnimationFrame(() => {
+          anchorTop = anchor?.getBoundingClientRect().top ?? anchorTop;
+          requestAnimationFrame(() => { compensating = false; });
+        });
+      } else {
+        anchorTop = now;
+      }
+    };
+
+    const requestCompensation = () => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(compensate);
+    };
+
+    let scrollTimer = 0;
+    addEventListener('scroll', () => {
+      if (compensating) return;
+      clearTimeout(scrollTimer);
+      // Während der Nutzer selbst scrollt, folgt der Anker seiner aktuellen
+      // Leseposition. Erst nach kurzer Ruhe werden spätere Bild-Loads ausgeglichen.
+      scrollTimer = setTimeout(chooseAnchor, 40);
+    }, { passive: true });
+    addEventListener('resize', () => requestAnimationFrame(chooseAnchor), { passive: true });
+
+    // load wird nicht gebubbelt, funktioniert aber in der Capture-Phase.
+    content.addEventListener('load', requestCompensation, true);
+    content.addEventListener('loadedmetadata', requestCompensation, true);
+
+    if ('ResizeObserver' in window) {
+      const observer = new ResizeObserver(requestCompensation);
+      observer.observe(content);
+    }
+
+    requestAnimationFrame(chooseAnchor);
+  }
+
+  function alignInitialHashAfterRender() {
+    const raw = String(location.hash || '').replace(/^#/, '');
+    if (!raw) return;
+    let id = raw;
+    try { id = decodeURIComponent(raw); } catch (_) {}
+    if (!sectionIds.includes(id)) return;
+    const target = document.getElementById(id);
+    if (!target) return;
+    requestAnimationFrame(() => target.scrollIntoView({ block: 'start', behavior: 'auto' }));
   }
 
   /* ---------- section + image color tracking ---------- */
@@ -926,6 +1036,8 @@
   }
 
   renderSections();
+  setupLayoutShiftProtection();
   setupContentUi();
   setupScrollState();
+  alignInitialHashAfterRender();
 })();
