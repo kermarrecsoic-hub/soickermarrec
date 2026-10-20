@@ -7,9 +7,11 @@ window.XXX_WORKS = [
     "availability": "",
     "text": "",
     "images": [
+      "../images/foto1/fotogalerie_sortiert/17.webp",
+      "../images/foto1/fotogalerie_sortiert/55.webp",
       "../images/foto1/fotogalerie_sortiert/50.webp",
-      "../images/foto1/fotogalerie_sortiert/11.webp",
-      "../images/foto1/fotogalerie_sortiert/29.webp",
+      "../images/foto1/fotogalerie_sortiert/14.webp",
+      "../images/foto1/fotogalerie_sortiert/56.webp",
       "../images/foto1/fotogalerie_sortiert/44.webp",
       "../images/foto1/fotogalerie_sortiert/18.webp",
       "../images/foto1/fotogalerie_sortiert/22.webp",
@@ -17,7 +19,6 @@ window.XXX_WORKS = [
       "../images/foto1/fotogalerie_sortiert/28.webp",
       "../images/foto1/fotogalerie_sortiert/35.webp",
       "../images/foto1/fotogalerie_sortiert/47.webp",
-      "../images/foto1/fotogalerie_sortiert/14.webp",
       "../images/foto1/fotogalerie_sortiert/39.webp",
       "../images/foto1/fotogalerie_sortiert/24.webp",
       "../images/foto1/fotogalerie_sortiert/23.webp",
@@ -29,9 +30,6 @@ window.XXX_WORKS = [
       "../images/foto1/fotogalerie_sortiert/19.webp",
       "../images/foto1/fotogalerie_sortiert/12.webp",
       "../images/foto1/fotogalerie_sortiert/21.webp",
-      "../images/foto1/fotogalerie_sortiert/17.webp",
-      "../images/foto1/fotogalerie_sortiert/55.webp",
-      "../images/foto1/fotogalerie_sortiert/56.webp",
       "../images/foto1/fotogalerie_sortiert/16.webp",
       "../images/foto1/fotogalerie_sortiert/43.webp",
       "../images/foto1/fotogalerie_sortiert/48.webp",
@@ -44,8 +42,8 @@ window.XXX_WORKS = [
       "../images/foto1/fotogalerie_sortiert/01.webp",
       "../images/foto1/fotogalerie_sortiert/03.webp",
       "../images/foto1/fotogalerie_sortiert/07.webp",
-      "../images/foto1/fotogalerie_sortiert/57.webp"
+      "../images/foto1/fotogalerie_sortiert/11.webp"
     ],
-    "navColor": "#5c5853"
+    "navColor": "#50514d"
   }
 ];
