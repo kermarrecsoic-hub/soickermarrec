@@ -69,6 +69,7 @@ window.ARCHITECTURE_WORKS = [
       "../images/architecture/untitled/main-20261001101929-04.webp",
       "../images/architecture/untitled/main-20261001101929-05.webp"
     ],
-    "navColor": "#787774"
+    "navColor": "#787774",
+    "visible": false
   }
 ];
