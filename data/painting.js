@@ -95,6 +95,19 @@ window.PAINTING_WORKS = [
     ]
   },
   {
+    "title": "Untitled (Bär), 2024",
+    "medium": "acrylic, ink on paper",
+    "dimensions": "30 × 41 cm",
+    "availability": "",
+    "text": "",
+    "image": "../images/painting/baer/main.webp",
+    "details": {
+      "left": "../images/painting/baer/detail-left.webp",
+      "right": "../images/painting/baer/detail-right.webp"
+    },
+    "navColor": "#735758"
+  },
+  {
     "title": "Köpfe, 2026",
     "medium": "acrylic, ink, paper fragments on canvas",
     "dimensions": "65 × 50 cm",
@@ -110,19 +123,6 @@ window.PAINTING_WORKS = [
     ],
     "shareId": "koepfe",
     "layout": "portrait"
-  },
-  {
-    "title": "Untitled (Bär), 2024",
-    "medium": "acrylic, ink on paper",
-    "dimensions": "30 × 41 cm",
-    "availability": "",
-    "text": "",
-    "image": "../images/painting/baer/main.webp",
-    "details": {
-      "left": "../images/painting/baer/detail-left.webp",
-      "right": "../images/painting/baer/detail-right.webp"
-    },
-    "navColor": "#735758"
   },
   {
     "title": "parigiparigiparigi2, 2026",
