@@ -44,6 +44,7 @@
     busy: false,
     landingConfig: null,
     customPages: [],
+    availableConfig: null,
   };
 
   async function api(name, options = {}) {
@@ -148,7 +149,6 @@
       const add = button('Neues Projekt', 'primary', () => openProjectEditor(-1));
       headerActions.appendChild(add);
       if (view === 'xxx') {
-        headerActions.prepend(button('Vorschaubilder aktualisieren', 'secondary', refreshSectionPreviews));
         headerActions.prepend(button('Alle Bilder nach Sättigung', 'secondary', sortAllPhotographyBySaturation));
       }
       try {
@@ -189,6 +189,13 @@
       workspaceEyebrow.textContent = 'Landingpage';
       workspaceTitle.textContent = 'Hintergrund-Slots';
       await renderLandingBackgrounds();
+      return;
+    }
+
+    if (view === 'available-settings') {
+      workspaceEyebrow.textContent = 'Website';
+      workspaceTitle.textContent = 'Available Works';
+      await renderAvailableSettings();
       return;
     }
   }
@@ -282,7 +289,10 @@
     const meta = document.createElement('div');
     meta.className = 'project-card-meta';
     const baseMeta = [work.medium, work.dimensions].filter(Boolean).join(' · ') || '—';
-    meta.textContent = work.visible === false ? `${baseMeta} · unsichtbar` : baseMeta;
+    const flags = [];
+    if (work.visible === false) flags.push('nicht im Portfolio');
+    if (work.availableWorks === true) flags.push('Available Works');
+    meta.textContent = [baseMeta, ...flags].filter(Boolean).join(' · ');
     const actions = document.createElement('div');
     actions.className = 'project-card-actions';
     const handle = document.createElement('span');
@@ -374,6 +384,9 @@
     $('#fieldMedium').value = work.medium || '';
     $('#fieldDimensions').value = work.dimensions || '';
     $('#fieldAvailability').value = work.availability || '';
+    $('#fieldPrice').value = work.price || '';
+    $('#fieldAvailableWorks').checked = work.availableWorks === true;
+    $$('.available-works-field').forEach(node => { node.hidden = config.kind !== 'art'; });
     $('#fieldText').value = work.text || '';
     $('#fieldVisible').checked = work.visible !== false;
     $('#fieldLayout').value = work.layout || '';
@@ -808,6 +821,14 @@
       else delete updated.navColor;
       if ($('#fieldVisible').checked) delete updated.visible;
       else updated.visible = false;
+      if (editor.config.kind === 'art') {
+        const price = $('#fieldPrice').value.trim();
+        if (price) updated.price = price; else delete updated.price;
+        if ($('#fieldAvailableWorks').checked) updated.availableWorks = true; else delete updated.availableWorks;
+      } else {
+        delete updated.price;
+        delete updated.availableWorks;
+      }
       if (editor.config.kind === 'art' && $('#fieldLayout').value) updated.layout = $('#fieldLayout').value;
       else delete updated.layout;
       if (stableShareId) updated.shareId = stableShareId;
@@ -851,6 +872,8 @@
     });
   }
 
+  const optimizedImageDimensions = new WeakMap();
+
   async function optimizeImage(file, maxSide = 3000, quality = 0.94) {
     // Studio-Uploads werden standardmäßig als WebP gespeichert. 3000 px an der
     // längsten Seite reichen auch für große Retina-Darstellungen, ohne kleine
@@ -869,7 +892,7 @@
 
     for (const q of [quality, 0.92, 0.89, 0.86]) {
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', q));
-      if (blob && blob.size <= 3_950_000) return blob;
+      if (blob && blob.size <= 3_950_000) { optimizedImageDimensions.set(blob, { width, height }); return blob; }
     }
     throw new Error(`${file.name} ist auch als vorsichtig optimiertes WebP größer als 4 MB.`);
   }
@@ -895,99 +918,10 @@
     });
   }
 
-  function previewStemFromRepoPath(path = '') {
-    let clean = toRepoPath(path);
-    if (clean.startsWith('images/')) clean = clean.slice(7);
-    clean = clean.replace(/\.[^.\/]+$/, '');
-    return clean
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase().replace(/ß/g, 'ss')
-      .split('/')
-      .map(part => part.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'item')
-      .join('--');
-  }
-
-  async function tinyPreviewBlob(blob, maxSide, quality) {
-    const bitmap = await createImageBitmap(blob);
-    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
-    const width = Math.max(1, Math.round(bitmap.width * scale));
-    const height = Math.max(1, Math.round(bitmap.height * scale));
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    canvas.getContext('2d', { alpha: true }).drawImage(bitmap, 0, 0, width, height);
-    bitmap.close();
-    const out = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', quality));
-    if (!out) throw new Error('Vorschaubild konnte nicht erzeugt werden.');
-    return out;
-  }
-
   async function uploadBlob(path, blob) {
-    const stem = previewStemFromRepoPath(path);
-    const [base64, desktopBlob, mobileBlob] = await Promise.all([
-      blobToBase64(blob),
-      tinyPreviewBlob(blob, 160, 0.45),
-      tinyPreviewBlob(blob, 96, 0.42)
-    ]);
-    const [desktopBase64, mobileBase64] = await Promise.all([
-      blobToBase64(desktopBlob),
-      blobToBase64(mobileBlob)
-    ]);
-    return api('upload-image', {
-      method: 'POST',
-      body: JSON.stringify({
-        path,
-        base64,
-        previews: [
-          { path: `Vorschaubild/${stem}-d.webp`, base64: desktopBase64 },
-          { path: `Vorschaubild/${stem}-m.webp`, base64: mobileBase64 }
-        ]
-      })
-    });
-  }
-
-  async function refreshSectionPreviews() {
-    if (state.busy) return;
-    const paths = [...new Set(state.works.flatMap(work => [...workImages(work), ...workDetails(work)]).filter(Boolean).map(toRepoPath))];
-    if (!paths.length) return;
-    if (!confirm(`${paths.length} Vorschaubilder aus den aktuell im Studio gespeicherten Bildern neu erzeugen?`)) return;
-
-    state.busy = true;
-    try {
-      for (let i = 0; i < paths.length; i++) {
-        const path = paths[i];
-        setStatus(`Vorschaubilder ${i + 1} / ${paths.length}: ${path}`);
-        const response = await fetch(studioImageUrl(path), { cache: 'no-store' });
-        if (!response.ok) throw new Error(`Bild konnte nicht geladen werden: ${path}`);
-        const blob = await response.blob();
-        const stem = previewStemFromRepoPath(path);
-        const [desktopBlob, mobileBlob] = await Promise.all([
-          tinyPreviewBlob(blob, 160, 0.45),
-          tinyPreviewBlob(blob, 96, 0.42)
-        ]);
-        const [desktopBase64, mobileBase64] = await Promise.all([
-          blobToBase64(desktopBlob),
-          blobToBase64(mobileBlob)
-        ]);
-        await api('upload-image', {
-          method: 'POST',
-          body: JSON.stringify({
-            previewOnly: true,
-            previews: [
-              { path: `Vorschaubild/${stem}-d.webp`, base64: desktopBase64 },
-              { path: `Vorschaubild/${stem}-m.webp`, base64: mobileBase64 }
-            ]
-          })
-        });
-      }
-      setStatus(`${paths.length} Vorschaubilder aktualisiert.`);
-      showToast('Vorschaubilder aktualisiert');
-    } catch (error) {
-      setStatus(error.message, true);
-      alert(`Vorschaubilder fehlgeschlagen:\n${error.message}`);
-    } finally {
-      state.busy = false;
-    }
+    const base64 = await blobToBase64(blob);
+    const dims = optimizedImageDimensions.get(blob) || {};
+    return api('upload-image', { method: 'POST', body: JSON.stringify({ path, base64, width: dims.width || 0, height: dims.height || 0 }) });
   }
 
   async function ensureMedia() {
@@ -1085,7 +1019,64 @@
     fileInput.multiple = true;
     fileInput.hidden = true;
     uploadLabel.appendChild(fileInput);
-    toolbar.append(search, folder, uploadLabel);
+    async function confirmFullCleanupPlan(plan) {
+      // Die Vorschau zeigt jede Datei inklusive Bildansicht und Repository-Pfad.
+      const dialog = document.createElement('dialog');
+      dialog.className = 'cleanup-review-dialog';
+      const shell = document.createElement('div'); shell.className = 'cleanup-review-shell';
+      const heading = document.createElement('h2'); heading.textContent = 'Löschvorschau — alles prüfen';
+      const intro = document.createElement('p'); intro.className='cleanup-review-intro';
+      intro.textContent = `${plan.deletePreviewCount} alte Vorschaubilder · ${plan.deleteImageCount} unbenutzte Bilddateien. Alle Projekte, auch versteckte, und ihre Bilder bleiben erhalten.`;
+      const field = document.createElement('input'); field.type='search'; field.placeholder='In Dateinamen suchen …'; field.setAttribute('aria-label','Zu löschende Dateien filtern');
+      const scroll = document.createElement('div'); scroll.className='cleanup-review-scroll';
+      const groups = [
+        ['Alte Vorschaubilder',plan.deletePreviews||[]],
+        ['Unbenutzte Bilddateien',plan.deleteImages||[]],
+      ];
+      for (const [label, paths] of groups) {
+        const section = document.createElement('section'); section.className='cleanup-review-group';
+        const title = document.createElement('h3'); title.textContent=`${label} (${paths.length})`; section.appendChild(title);
+        const grid = document.createElement('div'); grid.className='cleanup-review-grid';
+        paths.forEach(path => {
+          const item=document.createElement('div'); item.className='cleanup-review-item'; item.dataset.search=path.toLowerCase();
+          const img=document.createElement('img'); img.loading='lazy'; img.decoding='async'; img.alt=''; img.src=publicUrl(path);
+          const name=document.createElement('span'); name.textContent=path;
+          item.append(img,name); grid.appendChild(item);
+        });
+        section.appendChild(grid); scroll.appendChild(section);
+      }
+      field.addEventListener('input',()=>{
+        const q=field.value.trim().toLowerCase();
+        scroll.querySelectorAll('.cleanup-review-item').forEach(item=>{ item.hidden=!!q&&!item.dataset.search.includes(q); });
+        scroll.querySelectorAll('.cleanup-review-group').forEach(group=>{group.hidden=!group.querySelector('.cleanup-review-item:not([hidden])');});
+      });
+      const actions=document.createElement('div'); actions.className='cleanup-review-actions';
+      const cancel=button('Abbrechen','secondary',()=>dialog.close('cancel'));
+      const execute=button(`${plan.totalDeleteCount} Dateien löschen`,'primary',()=>dialog.close('delete'));
+      actions.append(cancel,execute); shell.append(heading,intro,field,scroll,actions); dialog.appendChild(shell); document.body.appendChild(dialog);
+      return await new Promise(resolve => {
+        dialog.addEventListener('close',()=>{const approved=dialog.returnValue==='delete';dialog.remove();resolve(approved)},{once:true});
+        dialog.addEventListener('cancel',()=>{dialog.returnValue='cancel'});
+        dialog.showModal();
+      });
+    }
+    const cleanupButton = button('Unbenutzte Medien aufräumen', 'secondary', async () => {
+      cleanupButton.disabled = true;
+      try {
+        setStatus('Repository wird auf unbenutzte Bilddateien geprüft …');
+        const plan = await api('cleanup-media');
+        if (!plan.totalDeleteCount) { showToast('Nichts zu bereinigen'); setStatus('Keine unbenutzten Medien gefunden.'); return; }
+        const confirmed = await confirmFullCleanupPlan(plan);
+        if (!confirmed) { setStatus('Bereinigung abgebrochen — nichts gelöscht.'); return; }
+        const result = await api('cleanup-media', { method:'POST', body:JSON.stringify({execute:true,planId:plan.planId}) });
+        state.mediaLoaded = false;
+        await ensureMedia();
+        paint();
+        showToast('Mediathek bereinigt');
+        setStatus(`${result.totalDeleteCount || 0} Dateien entfernt. Alle Projekte bleiben erhalten.`);
+      } catch (error) { setStatus(`${error.message} Keine Dateien gelöscht, falls die Vorschau veraltet war.`, true); } finally { cleanupButton.disabled = false; }
+    });
+    toolbar.append(search, folder, uploadLabel, cleanupButton);
     const grid = document.createElement('div');
     grid.className = 'media-page-grid';
     workspaceContent.append(toolbar, grid);
@@ -1145,6 +1136,45 @@
     } catch (error) {
       setStatus(error.message, true);
     }
+  }
+
+  async function loadAvailableConfig() {
+    const data = await api('available-config');
+    state.availableConfig = data.config || { enabled: false };
+    return state.availableConfig;
+  }
+
+  async function renderAvailableSettings() {
+    workspaceContent.innerHTML = '<div class="empty-state">Lade Available-Works-Einstellungen …</div>';
+    try {
+      const cfg = await loadAvailableConfig();
+      workspaceContent.innerHTML = '';
+      const card = document.createElement('section');
+      card.className = 'empty-state';
+      card.style.textAlign = 'left';
+      const title = document.createElement('h2'); title.textContent = 'Available Works';
+      const info = document.createElement('p');
+      info.textContent = 'Diese Einstellung blendet den festen Link unten rechts ein oder aus. Projekte werden unabhängig davon im jeweiligen Projekteditor für die private Liste markiert.';
+      const label = document.createElement('label'); label.className = 'checkbox-row';
+      const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = cfg.enabled === true;
+      const span = document.createElement('span'); span.textContent = 'Available Works auf der öffentlichen Website aktivieren';
+      label.append(checkbox, span);
+      const save = button('Speichern', 'primary', async () => {
+        save.disabled = true;
+        try {
+          await api('save-available-config', { method:'POST', body:JSON.stringify({config:{enabled:checkbox.checked}}) });
+          state.availableConfig = { enabled: checkbox.checked };
+          showToast(checkbox.checked ? 'Available Works aktiviert' : 'Available Works versteckt');
+          setStatus('Einstellung in GitHub gespeichert. Kein weiterer Studio-Deploy nötig.');
+        } catch (error) { setStatus(error.message, true); }
+        finally { save.disabled = false; }
+      });
+      const note = document.createElement('p');
+      note.textContent = 'Die E-Mail-Adressen werden über Netlify Forms unter dem Formular „available-works-access“ gesammelt. Es werden dadurch noch keine automatischen E-Mails versendet.';
+      card.append(title, info, label, save, note);
+      workspaceContent.appendChild(card);
+      setStatus(cfg.enabled ? 'Available Works ist sichtbar.' : 'Available Works ist momentan versteckt.');
+    } catch (error) { setStatus(error.message, true); }
   }
 
   function renderSiteImages() {

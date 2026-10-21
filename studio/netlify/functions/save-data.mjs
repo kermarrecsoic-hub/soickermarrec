@@ -1,4 +1,4 @@
-import { SECTIONS, deleteRepoFile, json, putRepoFile, requireAuth, requireSameOrigin } from '../../lib/server.mjs';
+import { SECTIONS, deleteRepoFile, getRepoFile, json, putRepoFile, requireAuth, requireSameOrigin } from '../../lib/server.mjs';
 import { renderSharePage, shareIdForWork, sharePagePath } from '../../lib/share-pages.mjs';
 
 function serialize(section, works) {
@@ -16,6 +16,17 @@ function serialize(section, works) {
     return copy;
   });
   return `/* Verwaltet über Soïc Studio. Manuelle Änderungen bleiben möglich. */\nwindow.${section.globalName} = ${JSON.stringify(cleaned, null, 2)};\n`;
+}
+
+
+async function bumpPublicDataVersion() {
+  const token = Date.now().toString(36);
+  for (const path of ['index.html', 'pages/available.html']) {
+    const file = await getRepoFile(path);
+    let html = file.content.toString('utf8');
+    const next = html.replace(/(data\/(?:painting|graphic|xxx|architecture|exhibitions|image-dimensions)\.js)(?:\?v=[^"']*)?/g, `$1?v=${token}`);
+    if (next !== html) await putRepoFile(path, Buffer.from(next, 'utf8'), `Studio: Inhaltsversion ${token}`);
+  }
 }
 
 export default async (req) => {
@@ -55,6 +66,7 @@ export default async (req) => {
       if (id) await deleteRepoFile(`share/${body.section}/${id}.html`, `Studio: Share-Seite ${id} entfernt`);
     }
 
+    await bumpPublicDataVersion();
     return json({ ok: true });
   } catch (error) {
     return json({ ok: false, error: error.message }, 500);

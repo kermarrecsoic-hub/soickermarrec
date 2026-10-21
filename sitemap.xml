@@ -1,48 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://soickermarrec.de/</loc>
-    <lastmod>2026-10-18</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
-  <url>
-    <loc>https://soickermarrec.de/pages/about.html</loc>
-    <lastmod>2026-10-18</lastmod>
-  </url>
-  <url>
-    <loc>https://soickermarrec.de/pages/painting.html</loc>
-    <lastmod>2026-10-18</lastmod>
-  </url>
-  <url>
-    <loc>https://soickermarrec.de/pages/graphic.html</loc>
-    <lastmod>2026-10-18</lastmod>
-  </url>
-  <url>
-    <loc>https://soickermarrec.de/pages/ex26.html</loc>
-    <lastmod>2026-10-18</lastmod>
-  </url>
-  <url>
-    <loc>https://soickermarrec.de/pages/architecture.html</loc>
-    <lastmod>2026-10-18</lastmod>
-  </url>
-  <url>
-    <loc>https://soickermarrec.de/pages/xxx.html</loc>
-    <lastmod>2026-10-18</lastmod>
-  </url>
-  <url>
-    <loc>https://soickermarrec.de/pages/contact.html</loc>
-    <lastmod>2026-10-18</lastmod>
-    <image:image>
-      <image:loc>https://soickermarrec.de/images/contact.webp</image:loc>
-      <image:title>Porträt von Soïc Kermarrec</image:title>
-      <image:caption>Soïc Kermarrec, Künstler und Architekturstudent aus Leipzig</image:caption>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://soickermarrec.de/pages/impressum.html</loc>
-  </url>
-  <url>
-    <loc>https://soickermarrec.de/pages/datenschutz.html</loc>
-  </url>
-  <!-- CUSTOM_PAGES_START -->
-  <!-- CUSTOM_PAGES_END -->
 </urlset>

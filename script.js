@@ -67,7 +67,7 @@
 
   async function loadConfig() {
     try {
-      const response = await fetch(`${CONFIG_URL}?v=${Date.now()}`, { cache: 'no-store' });
+      const response = await fetch(CONFIG_URL, { cache: 'no-cache' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       config = await response.json();
     } catch {
@@ -87,10 +87,19 @@
     return nextBg;
   }
 
+  function syncLandingFadeHeight(image = bg) {
+    if (!image?.naturalWidth || !image?.naturalHeight) return;
+    // Die Grafik wird proportional auf 100vw skaliert, niemals gecroppt.
+    document.querySelector('.landing-background')?.style.setProperty(
+      '--landing-image-height', `${innerWidth * image.naturalHeight / image.naturalWidth}px`
+    );
+  }
+
   function showPath(path, animate = false) {
     if (!path) return;
     const probe = new Image();
     probe.onload = () => {
+      syncLandingFadeHeight(probe);
       if (!animate || !bg.src) {
         bg.src = path;
         bg.classList.remove('is-hidden');
@@ -179,7 +188,9 @@
       rgb = rgb.map(v => v * .90 + 255 * .10);
 
       // Gleiche Weißblende wie im CSS: Verlauf von 22 % bis 78 % der Viewporthöhe.
-      const y = Math.max(0, Math.min(1, syImage / H));
+      const splitView = matchMedia('(min-width:701px) and (max-aspect-ratio:4/3) and (hover:hover) and (pointer:fine)').matches;
+      const fadeHeight = splitView ? Math.min(H, renderedHeight) : H;
+      const y = Math.max(0, Math.min(1, syImage / fadeHeight));
       let white = 0;
       if (y > .22 && y < .78) {
         const t = (y - .22) / (.78 - .22);
@@ -232,6 +243,7 @@
   addEventListener('resize', () => {
     scheduleContrast();
   });
+  addEventListener('resize', () => { syncLandingFadeHeight(); scheduleContrast(); }, { passive: true });
   addEventListener('scroll', () => {
     const stage = document.querySelector('.landing-scroll-stage');
     if (!stage || stage.getBoundingClientRect().bottom > 0) scheduleContrast();

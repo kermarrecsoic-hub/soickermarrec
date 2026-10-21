@@ -1,7 +1,6 @@
 import { getRepoFileIfExists, json, putRepoFile, requireAuth, requireSameOrigin, safePageSlug } from '../../lib/server.mjs';
 
 const SITE = 'https://soickermarrec.de';
-const TYPO_KEYWORDS = 'Soïc Kermarrec, Soic Kermarrec, S. Kermarrec, Soick Kermarrec, Soik Kermarrec, Kermarek, Kermarreg, Keramrec, Kermarec, Künstler Leipzig, artist Leipzig';
 
 function esc(value = '') {
   return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -23,10 +22,8 @@ function pageHtml(page) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${title} | Soïc Kermarrec</title>
 <meta name="description" content="${description}">
-<meta name="keywords" content="${TYPO_KEYWORDS}">
 <meta name="author" content="Soïc Kermarrec">
-<meta name="robots" content="index,follow,max-image-preview:large">
-<link rel="canonical" href="${url}">
+<meta name="robots" content="noindex,follow,noarchive">
 <link rel="icon" href="/favicon.png" type="image/png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Soïc Kermarrec">
@@ -44,7 +41,7 @@ function pageHtml(page) {
 </head>
 <body class="gallery-page custom-page">
 <header class="site-header"><nav class="site-nav" aria-label="Portfolio sections">
-<a href="../index.html">Soïc Kermarrec</a><a data-i18n="nav.painting" href="painting.html">Malerei</a><a data-i18n="nav.graphic" href="graphic.html">Grafik</a><a data-i18n="nav.exhibitions" href="ex26.html">Ausstellung</a><a data-i18n="nav.architecture" href="architecture.html">Arch.0</a><a data-i18n="nav.photography" href="xxx.html">Fotografie</a><a data-i18n="nav.about" href="about.html">About</a><a data-i18n="nav.contact" href="contact.html">Kontakt</a>
+<a href="../index.html#top">Soïc Kermarrec</a><a data-i18n="nav.painting" href="../index.html#painting">Malerei</a><a data-i18n="nav.graphic" href="../index.html#graphic">Grafik</a><a data-i18n="nav.photography" href="../index.html#photography">Fotografie</a><a data-i18n="nav.architecture" href="../index.html#architecture">Arch.0</a><a data-i18n="nav.exhibitions" href="../index.html#exhibitions">Ausstellung</a><a data-i18n="nav.about" href="../index.html#about">About</a><a data-i18n="nav.contact" href="../index.html#contact">Kontakt</a>
 </nav></header>
 <main class="editorial-page custom-page-shell"><div class="editorial-text custom-page-content"><h1 class="custom-page-title">${title}</h1>${paragraphs(page.body)}</div></main>
 <footer class="site-footer"><a class="footer-instagram" href="https://www.instagram.com/soicyv/" rel="noopener noreferrer me" target="_blank">Instagram</a><nav class="footer-links" aria-label="Legal links"><a data-i18n="legal.imprint" href="impressum.html">Impressum</a><a data-i18n="legal.privacy" href="datenschutz.html">Datenschutz</a></nav></footer>
@@ -58,15 +55,7 @@ async function loadPages() {
   return Array.isArray(parsed) ? parsed : [];
 }
 
-async function saveSitemap(pages) {
-  const sitemapFile = await getRepoFileIfExists('sitemap.xml');
-  if (!sitemapFile) return;
-  let source = sitemapFile.content.toString('utf8');
-  source = source.replace(/\n?\s*<!-- CUSTOM_PAGES_START -->[\s\S]*?<!-- CUSTOM_PAGES_END -->\s*/m, '\n');
-  const block = `\n  <!-- CUSTOM_PAGES_START -->\n${pages.map(page => `  <url><loc>${SITE}/pages/${page.slug}.html</loc></url>`).join('\n')}\n  <!-- CUSTOM_PAGES_END -->\n`;
-  source = source.replace(/\s*<\/urlset>\s*$/, `${block}\n</urlset>\n`);
-  await putRepoFile('sitemap.xml', Buffer.from(source), 'Studio: Sitemap aktualisiert');
-}
+async function saveSitemap(_pages) { /* Continuous portfolio keeps a single canonical sitemap URL. */ }
 
 export default async (req) => {
   const authError = requireAuth(req); if (authError) return authError;

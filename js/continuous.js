@@ -2,8 +2,6 @@
 (async () => {
   'use strict';
 
-  if (window.SoicProjectDataReady) await window.SoicProjectDataReady;
-
   if (!document.body.classList.contains('continuous-home')) return;
 
   const mobile = matchMedia('(max-width: 700px), (hover: none) and (pointer: coarse)');
@@ -13,6 +11,9 @@
     const value = i18n?.t?.(key);
     return value && value !== key ? value : fallback;
   };
+
+  const CONTACT_EMAIL = 'soickermarrec@gmail.com';
+  const PROJECT_UPDATES_FORM_ACTION = 'https://studio.soickermarrec.de/project-updates.html';
 
   const sourceMap = {
     painting: { works: window.PAINTING_WORKS || [], mode: 'projects' },
@@ -179,6 +180,100 @@
     panel.appendChild(box);
   }
 
+  let reachoutDialog = null;
+
+  function reachoutMailUrl(work, sectionId) {
+    const label = work.title || tr('gallery.work', 'Werk');
+    const subject = `${tr('reachOut.subjectPrefix', 'Anfrage zu')} ${label}`;
+    const target = `${location.origin}${location.pathname}#${sectionId}`;
+    const body = `${tr('reachOut.mailGreeting', 'Hallo Soïc,')}\n\n${tr('reachOut.mailIntro', 'ich möchte dich zu diesem Projekt kontaktieren:')} ${label}\n${target}\n\n`;
+    return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  function ensureReachoutDialog() {
+    if (reachoutDialog) return reachoutDialog;
+    const overlay = el('div', 'reachout-dialog');
+    overlay.hidden = true;
+    overlay.setAttribute('aria-hidden', 'true');
+    const panel = el('div', 'reachout-dialog-panel');
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute('aria-labelledby', 'reachout-dialog-title');
+    const close = el('button', 'reachout-dialog-close', '×');
+    close.type = 'button';
+    close.setAttribute('aria-label', tr('reachOut.close', 'Schließen'));
+    const title = el('h2', 'reachout-dialog-title', tr('reachOut.title', 'Kontakt'));
+    title.id = 'reachout-dialog-title';
+    const context = el('p', 'reachout-dialog-context');
+    const mail = el('a', 'reachout-mail-link', tr('reachOut.emailButton', 'E-Mail öffnen'));
+
+    const notifyLabel = el('label', 'reachout-notify-toggle');
+    const notify = document.createElement('input'); notify.type = 'checkbox';
+    const notifyText = el('span', '', tr('reachOut.notify', 'Bei neuen Projekten per E-Mail benachrichtigen'));
+    notifyLabel.append(notify, notifyText);
+
+    const iframe = document.createElement('iframe');
+    iframe.name = 'projectUpdatesFrame'; iframe.hidden = true; iframe.title = '';
+    const form = el('form', 'reachout-newsletter-form');
+    form.hidden = true; form.method = 'POST'; form.action = PROJECT_UPDATES_FORM_ACTION; form.target = iframe.name;
+    const formName = document.createElement('input'); formName.type='hidden'; formName.name='form-name'; formName.value='project-updates';
+    const source = document.createElement('input'); source.type='hidden'; source.name='source'; source.value='portfolio-project-contact';
+    const project = document.createElement('input'); project.type='hidden'; project.name='project';
+    const hp = document.createElement('input'); hp.name='bot-field'; hp.tabIndex=-1; hp.autocomplete='off'; hp.className='reachout-hp';
+    const emailLabel = el('label', 'reachout-email-label');
+    emailLabel.appendChild(el('span', '', tr('reachOut.emailLabel', 'E-Mail-Adresse')));
+    const email = document.createElement('input'); email.type='email'; email.name='email'; email.required=true; email.autocomplete='email';
+    emailLabel.appendChild(email);
+    const consent = el('p', 'reachout-consent');
+    consent.append(document.createTextNode(`${tr('reachOut.consent', 'Ich möchte freiwillig per E-Mail über neue Projekte informiert werden.')} `));
+    const privacy = el('a', '', tr('reachOut.privacy', 'Datenschutz')); privacy.href='pages/datenschutz.html';
+    consent.appendChild(privacy);
+    const save = el('button', 'reachout-subscribe-button', tr('reachOut.save', 'Benachrichtigung vormerken')); save.type='submit';
+    const status = el('p', 'reachout-status'); status.setAttribute('aria-live','polite');
+    form.append(formName,source,project,hp,emailLabel,consent,save,status);
+    panel.append(close,title,context,mail,notifyLabel,form,iframe); overlay.appendChild(panel); document.body.appendChild(overlay);
+
+    let submitted=false;
+    const shut = () => {
+      overlay.hidden=true; overlay.setAttribute('aria-hidden','true'); document.documentElement.classList.remove('reachout-open');
+      notify.checked=false; form.hidden=true; status.textContent=''; email.value=''; submitted=false;
+    };
+    close.addEventListener('click', shut);
+    overlay.addEventListener('click', event => { if (event.target===overlay) shut(); });
+    document.addEventListener('keydown', event => { if(event.key==='Escape' && !overlay.hidden) shut(); });
+    notify.addEventListener('change',()=>{ form.hidden=!notify.checked; if(notify.checked) email.focus({preventScroll:true}); });
+    form.addEventListener('submit', event => {
+      email.value=email.value.trim();
+      const plausible=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value) && !email.value.includes('..');
+      email.setCustomValidity(plausible?'':tr('reachOut.emailInvalid','Bitte gib eine gültige E-Mail-Adresse ein.'));
+      if(!email.reportValidity()){ event.preventDefault(); return; }
+      // Das Formular sendet an Netlify. Der iframe-Load selbst ist KEIN
+      // zuverlässiger Beleg für eine gespeicherte Anmeldung.
+      submitted=true; status.textContent=tr('reachOut.sending','Anmeldung wird übermittelt …'); save.disabled=true;
+      setTimeout(()=>{ if(submitted){ submitted=false; status.textContent=tr('reachOut.sent','Anmeldung abgesendet.'); save.disabled=false; } },400);
+    });
+    email.addEventListener('input',()=>email.setCustomValidity(''));
+    reachoutDialog={
+      open(work,sectionId,accent){
+        context.textContent=work.title || tr('gallery.work','Werk');
+        mail.href=reachoutMailUrl(work,sectionId); project.value=work.title || tr('gallery.work','Werk');
+        panel.style.setProperty('--reachout-accent', accent || work.navColor || '#8d8d8d');
+        overlay.hidden=false; overlay.setAttribute('aria-hidden','false'); document.documentElement.classList.add('reachout-open');
+        requestAnimationFrame(()=>mail.focus({preventScroll:true}));
+      }, close:shut
+    };
+    return reachoutDialog;
+  }
+
+  function createReachOutButton(work, sectionId) {
+    const wrap = el('div', 'project-reachout-wrap');
+    const button = el('button', 'project-reachout-button', tr('reachOut.button', 'Kontaktieren'));
+    button.type='button';
+    button.style.setProperty('--reachout-accent', work.navColor || '#8d8d8d');
+    button.addEventListener('click',event=>{ event.preventDefault(); event.stopPropagation(); ensureReachoutDialog().open(work,sectionId,work.navColor); });
+    wrap.appendChild(button); return wrap;
+  }
+
   function openProject(card, pinned = false) {
     if (!card) return;
     document.querySelectorAll('.continuous-project.is-open').forEach(other => {
@@ -219,7 +314,7 @@
     card.dataset.pinned = 'false';
     card.dataset.navColor = work.navColor || '';
     card.dataset.section = sectionId;
-    card.id = `${sectionId}-work-${index + 1}`;
+    card.id = `work-${sectionId}-${projectShareId(work, index, paths.main, sectionId)}`;
 
     const shell = el('div', 'project-main-shell');
     const button = el('button', 'project-main-button');
@@ -272,6 +367,7 @@
 
     const expanded = el('div', 'project-expanded');
     addDescription(expanded, work);
+    expanded.appendChild(createReachOutButton(work, sectionId));
 
     if (paths.details.length) {
       const details = el('div', 'project-details-grid');
@@ -362,11 +458,10 @@
       ['p', 'series-project-text', work.text]
     ].filter(([, , value]) => String(value || '').trim());
 
-    if (descriptionBits.length) {
-      const info = el('div', 'series-project-description');
-      descriptionBits.forEach(([tag, className, value]) => info.appendChild(el(tag, className, value)));
-      article.appendChild(info);
-    }
+    const info = el('div', 'series-project-description');
+    descriptionBits.forEach(([tag, className, value]) => info.appendChild(el(tag, className, value)));
+    info.appendChild(createReachOutButton(work, sectionId));
+    article.appendChild(info);
 
     const grid = el('div', 'series-grid');
     paths.mains.forEach((src, imageIndex) => {
@@ -624,6 +719,7 @@
   function setupContentUi() {
     const landingNav = document.querySelector('.landing-navigation');
     const trigger = document.querySelector('[data-current-section]');
+    const siteName = document.querySelector('.continuous-site-name');
     const menu = document.querySelector('.continuous-nav-menu');
     const frost = document.querySelector('.continuous-nav-frost');
     if (!landingNav || !trigger || !menu || !frost) return;
@@ -707,13 +803,15 @@
     if (finePointer.matches) {
       menu.querySelectorAll('a').forEach(link => {
         link.addEventListener('mouseenter', () => {
+          siteName?.classList.remove('is-cycling');
           menu.querySelectorAll('a').forEach(a => a.classList.remove('is-active'));
           link.classList.add('is-active');
         });
-        link.addEventListener('mouseleave', () => link.classList.remove('is-active'));
+        link.addEventListener('mouseleave', () => { link.classList.remove('is-active'); siteName?.classList.add('is-cycling'); });
       });
       menu.addEventListener('mouseleave', () => {
         menu.querySelectorAll('a').forEach(a => a.classList.remove('is-active'));
+        siteName?.classList.add('is-cycling');
       });
     }
 
@@ -742,9 +840,12 @@
     if (!raw) return;
     let id = raw;
     try { id = decodeURIComponent(raw); } catch (_) {}
-    if (!sectionIds.includes(id)) return;
+    const isSection = sectionIds.includes(id);
+    const isProject = id.startsWith('work-painting-') || id.startsWith('work-graphic-');
+    if (!isSection && !isProject) return;
     const target = document.getElementById(id);
     if (!target) return;
+    if (isProject && target.classList.contains('continuous-project')) openProject(target, true);
     requestAnimationFrame(() => target.scrollIntoView({ block: 'start', behavior: 'auto' }));
   }
 
@@ -802,10 +903,9 @@
   function saturateAverage(rgb) {
     if (!rgb) return null;
     const hsl = rgbToHsl(rgb);
-    // Die Durchschnittsfarbe soll wahrnehmbar bleiben, ohne eine neue Farbe
-    // zu erfinden. Sehr schwach farbige Bilder werden daher nur moderat,
-    // bereits farbige Bilder etwas stärker nachgesättigt.
-    if (hsl[1] > .015) hsl[1] = Math.min(.78, Math.max(hsl[1] * 1.65, .20));
+    // Die Durchschnittsfarbe bleibt erkennbar, wird aber nur leicht nachgesättigt.
+    // Besonders intensive Farben werden für den Navigator sichtbar beruhigt.
+    if (hsl[1] > .015) hsl[1] = Math.min(.46, Math.max(hsl[1] * 1.15, .10));
     return hslToRgb(hsl);
   }
 
@@ -860,6 +960,7 @@
 
   function setupScrollState() {
     const currentTitle = document.querySelector('[data-current-section]');
+    const siteName = document.querySelector('.continuous-site-name');
     const menuLinks = [...document.querySelectorAll('.continuous-nav-menu a[href^="#"]')];
     const colorImages = [...document.querySelectorAll('.continuous-content img')];
 
@@ -924,10 +1025,9 @@
         }
       }
 
-      if (!currentTitle || !document.body.classList.contains('content-ui-visible')) return;
+      if (!siteName || !document.body.classList.contains('content-ui-visible')) return;
 
-      // Auf der gesamten Continuous-Seite bestimmt das aktuell am stärksten
-      // sichtbare Bild die Farbe des rotierenden Abschnittstitels oben rechts.
+      // Das am stärksten sichtbare Bild färbt den rotierenden Soïc-Kermarrec-Schriftzug.
       let bestImage = null;
       let bestVisible = -1;
       let bestDistance = Infinity;
@@ -952,7 +1052,7 @@
         const fallback = displayColor(hexToRgb(owner?.dataset.navColor));
         if (fallback) color = rgbCss(fallback);
       }
-      currentTitle.style.setProperty('--scroll-project-color', color || 'var(--ink)');
+      siteName.style.setProperty('--scroll-project-color', color || '#9a9a9a');
     }
 
     addEventListener('scroll', requestUpdate, { passive: true });
@@ -962,8 +1062,18 @@
     requestUpdate();
   }
 
+  function setupAvailableWorksLink() {
+    const link = document.querySelector('[data-available-works-link]');
+    if (!link) return;
+    fetch('data/available-config.json', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : { enabled: false })
+      .then(config => link.classList.toggle('is-enabled', config?.enabled === true))
+      .catch(() => link.classList.remove('is-enabled'));
+  }
+
   renderSections();
   setupContentUi();
   setupScrollState();
+  setupAvailableWorksLink();
   alignInitialHashAfterRender();
 })();

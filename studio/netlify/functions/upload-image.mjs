@@ -1,11 +1,23 @@
-import { json, putRepoFile, requireAuth, requireSameOrigin, safeImagePath } from '../../lib/server.mjs';
+import { getRepoFileIfExists, json, putRepoFile, requireAuth, requireSameOrigin, safeImagePath } from '../../lib/server.mjs';
 
-function safePreviewPath(value) {
-  const path = String(value || '').replace(/^\/+/, '');
-  if (!path.startsWith('Vorschaubild/')) throw new Error('Vorschaubilder dürfen nur unter Vorschaubild/ gespeichert werden.');
-  if (path.includes('..') || path.includes('\\')) throw new Error('Ungültiger Vorschaubildpfad.');
-  if (!/\.webp$/i.test(path)) throw new Error('Vorschaubilder müssen WebP sein.');
-  return path;
+const DIMENSIONS_PATH = 'data/image-dimensions.js';
+
+function parseDimensions(source = '') {
+  const match = String(source).match(/window\.SOIC_IMAGE_DIMENSIONS\s*=\s*(\{[\s\S]*\})\s*;?\s*$/);
+  if (!match) return {};
+  try { return JSON.parse(match[1]); } catch { return {}; }
+}
+
+async function updateDimensions(path, width, height) {
+  width = Math.round(Number(width));
+  height = Math.round(Number(height));
+  if (!(width > 0 && height > 0)) return;
+  const existing = await getRepoFileIfExists(DIMENSIONS_PATH);
+  const map = existing ? parseDimensions(existing.content.toString('utf8')) : {};
+  map[path] = [width, height];
+  const ordered = Object.fromEntries(Object.entries(map).sort(([a], [b]) => a.localeCompare(b)));
+  const source = `/* Managed by Soïc Studio. Reserves intrinsic image geometry before lazy loading. */\nwindow.SOIC_IMAGE_DIMENSIONS = ${JSON.stringify(ordered)};\n`;
+  await putRepoFile(DIMENSIONS_PATH, Buffer.from(source), `Studio: Bildmaße ${path}`);
 }
 
 export default async (req) => {
@@ -17,32 +29,16 @@ export default async (req) => {
 
   try {
     const body = await req.json();
-    const previewOnly = body.previewOnly === true;
-    let path = '';
-
-    if (!previewOnly) {
-      path = safeImagePath(body.path);
-      const base64 = String(body.base64 || '').replace(/^data:[^,]+,/, '');
-      if (!base64) return json({ ok: false, error: 'Kein Bild empfangen.' }, 400);
-      const bytes = Buffer.from(base64, 'base64');
-      if (bytes.length > 4_000_000) {
-        return json({ ok: false, error: 'Das optimierte Bild ist größer als 4 MB. Bitte kleiner exportieren.' }, 413);
-      }
-      await putRepoFile(path, bytes, `Studio: Bild ${path}`);
+    const path = safeImagePath(body.path);
+    const base64 = String(body.base64 || '').replace(/^data:[^,]+,/, '');
+    if (!base64) return json({ ok: false, error: 'Kein Bild empfangen.' }, 400);
+    const bytes = Buffer.from(base64, 'base64');
+    if (bytes.length > 4_000_000) {
+      return json({ ok: false, error: 'Das optimierte Bild ist größer als 4 MB. Bitte kleiner exportieren.' }, 413);
     }
-
-    const previews = Array.isArray(body.previews) ? body.previews.slice(0, 4) : [];
-    if (previewOnly && !previews.length) return json({ ok: false, error: 'Keine Vorschaubilder empfangen.' }, 400);
-    for (const preview of previews) {
-      const previewPath = safePreviewPath(preview?.path);
-      const previewBase64 = String(preview?.base64 || '').replace(/^data:[^,]+,/, '');
-      if (!previewBase64) continue;
-      const previewBytes = Buffer.from(previewBase64, 'base64');
-      if (previewBytes.length > 250_000) throw new Error('Vorschaubild ist unerwartet groß.');
-      await putRepoFile(previewPath, previewBytes, `Studio: Vorschaubild ${previewPath}`);
-    }
-
-    return json({ ok: true, path: path || null, previews: previews.map(item => item.path) });
+    await putRepoFile(path, bytes, `Studio: Bild ${path}`);
+    await updateDimensions(path, body.width, body.height);
+    return json({ ok: true, path });
   } catch (error) {
     return json({ ok: false, error: error.message }, 500);
   }

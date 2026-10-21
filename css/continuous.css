@@ -1708,496 +1708,150 @@ body.continuous-nav-open .continuous-nav-frost { opacity: 1; visibility: visible
   }
 }
 
-
 /* ================================================================
-   2026-10-18 UI4 – ruhiger Footer / Legal nur in Kontakt / Rotation Mitte
-   ================================================================ */
-
-/* Der aktuelle Bereich oben rechts bleibt ein statischer Navigator-Titel.
-   Die permanente Schriftrotation sitzt nun ausschließlich auf dem dezenten
-   Soïc-Kermarrec-Schriftzug in der Mitte. */
-.continuous-current-section,
-.continuous-current-section.is-cycling {
-  animation: none !important;
-}
-.continuous-site-name.is-cycling {
-  animation: continuous-site-font-cycle 1.2s step-end infinite;
-}
-@keyframes continuous-site-font-cycle {
-  0%, 33.332% {
-    font-family: var(--site-font);
-    font-size: 12px;
-    font-weight: 300;
-    letter-spacing: .45px;
-  }
-  33.333%, 66.665% {
-    font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
-    font-size: 12px;
-    font-weight: 300;
-    letter-spacing: .45px;
-  }
-  66.666%, 100% {
-    font-family: "Michroma", Arial, sans-serif;
-    font-size: 9px;
-    font-weight: 400;
-    letter-spacing: .45px;
-  }
-}
-
-/* Impressum und Datenschutz sind keine dauerhaft eingeblendete Footer-Zeile
-   mehr. Sie stehen ausschließlich am Ende des Kontaktbereichs. */
-.continuous-global-footer .footer-links {
-  display: none !important;
-}
-.contact-legal-links {
-  width: min(100%, 620px);
-  margin: clamp(72px, 10vh, 130px) auto 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  color: #8f8f8f;
-  font: 300 10px/1.35 var(--site-font);
-  letter-spacing: .35px;
-}
-.contact-legal-links a {
-  color: inherit;
-  text-decoration: none;
-}
-.contact-legal-links a:hover,
-.contact-legal-links a:focus-visible {
-  color: var(--ink);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-@media (max-width: 700px), (hover:none) and (pointer:coarse) {
-  .continuous-site-name.is-cycling {
-    animation-name: continuous-site-font-cycle-mobile;
-  }
-  @keyframes continuous-site-font-cycle-mobile {
-    0%, 33.332% {
-      font-family: var(--site-font);
-      font-size: 12px;
-      font-weight: 300;
-    }
-    33.333%, 66.665% {
-      font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
-      font-size: 12px;
-      font-weight: 300;
-    }
-    66.666%, 100% {
-      font-family: "Michroma", Arial, sans-serif;
-      font-size: 9px;
-      font-weight: 400;
-    }
-  }
-  .contact-legal-links {
-    margin-top: 72px;
-    gap: 16px;
-    font-size: 10px;
-  }
-}
-
-
-/* ================================================================
-   2026-10-18 UI5 – top-row alignment, softer lower frost, stable nav hover
-   ================================================================ */
-
-/* All three top-row controls share the same vertical centre. The middle
-   Soïc Kermarrec label now matches the navigator title size. */
-.continuous-home .language-switch,
-.continuous-site-name,
-.continuous-current-section {
-  top: 18px !important;
-  min-height: 22px;
-}
-.continuous-site-name,
-.continuous-current-section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 22px !important;
-}
-.continuous-site-name {
-  font-size: 14px !important;
-  transform: translateX(-50%);
-  text-align: center;
-}
-.continuous-current-section {
-  text-align: center;
-}
-
-/* Keep each font in the rotation optically centred in the same 22px box. */
-@keyframes continuous-site-font-cycle {
-  0%, 33.332% {
-    font-family: var(--site-font);
-    font-size: 14px;
-    font-weight: 300;
-    letter-spacing: .45px;
-  }
-  33.333%, 66.665% {
-    font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
-    font-size: 14px;
-    font-weight: 300;
-    letter-spacing: .45px;
-  }
-  66.666%, 100% {
-    font-family: "Michroma", Arial, sans-serif;
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: .45px;
-  }
-}
-
-/* Frost belongs only to the bottom corner links. Remove the mobile glass
-   boxes from the top row while keeping the existing soft top gradient. */
-@media (max-width: 700px), (hover:none) and (pointer:coarse) {
-  .continuous-home .language-switch,
-  .continuous-site-name,
-  .continuous-current-section {
-    top: 16px !important;
-    min-height: 22px;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    background: transparent !important;
-    border-radius: 0 !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    box-shadow: none !important;
-  }
-  .continuous-site-name {
-  }
-  @keyframes continuous-site-font-cycle-mobile {
-    0%, 33.332% {
-      font-family: var(--site-font);
-      font-size: 12px;
-      font-weight: 300;
-      letter-spacing: .45px;
-    }
-    33.333%, 66.665% {
-      font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
-      font-size: 12px;
-      font-weight: 300;
-      letter-spacing: .45px;
-    }
-    66.666%, 100% {
-      font-family: "Michroma", Arial, sans-serif;
-      font-size: 9px;
-      font-weight: 400;
-      letter-spacing: .45px;
-    }
-  }
-}
-
-/* Soft local frost behind the two lower links. A masked pseudo-element makes
-   the blur fade outwards instead of ending at a hard rounded rectangle. */
-.continuous-global-footer .footer-instagram,
-.available-works-fixed-link {
-  isolation: isolate;
-  overflow: visible;
-  background: transparent !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  border-radius: 0 !important;
-}
-.continuous-global-footer .footer-instagram::before,
-.available-works-fixed-link::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: -10px -14px;
-  pointer-events: none;
-  background: rgba(255,255,255,.38);
-  -webkit-backdrop-filter: blur(10px) saturate(112%);
-  backdrop-filter: blur(10px) saturate(112%);
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 36%, rgba(0,0,0,.82) 54%, transparent 82%);
-  mask-image: radial-gradient(ellipse at center, #000 36%, rgba(0,0,0,.82) 54%, transparent 82%);
-}
-
-/* Two-line lower-right label. */
-.available-works-fixed-link {
-  text-align: right;
-  line-height: 1.02 !important;
-  white-space: nowrap;
-}
-
-@media (max-width: 700px), (hover:none) and (pointer:coarse) {
-  .continuous-global-footer .footer-instagram,
-  .available-works-fixed-link {
-    padding: 0 !important;
-  }
-  .continuous-global-footer .footer-instagram::before,
-  .available-works-fixed-link::before {
-    inset: -11px -15px;
-    background: rgba(255,255,255,.42);
-    -webkit-backdrop-filter: blur(11px) saturate(112%);
-    backdrop-filter: blur(11px) saturate(112%);
-  }
-}
-\n\n/* ================================================================\n   2026-10-18 UI6 – no middle banner; lower links use soft gradients only\n   ================================================================ */\n.continuous-site-name { display: none !important; }\n\n.continuous-global-footer .footer-instagram,\n.available-works-fixed-link {\n  transition: color .22s ease, opacity .22s ease;\n  background: transparent !important;\n  -webkit-backdrop-filter: none !important;\n  backdrop-filter: none !important;\n  border-radius: 0 !important;\n}\n/* On the untouched landing state the two corner entries stay quiet. */\nbody.continuous-home:not(.has-scrolled) .continuous-global-footer .footer-instagram,\nbody.continuous-home:not(.has-scrolled) .available-works-fixed-link {\n  color: #aaa !important;\n}\nbody.continuous-home.has-scrolled .continuous-global-footer .footer-instagram,\nbody.continuous-home.has-scrolled .available-works-fixed-link {\n  color: var(--ink) !important;\n}\n/* No glass rectangle: only a soft white gradient that dissolves into the page. */\n.continuous-global-footer .footer-instagram::before,\n.available-works-fixed-link::before {\n  content: \"\";\n  position: absolute;\n  z-index: -1;\n  inset: -14px -22px;\n  pointer-events: none;\n  background: radial-gradient(ellipse at center, rgba(255,255,255,.98) 0%, rgba(255,255,255,.80) 36%, rgba(255,255,255,.34) 64%, rgba(255,255,255,0) 88%);\n  -webkit-backdrop-filter: none !important;\n  backdrop-filter: none !important;\n  -webkit-mask-image: none !important;\n  mask-image: none !important;\n}\n@media (max-width:700px),(hover:none) and (pointer:coarse){\n  .continuous-global-footer .footer-instagram,\n  .available-works-fixed-link { padding: 0 !important; }\n  .continuous-global-footer .footer-instagram::before,\n  .available-works-fixed-link::before { inset: -15px -23px; }\n}\n
-
-/* ================================================================
-   2026-10-18 UI7 – rotating Soïc Kermarrec top-left, automatic language
+   FINAL 2026-10-19 — consolidated portfolio UI
    ================================================================ */
 .language-switch { display: none !important; }
+
+/* Top-left rotating name; top-right current section is the dropdown trigger. */
 .continuous-site-name {
   display: flex !important;
   position: fixed !important;
+  z-index: 2230;
   top: 18px !important;
   left: 24px !important;
   right: auto !important;
-  transform: none !important;
   width: auto !important;
   min-width: 0 !important;
   min-height: 22px;
   align-items: center;
   justify-content: flex-start !important;
+  transform: none !important;
   text-align: left !important;
   line-height: 22px !important;
-  color: #9a9a9a;
+  color: var(--scroll-project-color, #9a9a9a);
+  transition: color .32s ease;
 }
-.continuous-site-name.is-cycling {
-  animation: continuous-site-font-cycle-ui7 1.2s step-end infinite !important;
-}
-@keyframes continuous-site-font-cycle-ui7 {
-  0%, 33.332% {
-    font-family: var(--site-font);
-    font-size: 14px;
-    font-weight: 300;
-    letter-spacing: .45px;
-  }
-  33.333%, 66.665% {
-    font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
-    font-size: 14px;
-    font-weight: 300;
-    letter-spacing: .45px;
-  }
-  66.666%, 100% {
-    font-family: "Michroma", Arial, sans-serif;
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: .45px;
-  }
-}
-@media (max-width:700px),(hover:none) and (pointer:coarse) {
-  .continuous-site-name {
-    top: 16px !important;
-    left: 18px !important;
-  }
-  .continuous-site-name.is-cycling { animation-name: continuous-site-font-cycle-ui7-mobile !important; }
-  @keyframes continuous-site-font-cycle-ui7-mobile {
-    0%, 33.332% { font-family: var(--site-font); font-size: 12px; font-weight: 300; letter-spacing: .45px; }
-    33.333%, 66.665% { font-family: Baskerville, "Baskerville Old Face", Georgia, serif; font-size: 12px; font-weight: 300; letter-spacing: .45px; }
-    66.666%, 100% { font-family: "Michroma", Arial, sans-serif; font-size: 8px; font-weight: 400; letter-spacing: .45px; }
-  }
+.continuous-current-section,
+.continuous-current-section.is-cycling { animation: none !important; }
+.continuous-site-name.is-cycling { animation: continuous-site-font-cycle-final 1.2s step-end infinite !important; }
+@keyframes continuous-site-font-cycle-final {
+  0%,33.332% { font-family:var(--site-font); font-size:14px; font-weight:300; letter-spacing:.45px; }
+  33.333%,66.665% { font-family:Baskerville,"Baskerville Old Face",Georgia,serif; font-size:14px; font-weight:300; letter-spacing:.45px; }
+  66.666%,100% { font-family:"Michroma",Arial,sans-serif; font-size:11.4px; font-weight:400; letter-spacing:.45px; }
 }
 
-/* ================================================================
-   2026-10-19 UI8 – mobile bottom fade, smaller Michroma, diptych <= 80vw
-   ================================================================ */
-
-/* Michroma is optically taller/wider than the other two faces, so the third
-   rotation step is intentionally smaller while staying centred in the same
-   22px line box. */
-@keyframes continuous-site-font-cycle-ui7 {
-  0%, 33.332% {
-    font-family: var(--site-font);
-    font-size: 14px;
-    font-weight: 300;
-    letter-spacing: .45px;
-  }
-  33.333%, 66.665% {
-    font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
-    font-size: 14px;
-    font-weight: 300;
-    letter-spacing: .45px;
-  }
-  66.666%, 100% {
-    font-family: "Michroma", Arial, sans-serif;
-    font-size: 13px;
-    font-weight: 400;
-    letter-spacing: .45px;
-  }
+/* Legal links live only at the bottom of Contact. */
+.continuous-global-footer .footer-links { display:none !important; }
+.contact-legal-links {
+  width:min(100%,620px); margin:clamp(72px,10vh,130px) auto 0;
+  display:flex; align-items:center; justify-content:center; gap:18px;
+  color:#8f8f8f; font:300 10px/1.35 var(--site-font); letter-spacing:.35px;
 }
+.contact-legal-links a { color:inherit; text-decoration:none; }
+.contact-legal-links a:hover,.contact-legal-links a:focus-visible { color:var(--ink); text-decoration:underline; text-underline-offset:3px; }
 
-/* The entire diptych composition — main image, controls, description and
-   detail grid — is constrained by the project wrapper, never wider than 80vw. */
+/* Fixed lower links. Available Works is hidden until config.enabled=true. */
+.continuous-global-footer .footer-instagram,
+.available-works-fixed-link {
+  color:#9a9a9a !important; font-family:var(--site-font) !important;
+  font-size:14px !important; font-weight:300 !important; letter-spacing:.45px !important;
+  text-decoration:none; transition:color .22s ease,opacity .22s ease;
+  background:transparent !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+}
+.available-works-fixed-link {
+  position:fixed; z-index:190; right:24px; bottom:10px; display:none;
+  line-height:1.02 !important; text-align:right; white-space:nowrap; pointer-events:auto;
+}
+.available-works-fixed-link.is-enabled { display:block; }
+body.continuous-home:not(.has-scrolled) .continuous-global-footer .footer-instagram,
+body.continuous-home:not(.has-scrolled) .available-works-fixed-link { color:#d8d8d8 !important; }
+body.continuous-home.has-scrolled .continuous-global-footer .footer-instagram,
+body.continuous-home.has-scrolled .available-works-fixed-link { color:#9a9a9a !important; }
+.continuous-global-footer .footer-instagram:hover,.continuous-global-footer .footer-instagram:focus-visible,
+.available-works-fixed-link:hover,.available-works-fixed-link:focus-visible { color:var(--ink) !important; text-decoration:underline; text-underline-offset:3px; }
+
+/* Diptych width follows the same 75vw maximum as the two-column series layout on desktop. */
 .continuous-project.layout-diptych,
 .continuous-artworks[data-columns="1"] .continuous-project.layout-diptych {
-  width: min(80vw, 1320px) !important;
-  max-width: 80vw !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  justify-self: center !important;
+  width:min(75vw,1320px) !important; max-width:75vw !important; margin-inline:auto !important; justify-self:center !important;
 }
 .continuous-project.layout-diptych .project-main-shell,
 .continuous-project.layout-diptych .project-main-button,
 .continuous-artworks[data-columns="1"] .continuous-project.layout-diptych .project-main-image,
-.continuous-project.layout-diptych .project-details-grid {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-.continuous-project.layout-diptych .project-main-image {
-  width: 100% !important;
-  height: auto !important;
-  object-fit: contain;
-}
+.continuous-project.layout-diptych .project-details-grid { width:100% !important; max-width:100% !important; }
+.continuous-project.layout-diptych .project-main-image { width:100% !important; height:auto !important; object-fit:contain; }
 
 @media (max-width:700px),(hover:none) and (pointer:coarse) {
-  @keyframes continuous-site-font-cycle-ui7-mobile {
-    0%,33.332% {
-      font-family:var(--site-font);
-      font-size:12px;
-      font-weight:300;
-      letter-spacing:.45px;
-    }
-    33.333%,66.665% {
-      font-family:Baskerville,"Baskerville Old Face",Georgia,serif;
-      font-size:12px;
-      font-weight:300;
-      letter-spacing:.45px;
-    }
-    66.666%,100% {
-      font-family:"Michroma",Arial,sans-serif;
-      font-size:11px;
-      font-weight:400;
-      letter-spacing:.45px;
-    }
+  .continuous-site-name { top:16px !important; left:18px !important; }
+  .continuous-site-name.is-cycling { animation-name:continuous-site-font-cycle-final-mobile !important; }
+  @keyframes continuous-site-font-cycle-final-mobile {
+    0%,33.332% { font-family:var(--site-font); font-size:12px; font-weight:300; letter-spacing:.45px; }
+    33.333%,66.665% { font-family:Baskerville,"Baskerville Old Face",Georgia,serif; font-size:12px; font-weight:300; letter-spacing:.45px; }
+    66.666%,100% { font-family:"Michroma",Arial,sans-serif; font-size:9.8px; font-weight:400; letter-spacing:.45px; }
   }
-
-  /* Replace all local glass/frost chips at the bottom with one soft, full-width
-     white fade that rises from the viewport edge, mirroring the top fade. */
-  .continuous-global-footer {
-    isolation: isolate;
-  }
+  .continuous-global-footer { isolation:isolate; }
   .continuous-global-footer::before {
-    content: "";
-    position: fixed;
-    z-index: -1;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 104px;
-    pointer-events: none;
-    background: linear-gradient(
-      to top,
-      rgba(255,255,255,.99) 0%,
-      rgba(255,255,255,.92) 24%,
-      rgba(255,255,255,.68) 50%,
-      rgba(255,255,255,.28) 74%,
-      rgba(255,255,255,0) 100%
-    );
+    content:""; position:fixed; z-index:-1; left:0; right:0; bottom:0; height:52px; pointer-events:none;
+    background:linear-gradient(to top,rgba(255,255,255,.99) 0%,rgba(255,255,255,.90) 26%,rgba(255,255,255,.58) 56%,rgba(255,255,255,.20) 78%,rgba(255,255,255,0) 100%);
   }
-  .continuous-global-footer .footer-instagram,
-  .available-works-fixed-link {
-    background: transparent !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-  }
-  .continuous-global-footer .footer-instagram::before,
-  .available-works-fixed-link::before {
-    content: none !important;
-    display: none !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
+  .continuous-global-footer .footer-instagram { bottom:8px !important; font-size:12px !important; }
+  .available-works-fixed-link { right:18px; bottom:10px !important; font-size:12px !important; line-height:1.02 !important; }
+  .contact-legal-links { margin-top:72px; gap:16px; font-size:10px; }
+  .continuous-project.layout-diptych,
+  .continuous-artworks[data-columns="1"] .continuous-project.layout-diptych { width:80vw !important; max-width:80vw !important; }
 }
 
 
 /* ================================================================
-   2026-10-19 UI9 – compact mobile bottom fade + baseline alignment
+   FINAL ONE-SHOT — project contact / optional project-updates list
    ================================================================ */
-@media (max-width:700px),(hover:none) and (pointer:coarse) {
-  .continuous-global-footer::before {
-    height: 52px !important;
-    background: linear-gradient(
-      to top,
-      rgba(255,255,255,.99) 0%,
-      rgba(255,255,255,.90) 26%,
-      rgba(255,255,255,.58) 56%,
-      rgba(255,255,255,.20) 78%,
-      rgba(255,255,255,0) 100%
-    ) !important;
+.project-reachout-wrap { width:100%; display:flex; justify-content:center; margin:14px auto 0; }
+.project-reachout-button,.reachout-mail-link,.reachout-subscribe-button {
+  --reachout-accent:#8d8d8d;
+  appearance:none; border:1px solid color-mix(in srgb,var(--reachout-accent) 42%,#d9d9d9);
+  background:rgba(255,255,255,.72); color:#555; text-decoration:none; cursor:pointer;
+  font:300 11px/1 var(--site-font); letter-spacing:.4px; padding:9px 16px; border-radius:999px;
+  box-shadow:0 7px 22px rgba(0,0,0,.035), inset 0 1px 0 rgba(255,255,255,.92);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,color .18s ease;
+}
+@media (hover:hover) and (pointer:fine){
+  .project-reachout-button:hover,.reachout-mail-link:hover,.reachout-subscribe-button:hover {
+    transform:translateY(-1px); color:#414141; border-color:color-mix(in srgb,var(--reachout-accent) 68%,#cfcfcf);
+    box-shadow:0 9px 24px rgba(0,0,0,.05), inset 0 1px 0 rgba(255,255,255,.95);
   }
-  .continuous-global-footer .footer-instagram {
-    bottom: 8px !important;
-  }
-  .available-works-fixed-link {
-    bottom: 10px !important;
-    line-height: 1.02 !important;
-    text-align: right;
+}
+.series-project-description .project-reachout-wrap { margin-top:14px; justify-content:flex-start; }
+.reachout-dialog[hidden]{display:none!important}.reachout-dialog{position:fixed;inset:0;z-index:6000;display:grid;place-items:center;padding:24px;background:rgba(255,255,255,.55);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+.reachout-dialog-panel{--reachout-accent:#8d8d8d;position:relative;width:min(430px,92vw);padding:30px 26px 25px;border:1px solid color-mix(in srgb,var(--reachout-accent) 28%,#e0e0e0);border-radius:24px;background:rgba(255,255,255,.9);box-shadow:0 18px 60px rgba(0,0,0,.07),inset 0 1px 0 #fff;text-align:center}
+.reachout-dialog-close{position:absolute;top:10px;right:13px;border:0;background:transparent;color:#888;font:300 20px/1 var(--site-font);cursor:pointer;padding:5px}
+.reachout-dialog-title{margin:0 0 9px;font:300 15px/1.2 var(--site-font)}.reachout-dialog-context{margin:0 0 20px;color:#777;font:300 11px/1.45 var(--site-font)}
+.reachout-mail-link{display:inline-flex;align-items:center;justify-content:center;margin:0 auto 20px;--reachout-accent:inherit}
+.reachout-notify-toggle{display:flex;align-items:center;justify-content:center;gap:8px;color:#777;font:300 10px/1.4 var(--site-font);cursor:pointer}.reachout-notify-toggle input{accent-color:#777}
+.reachout-newsletter-form{margin-top:15px}.reachout-email-label{display:grid;gap:6px;text-align:left;color:#888;font:300 9px/1.35 var(--site-font)}.reachout-email-label input{width:100%;border:0;border-bottom:1px solid #cfcfcf;border-radius:0;background:transparent;color:#414141;font:300 13px/1.4 var(--site-font);padding:7px 2px;outline:none}.reachout-email-label input:focus{border-bottom-color:var(--reachout-accent)}
+.reachout-consent,.reachout-status{color:#999;font:300 8.5px/1.45 var(--site-font)}.reachout-consent{text-align:left;margin:9px 0 12px}.reachout-consent a{color:inherit;text-underline-offset:2px}.reachout-subscribe-button{--reachout-accent:inherit}.reachout-subscribe-button:disabled{opacity:.5;cursor:wait}.reachout-status{min-height:13px;margin:9px 0 0}.reachout-hp{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}html.reachout-open{overflow:hidden}
+@media(max-width:700px),(hover:none) and (pointer:coarse){.project-reachout-wrap{margin-top:12px}.series-project-description .project-reachout-wrap{justify-content:center}.project-reachout-button,.reachout-mail-link,.reachout-subscribe-button{font-size:11px;padding:9px 15px}.reachout-dialog{padding:16px}.reachout-dialog-panel{padding:28px 20px 23px}}
+
+/* The top UI uses one soft banner gradient; no individual frosted pills. */
+@media(max-width:700px),(hover:none) and (pointer:coarse){
+  .continuous-site-name,.continuous-current-section{background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-radius:0!important;padding:0!important;box-shadow:none!important}
+}
+
+@media (min-width:701px) and (hover:hover) and (pointer:fine) {
+  .continuous-project.layout-portrait.is-open .project-reachout-wrap {
+    grid-column:2;
+    grid-row:3;
+    justify-content:center;
+    margin-top:13px;
   }
 }
 
-
-/* ================================================================
-   2026-10-19 UI10 – stable lazy layout, corrected Michroma, quieter footer
-   ================================================================ */
-
-/* The previous UI8 keyframes accidentally made Michroma almost as large as
-   Helvetica/Baskerville again. Use the same optical ratio as the working
-   landing rotation (13/16), with a unique animation name so older duplicate
-   keyframes cannot override it. */
-.continuous-site-name.is-cycling {
-  animation-name: continuous-site-font-cycle-ui10 !important;
-}
-@keyframes continuous-site-font-cycle-ui10 {
-  0%, 33.332% {
-    font-family: var(--site-font);
-    font-size: 14px;
-    font-weight: 300;
-    letter-spacing: .45px;
-  }
-  33.333%, 66.665% {
-    font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
-    font-size: 14px;
-    font-weight: 300;
-    letter-spacing: .45px;
-  }
-  66.666%, 100% {
-    font-family: "Michroma", Arial, sans-serif;
-    font-size: 11.4px;
-    font-weight: 400;
-    letter-spacing: .45px;
-  }
-}
-
-/* Bottom links: very quiet over the landing, then only as dark as the subtle
-   Soïc Kermarrec label (#9a9a9a), rather than the main body ink. */
-body.continuous-home:not(.has-scrolled) .continuous-global-footer .footer-instagram,
-body.continuous-home:not(.has-scrolled) .available-works-fixed-link {
-  color: #d8d8d8 !important;
-}
-body.continuous-home.has-scrolled .continuous-global-footer .footer-instagram,
-body.continuous-home.has-scrolled .available-works-fixed-link {
-  color: #9a9a9a !important;
-}
-
-@media (max-width:700px),(hover:none) and (pointer:coarse) {
-  .continuous-site-name.is-cycling {
-    animation-name: continuous-site-font-cycle-ui10-mobile !important;
-  }
-  @keyframes continuous-site-font-cycle-ui10-mobile {
-    0%, 33.332% {
-      font-family: var(--site-font);
-      font-size: 12px;
-      font-weight: 300;
-      letter-spacing: .45px;
-    }
-    33.333%, 66.665% {
-      font-family: Baskerville, "Baskerville Old Face", Georgia, serif;
-      font-size: 12px;
-      font-weight: 300;
-      letter-spacing: .45px;
-    }
-    66.666%, 100% {
-      font-family: "Michroma", Arial, sans-serif;
-      font-size: 9.8px;
-      font-weight: 400;
-      letter-spacing: .45px;
-    }
+/* Schmaler Desktop / Split View: Bei Querformat-Hintergründen ist die
+   tatsächliche Bildhöhe oft kürzer als die Fensterhöhe. Die Blende
+   endet am unteren Bildrand statt im bereits weißen Bereich. */
+@media (min-width:701px) and (max-aspect-ratio:4/3) and (hover:hover) and (pointer:fine) {
+  .continuous-home .landing-background-fade {
+    inset:0 0 auto 0;
+    height:min(100svh,var(--landing-image-height,100svh));
   }
 }

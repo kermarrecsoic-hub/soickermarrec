@@ -211,3 +211,17 @@ h3 { font-size: 15px; }
 .checkbox-row > span { color: var(--ink); font-size: 13px; }
 .project-card.is-hidden-project .project-thumb img { opacity: .28; filter: grayscale(.55); }
 .project-card.is-hidden-project .project-card-title { color: var(--muted); }
+
+/* Vollständige Cleanup-Vorschau mit Miniaturen und allen Originalpfaden. */
+.cleanup-review-dialog{width:min(1060px,calc(100vw - 24px));max-height:calc(100svh - 24px);padding:0;border:1px solid var(--line);border-radius:15px;background:#fff;color:var(--ink)}
+.cleanup-review-dialog::backdrop{background:rgba(30,30,30,.44)}
+.cleanup-review-shell{max-height:calc(100svh - 24px);display:flex;flex-direction:column;gap:13px;padding:22px}
+.cleanup-review-shell h2{font-size:20px}.cleanup-review-intro{font-size:12px;line-height:1.5;color:var(--muted);margin:0}
+.cleanup-review-scroll{min-height:0;overflow-y:auto;overscroll-behavior:contain;border-block:1px solid var(--line);padding:14px 2px}
+.cleanup-review-group h3{font-size:13px;margin:7px 0 12px}.cleanup-review-group+.cleanup-review-group{margin-top:20px}
+.cleanup-review-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px}
+.cleanup-review-item{min-width:0;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fafafa}
+.cleanup-review-item img{display:block;width:100%;height:108px;object-fit:contain;background:#f2f2f2}
+.cleanup-review-item span{display:block;padding:7px;overflow-wrap:anywhere;font-size:10px;line-height:1.45}
+.cleanup-review-actions{display:flex;justify-content:flex-end;gap:9px;align-items:center;flex-wrap:wrap}
+@media(max-width:650px){.cleanup-review-shell{padding:15px}.cleanup-review-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cleanup-review-item img{height:90px}}

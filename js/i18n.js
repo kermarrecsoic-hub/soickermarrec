@@ -17,6 +17,26 @@
       },
       legal: { imprint: 'Impressum', privacy: 'Datenschutz' },
       ui: { availableWorks: 'Verfügbare<br>Werke' },
+      reachOut: {
+        button: 'Kontaktieren',
+        title: 'Kontakt',
+        emailButton: 'E-Mail öffnen',
+        notify: 'Bei neuen Projekten per E-Mail benachrichtigen',
+        emailLabel: 'E-Mail-Adresse',
+        consent: 'Ich möchte freiwillig per E-Mail über neue Projekte informiert werden und kann die Einwilligung jederzeit widerrufen.',
+        privacy: 'Datenschutz',
+        save: 'Benachrichtigung vormerken',
+        saving: 'Wird gespeichert …',
+        saved: 'E-Mail-Adresse wurde vorgemerkt.',
+        emailInvalid: 'Bitte gib eine gültige E-Mail-Adresse ein.',
+        sending: 'Anmeldung wird übermittelt …',
+        sent: 'Anmeldung abgesendet.',
+        error: 'Die Vormerkung konnte gerade nicht gespeichert werden.',
+        close: 'Schließen',
+        subjectPrefix: 'Anfrage zu',
+        mailGreeting: 'Hallo Soïc,',
+        mailIntro: 'ich möchte dich zu diesem Projekt kontaktieren:'
+      },
       about: {
         bio1: 'Soïc Kermarrec wurde 2004 in Leipzig geboren und lebt und arbeitet in dieser Stadt als Künstler und Architekturstudent.<br>In seiner Jugend wollte er den großen Mangaka nacheifern und kam so zur Grafik mit Tinte und Feder. Als er 2025 nach Paris zog, fing er an, seine Eindrücke und Erlebnisse in Farben auf die Leinwand zu bannen, was zu seinem jetzigen Werk führte.',
         bio2: 'Er arbeitet intuitiv und stellt mit Tinte und Acryl, verschiedenen Fragmenten und Schrift Abhängigkeiten zwischen den einzelnen Elementen her. So entstehen visuelle Eindrücke, in denen sich komplexe und manchmal zufällige Zusammenhänge unserer subjektiv wahrgenommenen Realität widerspiegeln.',
@@ -90,6 +110,26 @@
       },
       legal: { imprint: 'Mentions légales', privacy: 'Confidentialité' },
       ui: { availableWorks: 'Œuvres<br>disponibles' },
+      reachOut: {
+        button: 'Contacter',
+        title: 'Contact',
+        emailButton: 'Ouvrir l’e-mail',
+        notify: 'M’informer par e-mail lors de nouveaux projets',
+        emailLabel: 'Adresse e-mail',
+        consent: 'Je souhaite recevoir volontairement des informations sur de nouveaux projets et peux retirer mon consentement à tout moment.',
+        privacy: 'Confidentialité',
+        save: 'Enregistrer l’adresse',
+        saving: 'Enregistrement …',
+        saved: 'Adresse e-mail enregistrée.',
+        emailInvalid: 'Veuillez saisir une adresse e-mail valide.',
+        sending: 'Envoi en cours …',
+        sent: 'Demande envoyée.',
+        error: 'L’adresse n’a pas pu être enregistrée.',
+        close: 'Fermer',
+        subjectPrefix: 'Demande concernant',
+        mailGreeting: 'Bonjour Soïc,',
+        mailIntro: 'je souhaite vous contacter au sujet de ce projet :'
+      },
       about: {
         bio1: 'Soïc Kermarrec est né à Leipzig en 2004 et y vit et travaille comme artiste et étudiant en architecture.<br>Dans sa jeunesse, il voulait suivre les traces des grands mangakas et s’est ainsi tourné vers le dessin à l’encre et à la plume. Lorsqu’il s’installe à Paris en 2025, il commence à transposer sur la toile, par la couleur, ses impressions et ses expériences, ce qui l’amène à son travail actuel.',
         bio2: 'Il travaille de manière intuitive et crée, avec l’encre et l’acrylique, différents fragments et l’écriture, des relations entre les éléments. Il en résulte des impressions visuelles dans lesquelles se reflètent les liens complexes et parfois fortuits de notre réalité perçue subjectivement.',
@@ -163,6 +203,26 @@
       },
       legal: { imprint: 'Legal notice', privacy: 'Privacy' },
       ui: { availableWorks: 'Available<br>Works' },
+      reachOut: {
+        button: 'Contact',
+        title: 'Contact',
+        emailButton: 'Open email',
+        notify: 'Email me when new projects are published',
+        emailLabel: 'Email address',
+        consent: 'I voluntarily agree to receive email updates about new projects and can withdraw consent at any time.',
+        privacy: 'Privacy',
+        save: 'Save email',
+        saving: 'Saving …',
+        saved: 'Email address saved.',
+        emailInvalid: 'Please enter a valid email address.',
+        sending: 'Sending request …',
+        sent: 'Request sent.',
+        error: 'The email address could not be saved right now.',
+        close: 'Close',
+        subjectPrefix: 'Enquiry about',
+        mailGreeting: 'Hello Soïc,',
+        mailIntro: 'I would like to contact you about this project:'
+      },
       about: {
         bio1: 'Soïc Kermarrec was born in Leipzig in 2004 and lives and works there as an artist and architecture student.<br>In his youth, he wanted to follow in the footsteps of the great manga artists and thus came to drawing with ink and nib. When he moved to Paris in 2025, he began translating his impressions and experiences into colour on canvas, leading to his current body of work.',
         bio2: 'He works intuitively, using ink and acrylic, various fragments and writing to establish relationships between individual elements. The result is a series of visual impressions in which the complex and sometimes accidental connections of our subjectively perceived reality are reflected.',
@@ -284,25 +344,13 @@
       const lang = String(raw || '').toLowerCase().split('-')[0];
       if (VALID.includes(lang)) return lang;
     }
-    return 'en';
+    return 'de';
   }
 
   function currentLanguage() {
     return browserLanguage();
   }
 
-  function propagateLanguage(lang) {
-    document.querySelectorAll('a[href]').forEach(link => {
-      const href = link.getAttribute('href');
-      if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
-      try {
-        const url = new URL(href, location.href);
-        if (url.origin !== location.origin) return;
-        url.searchParams.set('lang', lang);
-        link.href = url.href;
-      } catch (_) {}
-    });
-  }
 
   function pageKey() {
     const name = location.pathname.split('/').pop() || 'index.html';
@@ -322,7 +370,10 @@
 
   function applyMeta(lang) {
     const key = pageKey();
-    const titleKey = key === 'home' ? 'homeTitle' : `${key}Title`;
+    // Keep the canonical homepage metadata stable in the original HTML for
+    // Google/Bing. Browser-language localization changes visible UI only.
+    if (key === 'home') return;
+    const titleKey = `${key}Title`;
     const descriptionKey = key === 'home' ? 'homeDescription' : `${key}Description`;
     document.title = t(`meta.${titleKey}`, lang);
     const description = document.querySelector('meta[name="description"]');
@@ -340,29 +391,6 @@
     applyMeta(lang);
   }
 
-  function makeSwitch(lang) {
-    if (document.querySelector('.language-switch')) return;
-    const nav = document.createElement('nav');
-    nav.className = 'language-switch';
-    nav.setAttribute('aria-label', 'Language / Sprache / Langue');
-
-    VALID.forEach(code => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.textContent = code.toUpperCase();
-      button.dataset.lang = code;
-      button.classList.toggle('is-active', code === lang);
-      button.setAttribute('aria-pressed', String(code === lang));
-      button.addEventListener('click', () => {
-        const url = new URL(location.href);
-        url.searchParams.set('lang', code);
-        location.href = url.href;
-      });
-      nav.appendChild(button);
-    });
-
-    document.body.appendChild(nav);
-  }
 
   function localizeField(field, value, lang = currentLanguage()) {
     const table = fieldTranslations[field];

@@ -7,8 +7,8 @@
 <meta content="noindex,nofollow,noarchive" name="robots"/>
 <title>Soïc Studio</title>
 <link href="https://soickermarrec.de/favicon.png" rel="icon" type="image/png"/>
-<link href="app.css?v=20261006d" rel="stylesheet"/>
-<script defer="" src="app.js?v=20261013b"></script>
+<link href="app.css?v=20261020rev2" rel="stylesheet"/>
+<script defer="" src="app.js?v=20261020rev2"></script>
 </head>
 <body>
 <section class="login-shell" hidden="" id="loginShell">
@@ -38,7 +38,8 @@
 <div class="nav-separator"></div>
 <button data-view="pages" type="button">Seiten</button>
 <button data-view="media" type="button">Mediathek</button>
-<button data-view="landing-backgrounds" type="button">Landing-Hintergrund</button><button data-view="site-images" type="button">Seitenbilder</button>
+<button data-view="landing-backgrounds" type="button">Landing-Hintergrund</button>
+<button data-view="available-settings" type="button">Available Works</button><button data-view="site-images" type="button">Seitenbilder</button>
 </nav>
 <div class="sidebar-bottom">
 <a href="https://soickermarrec.de" rel="noreferrer" target="_blank">Website öffnen ↗</a>
@@ -72,13 +73,15 @@
 <label><span>Medium</span><input id="fieldMedium" name="medium" type="text"/></label>
 <label><span>Maße</span><input id="fieldDimensions" name="dimensions" type="text"/></label>
 <label class="wide"><span>Verfügbarkeit</span><input id="fieldAvailability" name="availability" placeholder="z. B. unavailable" type="text"/></label>
+<label class="available-works-field"><span>Preis</span><input id="fieldPrice" name="price" placeholder="z. B. 450 €" type="text"/></label>
+<label class="wide visibility-field available-works-field"><span>Available Works</span><span class="checkbox-row"><input id="fieldAvailableWorks" name="availableWorks" type="checkbox"/><span>In der privaten Available-Works-Liste anzeigen</span></span></label>
 <label class="wide"><span>Beschreibung</span><textarea id="fieldText" name="text" rows="5"></textarea></label>
-<label class="wide visibility-field"><span>Sichtbarkeit</span><span class="checkbox-row"><input checked id="fieldVisible" name="visible" type="checkbox"/><span>Projekt auf der Website anzeigen</span></span></label>
+<label class="wide visibility-field"><span>Sichtbarkeit</span><span class="checkbox-row"><input checked id="fieldVisible" name="visible" type="checkbox"/><span>Projekt auf Malerei / Grafik bzw. der normalen Portfolio-Seite anzeigen</span></span></label>
 <label class="wide" id="layoutField"><span>Layout</span><select id="fieldLayout" name="layout">
 <option value="">Automatisch</option>
 <option value="diptych">Diptychon</option>
 <option value="multiple">Mehrere</option>
-<option value="portrait">Hochformat</option>
+<option value="portrait">Hochformat – Details seitlich</option>
 <option value="landscape">Querformat</option>
 </select></label>
 <label class="wide folder-field"><span>Ordner für neue Uploads</span><div class="folder-row"><span id="folderPrefix"></span><input id="fieldFolder" placeholder="projektname" type="text"/></div></label>
@@ -132,7 +135,7 @@
 <label class="wide"><span>SEO-Beschreibung</span><textarea id="pageDescription" rows="3"></textarea></label>
 <label class="wide"><span>Inhalt</span><textarea id="pageBody" rows="14" placeholder="Absätze einfach mit Leerzeilen trennen."></textarea></label>
 </div>
-<p class="page-editor-note">Neue Seiten werden als echte HTML-Dateien veröffentlicht, automatisch in die Sitemap aufgenommen und verwenden Navigation, Footer, Baskerville und das Studio-Social-Preview.</p>
+<p class="page-editor-note">Neue Seiten werden als echte HTML-Dateien veröffentlicht, bleiben direkt erreichbar (aber nicht in Suchmaschinen indexiert) und verwenden Navigation, Footer, Baskerville und das Studio-Social-Preview.</p>
 </div>
 <footer class="dialog-footer">
 <button class="text-button danger" hidden="" id="deletePageButton" type="button">Seite löschen</button>

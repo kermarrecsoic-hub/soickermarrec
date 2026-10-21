@@ -1,12 +1,10 @@
 (async () => {
   'use strict';
-  if (window.SoicProjectDataReady) await window.SoicProjectDataReady;
-
   const lang = window.SoicI18n?.currentLanguage?.() || 'de';
   const copy = {
-    de: { intro:'Gib deine E-Mail-Adresse ein, um verfügbare Arbeiten und Preise zu sehen.', updates:'Bei neuen Projekten per E-Mail benachrichtigen.', submit:'Liste öffnen', privacy:'Die Adresse wird über Netlify Forms gespeichert. Projektbenachrichtigungen sind freiwillig.', current:'Aktuell verfügbare Arbeiten', empty:'Zurzeit sind keine Arbeiten in dieser Liste.', priceOnRequest:'Preis auf Anfrage', contact:'Contact', status:'Liste wird geöffnet …', hidden:'Diese Seite ist derzeit nicht verfügbar.' },
-    fr: { intro:'Saisissez votre adresse e-mail pour voir les œuvres disponibles et leurs prix.', updates:'M’informer par e-mail lors de la publication de nouveaux projets.', submit:'Ouvrir la liste', privacy:'L’adresse est enregistrée via Netlify Forms. Les notifications de projets sont facultatives.', current:'Œuvres disponibles', empty:'Aucune œuvre ne figure actuellement dans cette liste.', priceOnRequest:'Prix sur demande', contact:'Contact', status:'Ouverture de la liste …', hidden:'Cette page est actuellement indisponible.' },
-    en: { intro:'Enter your email address to view available works and prices.', updates:'Notify me by email when new projects are published.', submit:'Open list', privacy:'The address is stored through Netlify Forms. Project notifications are optional.', current:'Currently available works', empty:'No works are currently in this list.', priceOnRequest:'Price on request', contact:'Contact', status:'Opening list …', hidden:'This page is currently unavailable.' }
+    de: { title:'Verfügbare Werke', intro:'Gib deine E-Mail-Adresse ein, um verfügbare Arbeiten und Preise zu sehen.', updates:'Bei neuen Projekten per E-Mail benachrichtigen.', submit:'Liste öffnen', privacy:'Die Adresse wird über Netlify Forms gespeichert. Projektbenachrichtigungen sind freiwillig.', current:'Aktuell verfügbare Arbeiten', empty:'Zurzeit sind keine Arbeiten in dieser Liste.', priceOnRequest:'Preis auf Anfrage', contact:'Contact', status:'Zugang wird geprüft …', failed:'Die Liste konnte gerade nicht geöffnet werden. Bitte versuche es erneut.', hidden:'Diese Seite ist derzeit nicht verfügbar.' },
+    fr: { title:'Œuvres disponibles', intro:'Saisissez votre adresse e-mail pour voir les œuvres disponibles et leurs prix.', updates:'M’informer par e-mail lors de la publication de nouveaux projets.', submit:'Ouvrir la liste', privacy:'L’adresse est enregistrée via Netlify Forms. Les notifications de projets sont facultatives.', current:'Œuvres disponibles', empty:'Aucune œuvre ne figure actuellement dans cette liste.', priceOnRequest:'Prix sur demande', contact:'Contact', status:'Vérification de l’accès …', failed:'La liste ne peut pas être ouverte pour le moment. Veuillez réessayer.', hidden:'Cette page est actuellement indisponible.' },
+    en: { title:'Available Works', intro:'Enter your email address to view available works and prices.', updates:'Notify me by email when new projects are published.', submit:'Open list', privacy:'The address is stored through Netlify Forms. Project notifications are optional.', current:'Currently available works', empty:'No works are currently in this list.', priceOnRequest:'Price on request', contact:'Contact', status:'Checking access …', failed:'Please enter a valid email address.', hidden:'This page is currently unavailable.' }
   }[lang] || {};
 
   const gate=document.getElementById('availableGate');
@@ -55,6 +53,8 @@
   frost?.addEventListener('click',()=>setOpen(false));
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(viewer?.classList.contains('is-open')) closeViewer(); else setOpen(false); } });
 
+  document.querySelector('.available-gate-title').textContent=copy.title;
+  if (trigger) trigger.textContent=copy.title;
   document.querySelector('.available-intro').textContent=copy.intro;
   document.querySelector('.available-check span').textContent=copy.updates;
   form.querySelector('button[type="submit"]').textContent=copy.submit;
@@ -62,7 +62,7 @@
   document.querySelector('.available-list-intro p').textContent=copy.current;
   empty.textContent=copy.empty;
 
-  const availableWorks=works=>(works||[]).map((work,index)=>({work,index})).filter(item=>item.work&&item.work.availableWorks===true);
+  const availableWorks=works=>(works||[]).map((work,index)=>({work:(window.SoicI18n?.localizeWork?window.SoicI18n.localizeWork(work):work),index})).filter(item=>item.work&&item.work.availableWorks===true);
   const accent=work=>/^#[0-9a-f]{6}$/i.test(work.navColor||'')?work.navColor:'#777777';
   const stripYear=title=>String(title||'').replace(/,?\s*(?:19|20)\d{2}\s*$/,'').trim();
   const imageList=work=>{
@@ -80,7 +80,7 @@
     return `mailto:soickermarrec@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
-  let viewer=null, viewerImage=null, viewerItems=[], viewerIndex=0, pointerStart=null;
+  let viewer=null, viewerImage=null, viewerItems=[], viewerIndex=0, pointerStart=null, viewerScale=1, pinchStart=null;
   function ensureViewer(){
     if(viewer) return;
     viewer=document.createElement('div'); viewer.className='available-viewer'; viewer.setAttribute('aria-hidden','true');
@@ -90,14 +90,26 @@
     const prev=document.createElement('button'); prev.className='available-viewer-prev'; prev.type='button'; prev.textContent='‹';
     const next=document.createElement('button'); next.className='available-viewer-next'; next.type='button'; next.textContent='›';
     const count=document.createElement('div'); count.className='available-viewer-count';
-    viewer.append(stage, close, prev, next, count); document.body.appendChild(viewer);
-    const show=i=>{ if(!viewerItems.length)return; viewerIndex=(i+viewerItems.length)%viewerItems.length; viewerImage.src=viewerItems[viewerIndex]; count.textContent=`${viewerIndex+1} / ${viewerItems.length}`; prev.hidden=next.hidden=viewerItems.length<2; };
+    const zoomIn=document.createElement('button'); zoomIn.className='available-viewer-zoom-in'; zoomIn.type='button'; zoomIn.textContent='+'; zoomIn.setAttribute('aria-label','Zoom in');
+    const zoomOut=document.createElement('button'); zoomOut.className='available-viewer-zoom-out'; zoomOut.type='button'; zoomOut.textContent='−'; zoomOut.setAttribute('aria-label','Zoom out');
+    viewer.append(stage, close, prev, next, count, zoomIn, zoomOut); document.body.appendChild(viewer);
+    const applyZoom=()=>{ viewerImage.style.transform=`scale(${viewerScale})`; viewerImage.style.cursor=viewerScale>1?'zoom-out':'zoom-in'; };
+    const resetZoom=()=>{ viewerScale=1; applyZoom(); };
+    const setZoom=value=>{ viewerScale=Math.max(1,Math.min(4,value)); applyZoom(); };
+    const show=i=>{ if(!viewerItems.length)return; viewerIndex=(i+viewerItems.length)%viewerItems.length; resetZoom(); viewerImage.src=viewerItems[viewerIndex]; count.textContent=`${viewerIndex+1} / ${viewerItems.length}`; prev.hidden=next.hidden=viewerItems.length<2; };
     viewer._show=show;
     close.addEventListener('click',closeViewer);
     prev.addEventListener('click',e=>{e.stopPropagation();show(viewerIndex-1)});
     next.addEventListener('click',e=>{e.stopPropagation();show(viewerIndex+1)});
+    zoomIn.addEventListener('click',e=>{e.stopPropagation();setZoom(viewerScale+.5)});
+    zoomOut.addEventListener('click',e=>{e.stopPropagation();setZoom(viewerScale-.5)});
+    viewerImage.addEventListener('dblclick',e=>{e.stopPropagation();setZoom(viewerScale>1?1:2)});
+    stage.addEventListener('wheel',e=>{ if(!viewer.classList.contains('is-open'))return; e.preventDefault(); setZoom(viewerScale+(e.deltaY<0?.25:-.25)); },{passive:false});
     viewer.addEventListener('click',e=>{ if(e.target===viewer||e.target===stage) closeViewer(); });
     stage.addEventListener('pointerdown',e=>{ pointerStart={x:e.clientX,y:e.clientY,t:performance.now()}; });
+    stage.addEventListener('touchstart',e=>{ if(e.touches.length===2){ const [a,b]=e.touches; pinchStart=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY); } },{passive:true});
+    stage.addEventListener('touchmove',e=>{ if(e.touches.length===2&&pinchStart){ const [a,b]=e.touches; const d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY); setZoom(viewerScale*(d/pinchStart)); pinchStart=d; } },{passive:true});
+    stage.addEventListener('touchend',()=>{pinchStart=null},{passive:true});
     stage.addEventListener('pointerup',e=>{ if(!pointerStart)return; const dx=e.clientX-pointerStart.x,dy=e.clientY-pointerStart.y; if(performance.now()-pointerStart.t<700&&Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.2)show(viewerIndex+(dx<0?1:-1)); pointerStart=null; });
     document.addEventListener('keydown',e=>{ if(!viewer.classList.contains('is-open'))return; if(e.key==='ArrowLeft')show(viewerIndex-1); if(e.key==='ArrowRight')show(viewerIndex+1); });
   }
@@ -120,10 +132,47 @@
     const painting=availableWorks(window.PAINTING_WORKS); const graphic=availableWorks(window.GRAPHIC_WORKS); const works=[...painting,...graphic];
     list.innerHTML=''; works.forEach(item=>list.appendChild(row(item.work))); empty.hidden=works.length>0;
   }
-  function grantAccess(){ try{localStorage.setItem('soicAvailableWorksAccess','1')}catch(_){} gate.hidden=true; shell.hidden=false; render(); scrollTo({top:0,behavior:'auto'}); }
+  function grantAccess(){ try{sessionStorage.setItem('soicAvailableWorksAccess','1')}catch(_){} gate.hidden=true; shell.hidden=false; render(); scrollTo({top:0,behavior:'auto'}); }
   async function checkEnabled(){ try{const res=await fetch('../data/available-config.json',{cache:'no-store'});const cfg=res.ok?await res.json():{enabled:false};if(cfg?.enabled!==true){document.querySelector('.available-gate-inner').innerHTML=`<p class="available-intro">${copy.hidden}</p>`;return false}return true}catch(_){return false} }
-  let submitted=false;
-  form.addEventListener('submit',event=>{ if(!form.reportValidity()){event.preventDefault();return} submitted=true; status.textContent=copy.status; setTimeout(grantAccess,650); });
-  sink.addEventListener('load',()=>{if(submitted)grantAccess()});
-  checkEnabled().then(enabled=>{if(!enabled)return;let hasAccess=false;try{hasAccess=localStorage.getItem('soicAvailableWorksAccess')==='1'}catch(_){}if(hasAccess)grantAccess()});
+  // Soft Gate: Eine plausible E-Mail-Adresse reicht für sofortigen Zugang.
+  // Im Hintergrund geht die Eingabe weiterhin als Netlify-Formular ab;
+  // es wird KEINE Existenz des Postfachs behauptet oder überprüft.
+  const emailField=form.elements.namedItem('email');
+  const submitButton=form.querySelector('button[type="submit"]');
+  submitButton.disabled=true;
+  let gateEnabled=false;
+  function plausibleEmail(raw) {
+    const value=String(raw||'').trim();
+    if(value.length>254 || /\s/.test(value) || value.includes('..')) return false;
+    const parts=value.split('@');
+    if(parts.length!==2 || !parts[0] || parts[0].length>64) return false;
+    const domain=parts[1].split('.');
+    return domain.length>=2 && domain.every(label=>/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(label)&&label.length<=63)
+      && domain.at(-1).length>=2 && emailField.validity.typeMismatch===false;
+  }
+  emailField.addEventListener('input',()=>emailField.setCustomValidity(''));
+  form.addEventListener('submit',event=>{
+    emailField.value=emailField.value.trim();
+    emailField.setCustomValidity('');
+    if(!gateEnabled) { event.preventDefault(); return; }
+    if(!emailField.checkValidity()||!plausibleEmail(emailField.value)) {
+      event.preventDefault();
+      emailField.setCustomValidity(({de:'Bitte gib eine gültige E-Mail-Adresse ein.',fr:'Saisissez une adresse e-mail valide.',en:'Please enter a valid email address.'})[lang]||'Please enter a valid email address.');
+      emailField.reportValidity();
+      return;
+    }
+    // Standardmäßiger POST erfolgt unsichtbar im vorhandenen iframe.
+    // Die Liste öffnet ohne eine langsame Serverbestätigung. Die Sitzung
+    // speichert ausschließlich die Freischaltung, nicht die E-Mail.
+    submitButton.disabled=true;
+    setTimeout(grantAccess,120);
+  });
+  checkEnabled().then(enabled=>{
+    gateEnabled=enabled;
+    if(!enabled)return;
+    submitButton.disabled=false;
+    let hasAccess=false;
+    try{hasAccess=sessionStorage.getItem('soicAvailableWorksAccess')==='1'}catch(_){}
+    if(hasAccess)grantAccess();
+  });
 })();
