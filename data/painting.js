@@ -108,23 +108,6 @@ window.PAINTING_WORKS = [
     "navColor": "#735758"
   },
   {
-    "title": "Köpfe, 2026",
-    "medium": "acrylic, ink, paper fragments on canvas",
-    "dimensions": "65 × 50 cm",
-    "availability": "",
-    "text": "deeply informed by the aesthetics of past digital worlds, this piece brings together a view into an alternate, maybe frightening, supernatural reality.",
-    "details": [
-      "../images/painting/Koepfe/detail-left.webp",
-      "../images/painting/Koepfe/detail-right.webp"
-    ],
-    "navColor": "#315368",
-    "images": [
-      "../images/painting/Koepfe/main.webp"
-    ],
-    "shareId": "koepfe",
-    "layout": "portrait"
-  },
-  {
     "title": "Untitled (Kapelle), 2026",
     "medium": "acrylic, ink, on canvas",
     "dimensions": "61 × 46 cm",
@@ -181,5 +164,22 @@ window.PAINTING_WORKS = [
       "../images/painting/kunstdrucke/detail-20261002213434-02.webp"
     ],
     "navColor": "#796677"
+  },
+  {
+    "title": "Köpfe, 2026",
+    "medium": "acrylic, ink, paper fragments on canvas",
+    "dimensions": "65 × 50 cm",
+    "availability": "",
+    "text": "deeply informed by the aesthetics of past digital worlds, this piece brings together a view into an alternate, maybe frightening, supernatural reality.",
+    "details": [
+      "../images/painting/Koepfe/detail-left.webp",
+      "../images/painting/Koepfe/detail-right.webp"
+    ],
+    "navColor": "#315368",
+    "images": [
+      "../images/painting/Koepfe/main.webp"
+    ],
+    "shareId": "koepfe",
+    "layout": "portrait"
   }
 ];
