@@ -4,7 +4,7 @@ window.ARCHITECTURE_WORKS = [
     "title": "",
     "medium": "",
     "dimensions": "",
-    "availability": "",
+    "availability": "coming soon...",
     "text": "",
     "images": [
       "../images/architecture/untitled/main-20261001000714-01.webp"
