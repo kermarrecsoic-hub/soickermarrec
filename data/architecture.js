@@ -40,7 +40,8 @@ window.ARCHITECTURE_WORKS = [
       "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-04.webp",
       "../images/architecture/ausstellungsgestaltung-zur-19-architekturbiennale-vo/main-20260930235918-05.webp"
     ],
-    "navColor": "#787676"
+    "navColor": "#787676",
+    "visible": false
   },
   {
     "title": "The good the bad and the ulgy",
