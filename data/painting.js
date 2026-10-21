@@ -163,7 +163,8 @@ window.PAINTING_WORKS = [
       "../images/painting/kunstdrucke/detail-20261002213210-01.webp",
       "../images/painting/kunstdrucke/detail-20261002213434-02.webp"
     ],
-    "navColor": "#796677"
+    "navColor": "#796677",
+    "visible": false
   },
   {
     "title": "Köpfe, 2026",
