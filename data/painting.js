@@ -88,7 +88,11 @@ window.PAINTING_WORKS = [
       "../images/painting/prozession-diptychon/main-20261018110409-01.webp"
     ],
     "shareId": "prozession-diptychon",
-    "navColor": "#7c7577"
+    "navColor": "#7c7577",
+    "details": [
+      "../images/painting/prozession-diptychon/detail-20261021114953-01.webp",
+      "../images/painting/prozession-diptychon/detail-20261021114953-02.webp"
+    ]
   },
   {
     "title": "Köpfe, 2026",
