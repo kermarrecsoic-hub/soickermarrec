@@ -54,7 +54,8 @@ window.ARCHITECTURE_WORKS = [
       "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-03.webp",
       "../images/architecture/the-good-the-bad-and-the-ulgy/main-20261001000157-04.webp"
     ],
-    "navColor": "#3b3837"
+    "navColor": "#3b3837",
+    "visible": false
   },
   {
     "title": "",
