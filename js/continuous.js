@@ -180,100 +180,6 @@
     panel.appendChild(box);
   }
 
-  let reachoutDialog = null;
-
-  function reachoutMailUrl(work, sectionId) {
-    const label = work.title || tr('gallery.work', 'Werk');
-    const subject = `${tr('reachOut.subjectPrefix', 'Anfrage zu')} ${label}`;
-    const target = `${location.origin}${location.pathname}#${sectionId}`;
-    const body = `${tr('reachOut.mailGreeting', 'Hallo Soïc,')}\n\n${tr('reachOut.mailIntro', 'ich möchte dich zu diesem Projekt kontaktieren:')} ${label}\n${target}\n\n`;
-    return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  }
-
-  function ensureReachoutDialog() {
-    if (reachoutDialog) return reachoutDialog;
-    const overlay = el('div', 'reachout-dialog');
-    overlay.hidden = true;
-    overlay.setAttribute('aria-hidden', 'true');
-    const panel = el('div', 'reachout-dialog-panel');
-    panel.setAttribute('role', 'dialog');
-    panel.setAttribute('aria-modal', 'true');
-    panel.setAttribute('aria-labelledby', 'reachout-dialog-title');
-    const close = el('button', 'reachout-dialog-close', '×');
-    close.type = 'button';
-    close.setAttribute('aria-label', tr('reachOut.close', 'Schließen'));
-    const title = el('h2', 'reachout-dialog-title', tr('reachOut.title', 'Kontakt'));
-    title.id = 'reachout-dialog-title';
-    const context = el('p', 'reachout-dialog-context');
-    const mail = el('a', 'reachout-mail-link', tr('reachOut.emailButton', 'E-Mail öffnen'));
-
-    const notifyLabel = el('label', 'reachout-notify-toggle');
-    const notify = document.createElement('input'); notify.type = 'checkbox';
-    const notifyText = el('span', '', tr('reachOut.notify', 'Bei neuen Projekten per E-Mail benachrichtigen'));
-    notifyLabel.append(notify, notifyText);
-
-    const iframe = document.createElement('iframe');
-    iframe.name = 'projectUpdatesFrame'; iframe.hidden = true; iframe.title = '';
-    const form = el('form', 'reachout-newsletter-form');
-    form.hidden = true; form.method = 'POST'; form.action = PROJECT_UPDATES_FORM_ACTION; form.target = iframe.name;
-    const formName = document.createElement('input'); formName.type='hidden'; formName.name='form-name'; formName.value='project-updates';
-    const source = document.createElement('input'); source.type='hidden'; source.name='source'; source.value='portfolio-project-contact';
-    const project = document.createElement('input'); project.type='hidden'; project.name='project';
-    const hp = document.createElement('input'); hp.name='bot-field'; hp.tabIndex=-1; hp.autocomplete='off'; hp.className='reachout-hp';
-    const emailLabel = el('label', 'reachout-email-label');
-    emailLabel.appendChild(el('span', '', tr('reachOut.emailLabel', 'E-Mail-Adresse')));
-    const email = document.createElement('input'); email.type='email'; email.name='email'; email.required=true; email.autocomplete='email';
-    emailLabel.appendChild(email);
-    const consent = el('p', 'reachout-consent');
-    consent.append(document.createTextNode(`${tr('reachOut.consent', 'Ich möchte freiwillig per E-Mail über neue Projekte informiert werden.')} `));
-    const privacy = el('a', '', tr('reachOut.privacy', 'Datenschutz')); privacy.href='pages/datenschutz.html';
-    consent.appendChild(privacy);
-    const save = el('button', 'reachout-subscribe-button', tr('reachOut.save', 'Benachrichtigung vormerken')); save.type='submit';
-    const status = el('p', 'reachout-status'); status.setAttribute('aria-live','polite');
-    form.append(formName,source,project,hp,emailLabel,consent,save,status);
-    panel.append(close,title,context,mail,notifyLabel,form,iframe); overlay.appendChild(panel); document.body.appendChild(overlay);
-
-    let submitted=false;
-    const shut = () => {
-      overlay.hidden=true; overlay.setAttribute('aria-hidden','true'); document.documentElement.classList.remove('reachout-open');
-      notify.checked=false; form.hidden=true; status.textContent=''; email.value=''; submitted=false;
-    };
-    close.addEventListener('click', shut);
-    overlay.addEventListener('click', event => { if (event.target===overlay) shut(); });
-    document.addEventListener('keydown', event => { if(event.key==='Escape' && !overlay.hidden) shut(); });
-    notify.addEventListener('change',()=>{ form.hidden=!notify.checked; if(notify.checked) email.focus({preventScroll:true}); });
-    form.addEventListener('submit', event => {
-      email.value=email.value.trim();
-      const plausible=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value) && !email.value.includes('..');
-      email.setCustomValidity(plausible?'':tr('reachOut.emailInvalid','Bitte gib eine gültige E-Mail-Adresse ein.'));
-      if(!email.reportValidity()){ event.preventDefault(); return; }
-      // Das Formular sendet an Netlify. Der iframe-Load selbst ist KEIN
-      // zuverlässiger Beleg für eine gespeicherte Anmeldung.
-      submitted=true; status.textContent=tr('reachOut.sending','Anmeldung wird übermittelt …'); save.disabled=true;
-      setTimeout(()=>{ if(submitted){ submitted=false; status.textContent=tr('reachOut.sent','Anmeldung abgesendet.'); save.disabled=false; } },400);
-    });
-    email.addEventListener('input',()=>email.setCustomValidity(''));
-    reachoutDialog={
-      open(work,sectionId,accent){
-        context.textContent=work.title || tr('gallery.work','Werk');
-        mail.href=reachoutMailUrl(work,sectionId); project.value=work.title || tr('gallery.work','Werk');
-        panel.style.setProperty('--reachout-accent', accent || work.navColor || '#8d8d8d');
-        overlay.hidden=false; overlay.setAttribute('aria-hidden','false'); document.documentElement.classList.add('reachout-open');
-        requestAnimationFrame(()=>mail.focus({preventScroll:true}));
-      }, close:shut
-    };
-    return reachoutDialog;
-  }
-
-  function createReachOutButton(work, sectionId) {
-    const wrap = el('div', 'project-reachout-wrap');
-    const button = el('button', 'project-reachout-button', tr('reachOut.button', 'Kontaktieren'));
-    button.type='button';
-    button.style.setProperty('--reachout-accent', work.navColor || '#8d8d8d');
-    button.addEventListener('click',event=>{ event.preventDefault(); event.stopPropagation(); ensureReachoutDialog().open(work,sectionId,work.navColor); });
-    wrap.appendChild(button); return wrap;
-  }
-
   function openProject(card, pinned = false) {
     if (!card) return;
     document.querySelectorAll('.continuous-project.is-open').forEach(other => {
@@ -367,7 +273,6 @@
 
     const expanded = el('div', 'project-expanded');
     addDescription(expanded, work);
-    expanded.appendChild(createReachOutButton(work, sectionId));
 
     if (paths.details.length) {
       const details = el('div', 'project-details-grid');
@@ -460,7 +365,6 @@
 
     const info = el('div', 'series-project-description');
     descriptionBits.forEach(([tag, className, value]) => info.appendChild(el(tag, className, value)));
-    info.appendChild(createReachOutButton(work, sectionId));
     article.appendChild(info);
 
     const grid = el('div', 'series-grid');
@@ -1063,12 +967,12 @@
   }
 
   function setupAvailableWorksLink() {
-    const link = document.querySelector('[data-available-works-link]');
-    if (!link) return;
+    const links = document.querySelectorAll('[data-available-works-link]');
+    if (!links.length) return;
     fetch('data/available-config.json', { cache: 'no-store' })
       .then(response => response.ok ? response.json() : { enabled: false })
-      .then(config => link.classList.toggle('is-enabled', config?.enabled === true))
-      .catch(() => link.classList.remove('is-enabled'));
+      .then(config => links.forEach(link => link.classList.toggle('is-enabled', config?.enabled === true)))
+      .catch(() => links.forEach(link => link.classList.remove('is-enabled')));
   }
 
   renderSections();

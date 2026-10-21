@@ -16,7 +16,7 @@
 <meta content="https://soickermarrec.de/images/social-preview.jpg" property="og:image"/>
 <link href="/favicon.png" rel="icon" sizes="any" type="image/png"/>
 <link href="../css/gallery.css?v=20261008b" rel="stylesheet"/>
-<script defer="" src="../js/i18n.js?v=20261020rev2"></script>
+<script defer="" src="../js/i18n.js?v=20261021contact"></script>
 <meta content="Soïc Kermarrec" name="author"/><meta content="Soïc Kermarrec — Künstlerportfolio" property="og:image:alt"/><meta content="summary_large_image" name="twitter:card"/><meta content="Soïc Kermarrec Contact — Künstler Leipzig" name="twitter:title"/><meta content="Contact Soïc Kermarrec, artist in Leipzig, for artwork availability, projects, exhibitions and collaborations." name="twitter:description"/><meta content="https://soickermarrec.de/images/social-preview.jpg" name="twitter:image"/><script data-seo="contact-person" type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "WebPage",
@@ -87,6 +87,7 @@
 <p class="editorial-text" data-i18n="contact.intro">Alle Anfragen zur Verfügbarkeit von Werken, Projekten und Ausstellungen bitte per E-Mail.</p>
 <div class="editorial-contact">
 <a data-i18n="contact.email" href="mailto:soickermarrec@gmail.com">E-Mail</a>
+<a data-contact-available-link data-i18n="contact.availableWorks" href="available.html" style="display:none">Verfügbare Werke</a>
 <a href="https://www.instagram.com/soicyv/" rel="noopener noreferrer" target="_blank">Instagram</a>
 </div>
 </div>
@@ -98,5 +99,18 @@
 <a data-i18n="legal.privacy" href="datenschutz.html">Datenschutz</a>
 </nav>
 </footer>
+<script>
+/* Die klassische Kontakt-Unterseite respektiert denselben Studio-Schalter wie die Hauptseite. */
+(async () => {
+  const link = document.querySelector('[data-contact-available-link]');
+  if (!link) return;
+  try {
+    const response = await fetch('../data/available-config.json', {cache:'no-store'});
+    if (!response.ok) return;
+    const config = await response.json();
+    if (config?.enabled === true) link.style.display = '';
+  } catch (_) { /* Wenn die Konfiguration nicht erreichbar ist, bleibt der Link verborgen. */ }
+})();
+</script>
 </body>
 </html>
