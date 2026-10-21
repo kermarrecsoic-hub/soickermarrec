@@ -125,19 +125,6 @@ window.PAINTING_WORKS = [
     "layout": "portrait"
   },
   {
-    "title": "parigiparigiparigi2, 2026",
-    "medium": "acrylic, ink, on canvas",
-    "dimensions": "60 × 80 cm",
-    "availability": "",
-    "text": "",
-    "image": "../images/painting/parigi2/main.webp",
-    "details": {
-      "left": "../images/painting/parigi2/detail-left.webp",
-      "right": "../images/painting/parigi2/detail-right.webp"
-    },
-    "navColor": "#557488"
-  },
-  {
     "title": "Untitled (Kapelle), 2026",
     "medium": "acrylic, ink, on canvas",
     "dimensions": "61 × 46 cm",
@@ -149,6 +136,19 @@ window.PAINTING_WORKS = [
       "right": "../images/painting/kapelle/detail-right.webp"
     },
     "navColor": "#70636b"
+  },
+  {
+    "title": "parigiparigiparigi2, 2026",
+    "medium": "acrylic, ink, on canvas",
+    "dimensions": "60 × 80 cm",
+    "availability": "",
+    "text": "",
+    "image": "../images/painting/parigi2/main.webp",
+    "details": {
+      "left": "../images/painting/parigi2/detail-left.webp",
+      "right": "../images/painting/parigi2/detail-right.webp"
+    },
+    "navColor": "#557488"
   },
   {
     "title": "parigiparigiparigi, 2026",
