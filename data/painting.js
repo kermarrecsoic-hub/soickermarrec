@@ -58,12 +58,17 @@ window.PAINTING_WORKS = [
     "dimensions": "46 × 61 cm",
     "availability": "",
     "text": "",
-    "image": "../images/painting/rome/main.webp",
-    "details": {
-      "left": "../images/painting/rome/detail-left.webp",
-      "right": "../images/painting/rome/detail-right.webp"
-    },
-    "navColor": "#3c3e3e"
+    "details": [
+      "../images/painting/rome/detail-left.webp",
+      "../images/painting/rome/detail-right.webp"
+    ],
+    "navColor": "#3c3e3e",
+    "images": [
+      "../images/painting/rome/main.webp"
+    ],
+    "price": "450,00€",
+    "availableWorks": true,
+    "shareId": "rome"
   },
   {
     "title": "Untitled (etheral space), series of three",
