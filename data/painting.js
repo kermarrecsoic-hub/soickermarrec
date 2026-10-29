@@ -187,5 +187,23 @@ window.PAINTING_WORKS = [
     ],
     "shareId": "koepfe",
     "layout": "portrait"
+  },
+  {
+    "title": "Unbenannt (Duell)",
+    "medium": "Acrylic, ink and kyougi on canvas",
+    "dimensions": "100 x 60 cm",
+    "availability": "",
+    "text": "",
+    "images": [
+      "../images/painting/unbenannt-duell/main-20261029150108-01.webp"
+    ],
+    "navColor": "#966c6c",
+    "price": "700",
+    "layout": "portrait",
+    "shareId": "unbenannt-duell",
+    "details": [
+      "../images/painting/unbenannt-duell/detail-20261029150108-01.webp",
+      "../images/painting/unbenannt-duell/detail-20261029150108-02.webp"
+    ]
   }
 ];
